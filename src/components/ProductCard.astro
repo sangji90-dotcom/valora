@@ -1,0 +1,319 @@
+---
+import siteConfig from '../../site.config';
+import ProductImage from './ProductImage.astro';
+import type { Product } from '../lib/products';
+import { getCategoryLabel, getPriceView, STATUS_LABEL } from '../lib/products';
+
+interface Props {
+  product: Product;
+  /** 첫 화면에 보이는 카드는 eager 로딩으로 LCP 개선 */
+  eager?: boolean;
+  /** 프리셋을 무시하고 특정 구조를 강제할 때만 사용 (관련 제품 등) */
+  variant?: 'card' | 'overlay' | 'list';
+}
+
+const { product, eager = false, variant } = Astro.props;
+const shape = variant ?? siteConfig.layout.productCard;
+
+/**
+ * 이미지 비율은 카드 모양마다 기본값이 있고, 설정에서 덮어쓸 수 있습니다.
+ * 임의의 숫자가 아니라 정해진 값만 받는 이유는 CSP 때문입니다 —
+ * style 속성으로 비율을 넣으면 브라우저가 막고, 막힌 티도 안 납니다.
+ */
+const ratio = siteConfig.layout.imageRatio;
+
+const { data } = product;
+const statusLabel = STATUS_LABEL[data.status];
+const price = getPriceView(data);
+
+// 구조에 따라 필요한 이미지 폭이 다릅니다.
+const widths = shape === 'list' ? [240, 360, 480] : [320, 480, 640];
+const sizes =
+  shape === 'list'
+    ? '(max-width: 640px) 35vw, 200px'
+    : '(max-width: 640px) 50vw, 300px';
+---
+
+<article class="card" data-shape={shape} data-ratio={ratio}>
+  <a href={`/products/${product.id}/`} class="card__link">
+    <div class="card__media">
+      <ProductImage
+        image={data.thumbnail}
+        alt={data.title}
+        widths={widths}
+        sizes={sizes}
+        loading={eager ? 'eager' : 'lazy'}
+        class="card__img"
+      />
+      {data.badge && <span class="card__badge">{data.badge}</span>}
+      {statusLabel && <span class="card__status">{statusLabel}</span>}
+    </div>
+
+    <div class="card__body">
+      <span class="card__cat">{getCategoryLabel(data.category)}</span>
+      <h3 class="card__title">{data.title}</h3>
+      <p class="card__summary">{data.summary}</p>
+      <p class="card__price">
+        {
+          price.listText && (
+            <span class="card__list-price">
+              <span class="visually-hidden">정가</span>
+              {price.listText}
+            </span>
+          )
+        }
+        {
+          price.discount !== undefined && (
+            <span class="card__discount">{price.discount}%</span>
+          )
+        }
+        <span class="card__now">{price.text}</span>
+      </p>
+    </div>
+  </a>
+</article>
+
+<style>
+  .card {
+    background: var(--color-bg);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    transition: box-shadow var(--dur) var(--ease), transform var(--dur) var(--ease),
+      border-color var(--dur) var(--ease);
+  }
+
+  .card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
+
+  .card__media {
+    position: relative;
+    background: var(--color-bg-muted);
+    overflow: hidden;
+  }
+
+  /**
+   * :global 이 필요한 이유 —
+   * class를 자식 컴포넌트(ProductImage)에 prop으로 넘기면 Astro의 scoped 해시가
+   * 붙지 않아 일반 선택자로는 매칭되지 않습니다. 그러면 이미지가 media 박스를
+   * 채우지 않고 원본 비율대로 남아 overlay/list 구조가 깨집니다.
+   * media가 비율을 정하고 이미지는 그 안을 채우도록 절대 배치합니다.
+   */
+  .card__media :global(.card__img) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .card__status {
+    position: absolute;
+    top: var(--space-3);
+    right: var(--space-3);
+    background: var(--color-text);
+    color: var(--color-bg);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-full);
+  }
+
+  /* 판매 상태(단종 등)와 홍보 배지(BEST 등)는 성격이 달라 좌우로 나눕니다 */
+  .card__badge {
+    position: absolute;
+    top: var(--space-3);
+    left: var(--space-3);
+    background: var(--color-accent);
+    color: var(--color-accent-text);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-full);
+  }
+
+  .card__cat {
+    font-size: var(--text-xs);
+    color: var(--color-accent);
+    font-weight: 600;
+  }
+
+  .card__title {
+    font-size: var(--text-base);
+    margin: 0;
+  }
+
+  .card__summary {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .card__price {
+    margin: var(--space-2) 0 0;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .card__list-price {
+    order: 1;
+    width: 100%;
+    font-size: var(--text-xs);
+    font-weight: 400;
+    color: var(--color-text-muted);
+    text-decoration: line-through;
+  }
+
+  .card__discount {
+    order: 2;
+    color: var(--color-sale, #e2483d);
+    font-weight: 700;
+  }
+
+  .card__now {
+    order: 3;
+  }
+
+  /* ---------- card : 테두리 + 4:3 이미지 + 아래 텍스트 ---------- */
+
+  .card[data-shape='card'] {
+    border: 1px solid var(--color-border);
+  }
+
+  .card[data-shape='card'] .card__link {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .card[data-shape='card'] .card__media {
+    aspect-ratio: 4 / 3;
+  }
+
+  .card[data-shape='card'] .card__body {
+    padding: var(--space-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    flex: 1;
+  }
+
+  /* ---------- overlay : 이미지 위에 텍스트 ---------- */
+
+  .card[data-shape='overlay'] .card__link {
+    display: block;
+    position: relative;
+  }
+
+  .card[data-shape='overlay'] .card__media {
+    aspect-ratio: 3 / 4;
+  }
+
+  .card[data-shape='overlay'] .card__body {
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    padding: var(--space-6) var(--space-4) var(--space-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    /* 이미지가 밝아도 글자가 읽히도록 아래쪽에 그라데이션을 깝니다 */
+    background: linear-gradient(
+      180deg,
+      transparent 0%,
+      rgba(0, 0, 0, 0.35) 40%,
+      rgba(0, 0, 0, 0.78) 100%
+    );
+    color: #fff;
+  }
+
+  .card[data-shape='overlay'] .card__cat {
+    color: #fff;
+    opacity: 0.85;
+  }
+
+  .card[data-shape='overlay'] .card__summary {
+    color: rgba(255, 255, 255, 0.82);
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+  }
+
+  .card[data-shape='overlay'] .card__price {
+    color: #fff;
+  }
+
+  .card[data-shape='overlay'] .card__list-price {
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  /* 어두운 배경 위에서는 기본 세일 색이 잘 안 읽혀 밝은 쪽으로 보정 */
+  .card[data-shape='overlay'] .card__discount {
+    color: var(--color-sale-on-dark, #ff9a91);
+  }
+
+  /* ---------- list : 좌측 이미지 + 우측 텍스트 ---------- */
+
+  .card[data-shape='list'] {
+    border: 1px solid var(--color-border);
+  }
+
+  .card[data-shape='list'] .card__link {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: var(--space-5);
+    align-items: stretch;
+  }
+
+  .card[data-shape='list'] .card__media {
+    aspect-ratio: 1 / 1;
+  }
+
+  .card[data-shape='list'] .card__body {
+    padding: var(--space-4) var(--space-4) var(--space-4) 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    justify-content: center;
+  }
+
+  .card[data-shape='list'] .card__title {
+    font-size: var(--text-lg);
+  }
+
+  .card[data-shape='list'] .card__summary {
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+  }
+
+  /**
+   * 설정으로 지정한 비율은 카드 모양별 기본값을 덮어씁니다.
+   * 아래 모양별 규칙과 특정도가 같으므로 **뒤에 오는 이 블록이 이깁니다** —
+   * 순서를 바꾸면 조용히 무효가 되니 위치를 지키세요.
+   */
+  .card[data-ratio='4:3'] .card__media { aspect-ratio: 4 / 3; }
+  .card[data-ratio='1:1'] .card__media { aspect-ratio: 1 / 1; }
+  .card[data-ratio='3:4'] .card__media { aspect-ratio: 3 / 4; }
+  .card[data-ratio='2:3'] .card__media { aspect-ratio: 2 / 3; }
+  .card[data-ratio='16:9'] .card__media { aspect-ratio: 16 / 9; }
+
+  @media (max-width: 640px) {
+    .card[data-shape='list'] .card__link {
+      grid-template-columns: 120px 1fr;
+    }
+
+    .card[data-shape='list'] .card__title {
+      font-size: var(--text-base);
+    }
+  }
+</style>

@@ -1,0 +1,71 @@
+---
+import T from '../../../lib/terms';
+import type { GetStaticPaths } from 'astro';
+import siteConfig from '../../../../site.config';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import ProductBrowser from '../../../components/ProductBrowser.astro';
+import { getProductsByCategory } from '../../../lib/products';
+import { breadcrumbSchema } from '../../../lib/structured-data';
+
+/**
+ * 카테고리별 URL을 정적으로 생성합니다.
+ * 클라이언트 필터만 쓰면 카테고리 페이지가 검색엔진에 잡히지 않기 때문에,
+ * SEO용 실제 URL을 별도로 만들어 둡니다.
+ */
+export const getStaticPaths = (() => {
+  return siteConfig.categories.map((category) => ({
+    params: { category: category.id },
+    props: { category },
+  }));
+}) satisfies GetStaticPaths;
+
+const { category } = Astro.props;
+const products = await getProductsByCategory(category.id);
+
+const breadcrumb = breadcrumbSchema([
+  { name: T.item, path: '/products/' },
+  { name: category.label, path: `/products/category/${category.id}/` },
+]);
+---
+
+<BaseLayout
+  title={category.label}
+  description={category.description ?? T.categoryDesc(category.label)}
+>
+  <script
+    is:inline
+    slot="head"
+    type="application/ld+json"
+    set:html={JSON.stringify(breadcrumb)}
+  />
+  <section class="section">
+    <div class="container">
+      <nav class="crumb" aria-label="현재 위치">
+        <a href="/products/">{T.item}</a>
+        <span aria-hidden="true">/</span>
+        <span>{category.label}</span>
+      </nav>
+
+      <div class="section__head">
+        <h1 class="section__title">{category.label}</h1>
+        {category.description && <p class="section__desc">{category.description}</p>}
+      </div>
+
+      <ProductBrowser products={products} showFilter={false} />
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .crumb {
+    display: flex;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-4);
+  }
+
+  .crumb a:hover {
+    color: var(--color-accent);
+  }
+</style>

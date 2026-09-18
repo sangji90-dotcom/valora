@@ -1,0 +1,48 @@
+---
+import siteConfig from '../../site.config';
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  /** 검색엔진 색인 제외 (개인정보처리방침 등) */
+  noindex?: boolean;
+}
+
+const { title, description, image, noindex = false } = Astro.props;
+
+const pageTitle = title ? `${title} | ${siteConfig.company}` : `${siteConfig.company} — ${siteConfig.tagline}`;
+const pageDesc = description ?? siteConfig.description;
+const canonical = new URL(Astro.url.pathname, Astro.site ?? siteConfig.site);
+const ogImage = new URL(image ?? siteConfig.ogImage, Astro.site ?? siteConfig.site);
+---
+
+<title>{pageTitle}</title>
+<meta name="description" content={pageDesc} />
+<link rel="canonical" href={canonical} />
+{noindex && <meta name="robots" content="noindex, nofollow" />}
+
+{/* 검색엔진 사이트 소유확인 — 값이 없으면 출력하지 않습니다 */}
+{
+  siteConfig.verification.naver && (
+    <meta name="naver-site-verification" content={siteConfig.verification.naver} />
+  )
+}
+{
+  siteConfig.verification.google && (
+    <meta name="google-site-verification" content={siteConfig.verification.google} />
+  )
+}
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content={siteConfig.company} />
+<meta property="og:title" content={pageTitle} />
+<meta property="og:description" content={pageDesc} />
+<meta property="og:url" content={canonical} />
+<meta property="og:image" content={ogImage} />
+<meta property="og:locale" content="ko_KR" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={pageTitle} />
+<meta name="twitter:description" content={pageDesc} />
+<meta name="twitter:image" content={ogImage} />

@@ -1,0 +1,303 @@
+---
+import siteConfig from '../../site.config';
+import T from '../lib/terms';
+import type { Product } from '../lib/products';
+import ProductCard from './ProductCard.astro';
+import { getCategoriesWithCount } from '../lib/products';
+
+interface Props {
+  products: Product[];
+  /** 카테고리 필터 UI 노출 여부 (카테고리 전용 페이지에서는 숨김) */
+  showFilter?: boolean;
+  /** 현재 선택된 카테고리 id */
+  activeCategory?: string;
+}
+
+const { products, showFilter = true, activeCategory } = Astro.props;
+const categories = await getCategoriesWithCount();
+const initial = siteConfig.productsPerPage;
+---
+
+<div
+  class="browser"
+  data-browser
+  data-initial={initial}
+  data-active-category={activeCategory ?? 'all'}
+  data-count-all={T.countAllTemplate}
+  data-count-some={T.countTemplate}
+>
+  {
+    (showFilter || siteConfig.enableSearch) && (
+      <div class="browser__bar">
+        {showFilter && (
+          <div class="browser__filters" role="group" aria-label="카테고리 필터">
+            <button class="chip is-active" data-filter="all" type="button">
+              전체 <span class="chip__count">{products.length}</span>
+            </button>
+            {categories.map((c) => (
+              <button class="chip" data-filter={c.id} type="button">
+                {c.label} <span class="chip__count">{c.count}</span>
+              </button>
+            ))}
+          </div>
+        )}
+
+        {siteConfig.enableSearch && (
+          <div class="browser__search">
+            <label for="product-search" class="visually-hidden">
+              {T.searchLabel}
+            </label>
+            <input
+              id="product-search"
+              type="search"
+              placeholder={T.searchPlaceholder}
+              autocomplete="off"
+              data-search-input
+            />
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  {/*
+    제목 계층 보정 — 목록 페이지는 h1 다음에 바로 상품 카드(h3)가 와서
+    단계를 건너뛰게 됩니다. 스크린리더가 구조를 잘못 읽으므로
+    시각적으로 숨긴 h2를 넣어 계층을 메웁니다.
+  */}
+  <h2 class="visually-hidden">{T.itemList}</h2>
+
+  <p class="browser__count" data-count-label aria-live="polite"></p>
+
+  <div class="grid" data-shape={siteConfig.layout.productCard}>
+    {
+      products.map((product, i) => (
+        <div
+          class="grid__item"
+          data-item
+          data-category={product.data.category}
+          data-keywords={[
+            product.data.title,
+            product.data.summary,
+            ...product.data.tags,
+          ]
+            .join(' ')
+            .toLowerCase()}
+          hidden={i >= initial}
+        >
+          <ProductCard product={product} eager={i < 4} />
+        </div>
+      ))
+    }
+  </div>
+
+  <p class="browser__empty" data-empty hidden>
+    {T.empty}
+  </p>
+
+  <div class="browser__more">
+    <button class="btn btn--ghost" type="button" data-more hidden>더 보기</button>
+  </div>
+
+  <noscript>
+    <style>
+      /* JS가 꺼져 있으면 전부 노출하고 필터 UI는 숨깁니다 */
+      [data-item][hidden] { display: revert !important; }
+      .browser__bar, .browser__more { display: none !important; }
+    </style>
+  </noscript>
+</div>
+
+<script>
+  // 의존성 없는 순수 DOM 스크립트. 빌드 시 외부 JS 파일로 번들되므로
+  // CSP에서 script-src 'unsafe-inline' 없이 운영할 수 있습니다.
+  document.querySelectorAll<HTMLElement>('[data-browser]').forEach((root) => {
+    const items = Array.from(root.querySelectorAll<HTMLElement>('[data-item]'));
+    const chips = Array.from(root.querySelectorAll<HTMLElement>('[data-filter]'));
+    const input = root.querySelector<HTMLInputElement>('[data-search-input]');
+    const moreBtn = root.querySelector<HTMLElement>('[data-more]');
+    const emptyEl = root.querySelector<HTMLElement>('[data-empty]');
+    const countEl = root.querySelector<HTMLElement>('[data-count-label]');
+    const step = Number(root.dataset.initial) || 12;
+
+    let category = root.dataset.activeCategory || 'all';
+    let keyword = '';
+    let visible = step;
+
+    // 헤더 검색창·인기 검색어에서 /products/?q=... 로 넘어온 경우
+    // URL 값은 textContent/value 로만 다루므로 HTML로 해석되지 않습니다.
+    const q = (new URLSearchParams(location.search).get('q') || '').trim();
+    if (q) {
+      keyword = q.toLowerCase();
+      if (input) input.value = q;
+    }
+
+    const matches = (el: HTMLElement) => {
+      const catOk = category === 'all' || el.dataset.category === category;
+      const kwOk = !keyword || (el.dataset.keywords || '').includes(keyword);
+      return catOk && kwOk;
+    };
+
+    const render = () => {
+      const matched = items.filter(matches);
+      items.forEach((el) => (el.hidden = true));
+      matched.slice(0, visible).forEach((el) => (el.hidden = false));
+
+      if (emptyEl) emptyEl.hidden = matched.length > 0;
+      if (moreBtn) moreBtn.hidden = matched.length <= visible;
+      if (countEl) {
+        // 문구는 서버에서 data 속성으로 넘어옵니다 (고객사마다 "제품/도서/작품"이 다름)
+        const template =
+          matched.length === items.length
+            ? root.dataset.countAll || '전체 {n}개'
+            : root.dataset.countSome || '{n}개';
+        countEl.textContent = template.replace('{n}', String(matched.length));
+      }
+    };
+
+    chips.forEach((chip) => {
+      chip.addEventListener('click', () => {
+        chips.forEach((c) => c.classList.remove('is-active'));
+        chip.classList.add('is-active');
+        category = chip.dataset.filter || 'all';
+        visible = step;
+        render();
+      });
+    });
+
+    if (input) {
+      let timer: ReturnType<typeof setTimeout>;
+      input.addEventListener('input', () => {
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+          keyword = input.value.trim().toLowerCase();
+          visible = step;
+          render();
+        }, 150);
+      });
+    }
+
+    if (moreBtn) {
+      moreBtn.addEventListener('click', () => {
+        visible += step;
+        render();
+      });
+    }
+
+    render();
+  });
+</script>
+
+<style>
+  .browser__bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+    margin-bottom: var(--space-6);
+  }
+
+  .browser__filters {
+    display: flex;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+  }
+
+  .chip {
+    font: inherit;
+    font-size: var(--text-sm);
+    padding: var(--space-2) var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-full);
+    background: var(--color-bg);
+    color: var(--color-text-muted);
+    cursor: pointer;
+    transition: all var(--dur) var(--ease);
+  }
+
+  .chip:hover {
+    border-color: var(--color-accent);
+    color: var(--color-text);
+  }
+
+  .chip.is-active {
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+    color: var(--color-accent-text);
+    font-weight: 600;
+  }
+
+  .chip__count {
+    opacity: 0.65;
+    font-size: var(--text-xs);
+    margin-left: 2px;
+  }
+
+  .browser__search input {
+    font: inherit;
+    font-size: var(--text-sm);
+    padding: var(--space-2) var(--space-4);
+    min-width: 220px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-bg);
+    color: var(--color-text);
+  }
+
+  .browser__count {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-4);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: var(--space-6);
+  }
+
+  /* 가로형 카드는 여러 열로 쪼개면 읽기 어려워 1~2열로 둡니다 */
+  .grid[data-shape='list'] {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+
+  @media (min-width: 1100px) {
+    .grid[data-shape='list'] {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  .grid__item {
+    min-width: 0;
+  }
+
+  .browser__empty {
+    color: var(--color-text-muted);
+    text-align: center;
+    padding-block: var(--space-16);
+  }
+
+  .browser__more {
+    display: flex;
+    justify-content: center;
+    margin-top: var(--space-8);
+  }
+
+  @media (max-width: 640px) {
+    .grid {
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: var(--space-4);
+    }
+
+    .browser__search input {
+      min-width: 0;
+      width: 100%;
+    }
+
+    .browser__search {
+      width: 100%;
+    }
+  }
+</style>

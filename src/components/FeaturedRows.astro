@@ -1,0 +1,249 @@
+---
+import siteConfig from '../../site.config';
+import ProductImage from './ProductImage.astro';
+import type { Product } from '../lib/products';
+import { getCategoryLabel, getPriceView, STATUS_LABEL } from '../lib/products';
+
+interface Props {
+  products: Product[];
+}
+
+const { products } = Astro.props;
+
+/**
+ * 대표 제품을 한 줄에 하나씩, 이미지와 설명을 좌우로 놓습니다.
+ * 카드 그리드가 "목록"이라면 이쪽은 "소개"에 가깝습니다.
+ *
+ * 제품 수가 적고 하나하나 설명할 게 있는 브랜드
+ * (화장품·식품·가구 등)에 맞습니다.
+ * 규격품을 많이 파는 곳은 grid 가 낫습니다.
+ */
+
+/** 사양은 앞에서 3개까지만 — 홈에서 표를 다 보여줄 필요는 없습니다 */
+const SPEC_LIMIT = 3;
+
+const ratio = siteConfig.layout.imageRatio;
+---
+
+<div class="rows">
+  {
+    products.map((product, index) => {
+      const { data } = product;
+      const specs = Object.entries(data.specs).slice(0, SPEC_LIMIT);
+      const statusLabel = STATUS_LABEL[data.status];
+      const price = getPriceView(data);
+
+      return (
+        <article class="row" data-flip={index % 2 === 1 ? 'true' : 'false'}>
+          <a href={`/products/${product.id}/`} class="row__media" data-ratio={ratio} tabindex="-1" aria-hidden="true">
+            <ProductImage
+              image={data.thumbnail}
+              alt={data.title}
+              widths={[480, 760, 1040]}
+              sizes="(max-width: 880px) 100vw, 520px"
+              loading={index === 0 ? 'eager' : 'lazy'}
+              class="row__img"
+            />
+          </a>
+
+          <div class="row__body">
+            <p class="row__meta">
+              <span class="badge">{getCategoryLabel(data.category)}</span>
+              {data.badge && <span class="badge badge--promo">{data.badge}</span>}
+              {statusLabel && <span class="badge badge--status">{statusLabel}</span>}
+            </p>
+
+            <h3 class="row__title">
+              {/* 링크는 제목에 걸어 스크린리더가 한 번만 읽도록 합니다 */}
+              <a href={`/products/${product.id}/`}>{data.title}</a>
+            </h3>
+
+            <p class="row__summary">{data.summary}</p>
+
+            {specs.length > 0 && (
+              <dl class="row__specs">
+                {specs.map(([key, value]) => (
+                  <div class="row__spec">
+                    <dt>{key}</dt>
+                    <dd>{value}</dd>
+                  </div>
+                ))}
+              </dl>
+            )}
+
+            <p class="row__price">
+              {price.listText && (
+                <span class="row__list-price">
+                  <span class="visually-hidden">정가</span>
+                  {price.listText}
+                </span>
+              )}
+              <span class="row__price-now">
+                {price.discount !== undefined && (
+                  <span class="row__discount">{price.discount}%</span>
+                )}
+                {price.text}
+              </span>
+            </p>
+
+            <a href={`/products/${product.id}/`} class="btn btn--ghost row__more">
+              자세히 보기
+            </a>
+          </div>
+        </article>
+      );
+    })
+  }
+</div>
+
+<style>
+  .rows {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-16);
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-12);
+    align-items: center;
+  }
+
+  /* 짝수 번째는 이미지를 오른쪽으로 — 시선이 지그재그로 내려가게 */
+  .row[data-flip='true'] .row__media {
+    order: 2;
+  }
+
+  .row__media {
+    display: block;
+    min-width: 0;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background: var(--color-bg-muted);
+  }
+
+  /* prop 으로 넘긴 class 에는 scoped 해시가 붙지 않으므로 :global 필요 */
+  /* 설정의 layout.imageRatio 가 있으면 기본 4:3 을 덮어씁니다 */
+  .row__media[data-ratio='1:1'] :global(.row__img) { aspect-ratio: 1 / 1; }
+  .row__media[data-ratio='3:4'] :global(.row__img) { aspect-ratio: 3 / 4; }
+  .row__media[data-ratio='2:3'] :global(.row__img) { aspect-ratio: 2 / 3; }
+  .row__media[data-ratio='16:9'] :global(.row__img) { aspect-ratio: 16 / 9; }
+
+  .row__media :global(.row__img) {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    transition: transform var(--dur) var(--ease);
+  }
+
+  .row__media:hover :global(.row__img) {
+    transform: scale(1.02);
+  }
+
+  .row__body {
+    min-width: 0;
+  }
+
+  .row__meta {
+    display: flex;
+    gap: var(--space-2);
+    margin: 0 0 var(--space-3);
+  }
+
+  .badge--status {
+    background: var(--color-bg-muted);
+    color: var(--color-text-muted);
+  }
+
+  .row__title {
+    font-size: var(--text-2xl);
+    margin: 0 0 var(--space-3);
+  }
+
+  .row__title a:hover {
+    color: var(--color-accent);
+  }
+
+  .row__summary {
+    color: var(--color-text-muted);
+    font-size: var(--text-lg);
+    margin-bottom: var(--space-6);
+  }
+
+  .row__specs {
+    margin: 0 0 var(--space-6);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .row__spec {
+    display: grid;
+    grid-template-columns: 96px 1fr;
+    gap: var(--space-4);
+    padding: var(--space-3) 0;
+    border-bottom: 1px solid var(--color-border);
+    font-size: var(--text-sm);
+  }
+
+  .row__spec dt {
+    color: var(--color-text-muted);
+  }
+
+  .row__spec dd {
+    margin: 0;
+  }
+
+  .row__price {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    margin-bottom: var(--space-6);
+  }
+
+  .row__list-price {
+    display: block;
+    font-size: var(--text-sm);
+    font-weight: 400;
+    color: var(--color-text-muted);
+    text-decoration: line-through;
+  }
+
+  .row__price-now {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-2);
+  }
+
+  .row__discount {
+    color: var(--color-sale);
+  }
+
+  .badge--promo {
+    background: var(--color-accent);
+    color: var(--color-accent-text);
+  }
+
+  @media (max-width: 880px) {
+    .rows {
+      gap: var(--space-12);
+    }
+
+    .row {
+      grid-template-columns: 1fr;
+      gap: var(--space-6);
+    }
+
+    /* 모바일에서는 항상 이미지가 먼저 */
+    .row[data-flip='true'] .row__media {
+      order: 0;
+    }
+
+    .row__title {
+      font-size: var(--text-xl);
+    }
+
+    .row__summary {
+      font-size: var(--text-base);
+      margin-bottom: var(--space-4);
+    }
+  }
+</style>

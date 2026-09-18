@@ -1,0 +1,410 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { render } from 'astro:content';
+import siteConfig from '../../../site.config';
+import T from '../../lib/terms';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ProductCard from '../../components/ProductCard.astro';
+import ProductImage from '../../components/ProductImage.astro';
+import {
+  getPublishedProducts,
+  getRelatedProducts,
+  getCategoryLabel,
+  getPriceView,
+  STATUS_LABEL,
+} from '../../lib/products';
+import { breadcrumbSchema } from '../../lib/structured-data';
+
+export const getStaticPaths = (async () => {
+  const products = await getPublishedProducts();
+  return products.map((product) => ({
+    params: { id: product.id },
+    props: { product },
+  }));
+}) satisfies GetStaticPaths;
+
+const { product } = Astro.props;
+const { data } = product;
+const { Content } = await render(product);
+const related = await getRelatedProducts(product);
+const specEntries = Object.entries(data.specs);
+const statusLabel = STATUS_LABEL[data.status];
+const price = getPriceView(data);
+const ratio = siteConfig.layout.imageRatio;
+
+// 구조화 데이터 — 구글 검색결과에 제품 카드로 노출될 수 있게 함
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Product',
+  name: data.title,
+  description: data.summary,
+  category: getCategoryLabel(data.category),
+  brand: { '@type': 'Brand', name: siteConfig.company },
+};
+
+// 검색결과에 "제품 > 산업용 > 프로쉴드 900" 경로가 표시될 수 있게 함
+const breadcrumb = breadcrumbSchema([
+  { name: T.item, path: '/products/' },
+  { name: getCategoryLabel(data.category), path: `/products/category/${data.category}/` },
+  { name: data.title, path: `/products/${product.id}/` },
+]);
+---
+
+<BaseLayout title={data.title} description={data.seoDescription ?? data.summary}>
+  <script
+    is:inline
+    slot="head"
+    type="application/ld+json"
+    set:html={JSON.stringify(jsonLd)}
+  />
+  <script
+    is:inline
+    slot="head"
+    type="application/ld+json"
+    set:html={JSON.stringify(breadcrumb)}
+  />
+
+  <div class="container detail">
+    <nav class="crumb" aria-label="현재 위치">
+      <a href="/products/">{T.item}</a>
+      <span aria-hidden="true">/</span>
+      <a href={`/products/category/${data.category}/`}>
+        {getCategoryLabel(data.category)}
+      </a>
+      <span aria-hidden="true">/</span>
+      <span>{data.title}</span>
+    </nav>
+
+    <div class="detail__top">
+      <div class="detail__media" data-ratio={ratio}>
+        <ProductImage
+          image={data.thumbnail}
+          alt={data.title}
+          widths={[480, 760, 1040]}
+          sizes="(max-width: 880px) 100vw, 560px"
+          loading="eager"
+          class="detail__img"
+        />
+        {
+          data.gallery.length > 0 && (
+            <div class="detail__thumbs">
+              {data.gallery.map((img, i) => (
+                <ProductImage
+                  image={img}
+                  alt={`${data.title} 상세 이미지 ${i + 1}`}
+                  widths={[160, 320]}
+                  sizes="120px"
+                  loading="lazy"
+                  class="detail__thumb"
+                />
+              ))}
+            </div>
+          )
+        }
+      </div>
+
+      <div class="detail__info">
+        <span class="badge">{getCategoryLabel(data.category)}</span>
+        {data.badge && <span class="badge badge--promo">{data.badge}</span>}
+        {statusLabel && <span class="badge badge--status">{statusLabel}</span>}
+
+        <h1 class="detail__title">{data.title}</h1>
+        <p class="detail__summary">{data.summary}</p>
+
+        <p class="detail__price">
+          {
+            price.listText && (
+              <span class="detail__list-price">
+                <span class="visually-hidden">정가</span>
+                {price.listText}
+              </span>
+            )
+          }
+          <span class="detail__price-now">
+            {
+              price.discount !== undefined && (
+                <span class="detail__discount">{price.discount}%</span>
+              )
+            }
+            {price.text}
+          </span>
+        </p>
+
+        {
+          specEntries.length > 0 && (
+            <table class="specs">
+              <caption class="visually-hidden">{T.specCaption(data.title)}</caption>
+              <tbody>
+                {specEntries.map(([key, value]) => (
+                  <tr>
+                    <th scope="row">{key}</th>
+                    <td>{value}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )
+        }
+
+        <div class="detail__actions">
+          {/*
+            어느 제품에 대한 문의인지 문의 페이지로 넘깁니다.
+            이게 없으면 고객은 제품명을 다시 적어야 하고,
+            고객사는 어느 제품 문의인지 알 수 없습니다.
+          */}
+          <a
+            href={`/contact/?product=${encodeURIComponent(data.title)}`}
+            class="btn btn--primary"
+          >
+            {T.askThis}
+          </a>
+          <a href={`tel:${siteConfig.contact.phone.replace(/-/g, '')}`} class="btn btn--ghost">
+            {siteConfig.contact.phone}
+          </a>
+        </div>
+
+        {
+          data.externalLinks.length > 0 && (
+            <div class="buy">
+              <h2 class="buy__label">구매처</h2>
+              <ul class="buy__list">
+                {data.externalLinks.map((link) => (
+                  <li>
+                    {/*
+                      외부 사이트로 나가는 링크입니다.
+                      noopener 없이 target="_blank" 를 쓰면 열린 쪽에서
+                      window.opener 로 이 페이지를 조작할 수 있습니다.
+                      noreferrer 는 어디서 왔는지까지 넘기지 않습니다.
+                    */}
+                    <a
+                      href={link.url}
+                      class="buy__link"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {link.label}
+                      <span class="visually-hidden">(새 창에서 열림)</span>
+                      <span aria-hidden="true">↗</span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )
+        }
+      </div>
+    </div>
+
+    <div class="detail__body prose">
+      <Content />
+    </div>
+
+    {
+      related.length > 0 && (
+        <section class="section">
+          <div class="section__head">
+            <h2 class="section__title">{T.related}</h2>
+          </div>
+          <div class="related">
+            {related.map((p) => (
+              /* 관련 제품은 좁은 영역이라 프리셋과 무관하게 기본 카드로 고정합니다 */
+              <ProductCard product={p} variant="card" />
+            ))}
+          </div>
+        </section>
+      )
+    }
+  </div>
+</BaseLayout>
+
+<style>
+  .detail {
+    padding-top: var(--space-8);
+  }
+
+  .crumb {
+    display: flex;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-6);
+    flex-wrap: wrap;
+  }
+
+  .crumb a:hover {
+    color: var(--color-accent);
+  }
+
+  .detail__top {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: var(--space-12);
+    align-items: start;
+  }
+
+  /* prop으로 넘긴 class에는 scoped 해시가 붙지 않으므로 :global 필요 */
+  .detail__media :global(.detail__img) {
+    width: 100%;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+    background: var(--color-bg-muted);
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+
+
+  /* 설정의 layout.imageRatio 가 있으면 기본 4:3 을 덮어씁니다 */
+  [data-ratio='4:3'] :global(.detail__img) { aspect-ratio: 4 / 3; }
+  [data-ratio='1:1'] :global(.detail__img) { aspect-ratio: 1 / 1; }
+  [data-ratio='3:4'] :global(.detail__img) { aspect-ratio: 3 / 4; }
+  [data-ratio='2:3'] :global(.detail__img) { aspect-ratio: 2 / 3; }
+  [data-ratio='16:9'] :global(.detail__img) { aspect-ratio: 16 / 9; }
+
+  .detail__thumbs {
+    display: flex;
+    gap: var(--space-3);
+    margin-top: var(--space-3);
+    flex-wrap: wrap;
+  }
+
+  .detail__thumbs :global(.detail__thumb) {
+    width: 96px;
+    height: 72px;
+    object-fit: cover;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+  }
+
+  .detail__title {
+    font-size: var(--text-3xl);
+    margin-block: var(--space-4) var(--space-3);
+  }
+
+  .detail__summary {
+    color: var(--color-text-muted);
+    font-size: var(--text-lg);
+  }
+
+  .detail__price {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    margin-bottom: var(--space-6);
+  }
+
+  .detail__list-price {
+    display: block;
+    font-size: var(--text-sm);
+    font-weight: 400;
+    color: var(--color-text-muted);
+    text-decoration: line-through;
+  }
+
+  .detail__price-now {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-2);
+  }
+
+  .detail__discount {
+    color: var(--color-sale);
+  }
+
+  /* ---------- 외부 구매처 ---------- */
+
+  .buy {
+    margin-top: var(--space-6);
+    padding-top: var(--space-6);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .buy__label {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--color-text-muted);
+    margin: 0 0 var(--space-3);
+  }
+
+  .buy__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .buy__link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    padding: var(--space-2) var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    color: var(--color-text);
+    transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease);
+  }
+
+  .buy__link:hover {
+    border-color: var(--color-accent);
+    background: var(--color-accent-subtle);
+  }
+
+  .badge--promo {
+    background: var(--color-accent);
+    color: var(--color-accent-text);
+    margin-left: var(--space-2);
+  }
+
+  .badge--status {
+    background: var(--color-bg-muted);
+    color: var(--color-text-muted);
+    margin-left: var(--space-2);
+  }
+
+  .specs {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+    margin-bottom: var(--space-8);
+  }
+
+  .specs th,
+  .specs td {
+    border-bottom: 1px solid var(--color-border);
+    padding: var(--space-3) var(--space-2);
+    text-align: left;
+    vertical-align: top;
+  }
+
+  .specs th {
+    width: 34%;
+    color: var(--color-text-muted);
+    font-weight: 500;
+  }
+
+  .detail__actions {
+    display: flex;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+  }
+
+  .detail__body {
+    margin-top: var(--space-16);
+  }
+
+  .related {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: var(--space-6);
+  }
+
+  @media (max-width: 880px) {
+    .detail__top {
+      grid-template-columns: 1fr;
+      gap: var(--space-8);
+    }
+  }
+</style>

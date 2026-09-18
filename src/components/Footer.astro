@@ -1,0 +1,142 @@
+---
+import siteConfig from '../../site.config';
+import T from '../lib/terms';
+import { getCategoriesWithCount } from '../lib/products';
+
+const categories = await getCategoriesWithCount();
+const year = new Date().getFullYear();
+const { contact } = siteConfig;
+---
+
+<footer class="footer">
+  <div class="container footer__grid">
+    <div>
+      <p class="footer__brand">{siteConfig.company}</p>
+      <p class="footer__muted">{siteConfig.tagline}</p>
+    </div>
+
+    <nav class="footer__col" aria-label={`${T.item} 카테고리`}>
+      <p class="footer__head">{T.item}</p>
+      {
+        categories.map((c) => (
+          <a href={`/products/category/${c.id}/`} class="footer__link">
+            {c.label}
+          </a>
+        ))
+      }
+    </nav>
+
+    <div class="footer__col">
+      <p class="footer__head">연락처</p>
+      <a href={`tel:${contact.phone.replace(/-/g, '')}`} class="footer__link">{contact.phone}</a>
+      <a href={`mailto:${contact.email}`} class="footer__link">{contact.email}</a>
+      <p class="footer__muted footer__address">{contact.address}</p>
+    </div>
+  </div>
+
+  <div class="container footer__bottom">
+    <p class="footer__legal">
+      대표 {contact.ceo} · 사업자등록번호 {contact.businessNumber}
+    </p>
+    <p class="footer__legal">
+      © {year} {siteConfig.company}. All rights reserved.
+      <a href="/privacy/" class="footer__legal-link">개인정보처리방침</a>
+    </p>
+
+    {/* 국내 사이트 관행 — 이메일 주소 자동 수집을 거부한다는 표시 */}
+    <p class="footer__legal footer__notice">
+      본 사이트에 게시된 이메일 주소가 전자우편 수집 프로그램이나 그 밖의 기술적 장치를
+      이용하여 무단으로 수집되는 것을 거부하며, 이를 위반 시 정보통신망법에 의해
+      형사처벌됨을 유념하시기 바랍니다.
+    </p>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    border-top: 1px solid var(--color-border);
+    background: var(--color-bg-subtle);
+    padding-block: var(--space-12) var(--space-8);
+    margin-top: var(--space-24);
+  }
+
+  .footer__grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1.4fr;
+    gap: var(--space-8);
+  }
+
+  .footer__col {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .footer__brand {
+    font-weight: 700;
+    font-size: var(--text-lg);
+    margin-bottom: var(--space-2);
+  }
+
+  .footer__head {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    margin-bottom: var(--space-1);
+  }
+
+  .footer__link {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    transition: color var(--dur) var(--ease);
+  }
+
+  .footer__link:hover {
+    color: var(--color-accent);
+  }
+
+  .footer__muted {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    margin: 0;
+  }
+
+  .footer__address {
+    margin-top: var(--space-2);
+    line-height: 1.5;
+  }
+
+  .footer__bottom {
+    margin-top: var(--space-12);
+    padding-top: var(--space-6);
+    border-top: 1px solid var(--color-border);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .footer__legal {
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+    margin: 0;
+  }
+
+  .footer__legal-link {
+    margin-left: var(--space-3);
+    text-decoration: underline;
+  }
+
+  .footer__notice {
+    flex-basis: 100%;
+    margin-top: var(--space-3);
+    line-height: 1.6;
+    opacity: 0.75;
+  }
+
+  @media (max-width: 720px) {
+    .footer__grid {
+      grid-template-columns: 1fr;
+      gap: var(--space-6);
+    }
+  }
+</style>

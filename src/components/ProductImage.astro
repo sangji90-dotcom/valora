@@ -1,0 +1,58 @@
+---
+import { Image } from 'astro:assets';
+import type { ProductImage } from '../lib/content/image';
+import { sanityImageUrl, sanitySrcSet } from '../lib/content/image';
+
+interface Props {
+  image: ProductImage;
+  alt: string;
+  widths: number[];
+  sizes: string;
+  loading?: 'eager' | 'lazy';
+  class?: string;
+}
+
+const {
+  image,
+  alt,
+  widths,
+  sizes,
+  loading = 'lazy',
+  class: className,
+} = Astro.props;
+
+/**
+ * 로컬 이미지는 Astro가 빌드 시 WebP로 변환하고,
+ * 원격(CMS) 이미지는 Sanity CDN의 변환 파라미터를 사용합니다.
+ * 호출하는 쪽은 둘의 차이를 몰라도 됩니다.
+ */
+const maxWidth = Math.max(...widths);
+---
+
+{
+  image.kind === 'local' ? (
+    <Image
+      src={image.src}
+      alt={alt}
+      widths={widths}
+      sizes={sizes}
+      loading={loading}
+      class={className}
+    />
+  ) : (
+    <img
+      src={sanityImageUrl(image.url, { width: maxWidth })}
+      srcset={sanitySrcSet(image.url, widths)}
+      sizes={sizes}
+      width={image.width}
+      height={image.height}
+      alt={alt}
+      loading={loading}
+      decoding="async"
+      class={className}
+      style={image.lqip
+        ? `background-image:url(${image.lqip});background-size:cover;background-position:center;`
+        : undefined}
+    />
+  )
+}

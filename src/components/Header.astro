@@ -1,0 +1,312 @@
+---
+import siteConfig from '../../site.config';
+import T from '../lib/terms';
+
+const path = Astro.url.pathname;
+const isActive = (href: string) =>
+  href === '/' ? path === '/' : path.startsWith(href);
+
+const utility = siteConfig.utilityNav;
+const hasUtility = Boolean(utility?.left?.length || utility?.right?.length);
+
+/**
+ * 헤더 검색창은 /products/ 로 GET 이동합니다.
+ * 검색 자체는 목록 페이지에서 처리하므로 여기에는 로직이 없습니다.
+ */
+const showSearch = siteConfig.enableSearch;
+---
+
+<header class="header">
+  {
+    hasUtility && (
+      <div class="utility">
+        <div class="container utility__inner">
+          <nav class="utility__group" aria-label="보조 메뉴">
+            {(utility?.left ?? []).map((item) => (
+              <a href={item.href} class="utility__link">
+                {item.label}
+              </a>
+            ))}
+          </nav>
+          <nav class="utility__group" aria-label="고객 안내">
+            {(utility?.right ?? []).map((item) => (
+              <a href={item.href} class="utility__link">
+                {item.label}
+              </a>
+            ))}
+          </nav>
+        </div>
+      </div>
+    )
+  }
+
+  <div class="container header__inner">
+    <a href="/" class="header__logo" aria-label={`${siteConfig.company} 홈`}>
+      {
+        siteConfig.logo ? (
+          <img src={siteConfig.logo} alt={siteConfig.company} height="28" />
+        ) : (
+          <span>{siteConfig.company}</span>
+        )
+      }
+    </a>
+
+    <input type="checkbox" id="nav-toggle" class="header__toggle visually-hidden" />
+    <label for="nav-toggle" class="header__burger" aria-label="메뉴 열기">
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+    </label>
+
+    <nav class="header__nav" aria-label="주 메뉴">
+      {
+        siteConfig.nav.map((item) => (
+          <a
+            href={item.href}
+            class:list={['header__link', { 'is-active': isActive(item.href) }]}
+            aria-current={isActive(item.href) ? 'page' : undefined}
+          >
+            {item.label}
+          </a>
+        ))
+      }
+
+      {
+        showSearch && (
+          <form class="header__search" action="/products/" method="get" role="search">
+            <label for="header-q" class="visually-hidden">
+              {T.searchLabel}
+            </label>
+            <input
+              id="header-q"
+              name="q"
+              type="search"
+              placeholder={T.searchLabel}
+              autocomplete="off"
+            />
+            <button type="submit" aria-label="검색">
+              <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true" focusable="false">
+                <circle cx="9" cy="9" r="6" fill="none" stroke="currentColor" stroke-width="2" />
+                <line
+                  x1="13.5"
+                  y1="13.5"
+                  x2="18"
+                  y2="18"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                />
+              </svg>
+            </button>
+          </form>
+        )
+      }
+    </nav>
+  </div>
+
+  <noscript>
+    <style>
+      /* 검색 결과 필터링은 JS가 담당하므로, JS가 없으면 검색창을 숨깁니다 */
+      .header__search { display: none !important; }
+    </style>
+  </noscript>
+</header>
+
+<style>
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: color-mix(in srgb, var(--color-bg) 88%, transparent);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  /* ---------- 상단 유틸바 ---------- */
+
+  .utility {
+    background: var(--color-bg-subtle);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .utility__inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-4);
+    min-height: 34px;
+  }
+
+  .utility__group {
+    display: flex;
+    gap: var(--space-4);
+  }
+
+  .utility__link {
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+    transition: color var(--dur) var(--ease);
+  }
+
+  .utility__link:hover {
+    color: var(--color-text);
+  }
+
+  /* 좁은 화면에서는 줄을 통째로 접습니다 (주 메뉴만 남김) */
+  @media (max-width: 720px) {
+    .utility {
+      display: none;
+    }
+  }
+
+  /* ---------- 주 헤더 ---------- */
+
+  .header__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 64px;
+    gap: var(--space-4);
+  }
+
+  .header__logo {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    flex-shrink: 0;
+  }
+
+  .header__nav {
+    display: flex;
+    align-items: center;
+    gap: var(--space-6);
+  }
+
+  .header__link {
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-text-muted);
+    padding-block: var(--space-2);
+    transition: color var(--dur) var(--ease);
+    white-space: nowrap;
+  }
+
+  .header__link:hover,
+  .header__link.is-active {
+    color: var(--color-text);
+  }
+
+  .header__link.is-active {
+    font-weight: 600;
+  }
+
+  /* ---------- 헤더 검색 ---------- */
+
+  .header__search {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding-inline: var(--space-3);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-full);
+    background: var(--color-bg);
+  }
+
+  .header__search:focus-within {
+    border-color: var(--color-accent);
+  }
+
+  .header__search input {
+    font: inherit;
+    font-size: var(--text-sm);
+    width: 140px;
+    padding-block: var(--space-2);
+    border: 0;
+    background: transparent;
+    color: var(--color-text);
+  }
+
+  .header__search input:focus {
+    outline: none;
+  }
+
+  .header__search button {
+    display: flex;
+    align-items: center;
+    padding: var(--space-1);
+    border: 0;
+    background: transparent;
+    color: var(--color-text-muted);
+    cursor: pointer;
+  }
+
+  .header__search button:hover {
+    color: var(--color-text);
+  }
+
+  /* ---------- 모바일 ---------- */
+
+  .header__burger {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    width: 40px;
+    height: 40px;
+    padding: var(--space-2);
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+  }
+
+  .header__burger span {
+    display: block;
+    height: 2px;
+    background: var(--color-text);
+    border-radius: 2px;
+  }
+
+  /* JS 없이 CSS만으로 모바일 메뉴 동작 (정적 사이트 원칙 유지) */
+  @media (max-width: 720px) {
+    .header__burger {
+      display: flex;
+    }
+
+    .header__nav {
+      position: absolute;
+      inset-inline: 0;
+      top: 100%;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0;
+      background: var(--color-bg);
+      border-bottom: 1px solid var(--color-border);
+      padding: var(--space-2) var(--container-pad) var(--space-4);
+      display: none;
+    }
+
+    .header__toggle:checked ~ .header__nav {
+      display: flex;
+    }
+
+    .header__link {
+      padding-block: var(--space-3);
+      font-size: var(--text-base);
+    }
+
+    .header__search {
+      margin-top: var(--space-3);
+    }
+
+    .header__search input {
+      width: 100%;
+    }
+  }
+
+  @media print {
+    .utility,
+    .header__search,
+    .header__burger {
+      display: none;
+    }
+  }
+</style>

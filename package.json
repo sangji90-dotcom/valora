@@ -1,0 +1,33 @@
+{
+  "name": "valora",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "engines": {
+    "node": ">=22.19.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "test:sanity": "node scripts/test-sanity-integration.mjs",
+    "test:import": "node scripts/test-import.mjs",
+    "test:tokens": "node scripts/test-tokens.mjs",
+    "import": "node scripts/import-products.mjs",
+    "make-template": "node scripts/make-product-template.mjs",
+    "gen:og": "node scripts/gen-og.mjs"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.7.4",
+    "astro": "^7.3.2",
+    "sharp": "^0.35.4"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "exceljs": "^4.4.0",
+    "iconv-lite": "^0.7.3",
+    "playwright": "^1.63.0",
+    "typescript": "^6.0.3"
+  }
+}

@@ -1,0 +1,59 @@
+---
+import siteConfig from '../../site.config';
+
+/**
+ * 데모 사이트 고지.
+ * 가상의 회사임을 명시해 실존 업체로 오인되는 것을 막습니다.
+ * 납품 시에는 site.config.ts 의 demoBanner.enabled 를 false 로 둡니다.
+ */
+const { enabled, text } = siteConfig.demoBanner;
+const message =
+  text ?? '이 사이트는 템플릿 시연용 데모입니다. 등장하는 회사와 제품은 실재하지 않습니다.';
+---
+
+{
+  enabled && (
+    <div class="demo" role="note">
+      <div class="container demo__inner">
+        <span class="demo__tag">DEMO</span>
+        <p class="demo__text">{message}</p>
+      </div>
+    </div>
+  )
+}
+
+<style>
+  .demo {
+    background: var(--color-text);
+    color: var(--color-bg);
+  }
+
+  .demo__inner {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding-block: var(--space-2);
+  }
+
+  .demo__tag {
+    flex-shrink: 0;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    padding: 2px var(--space-2);
+    border: 1px solid currentColor;
+    border-radius: var(--radius-sm);
+  }
+
+  .demo__text {
+    margin: 0;
+    font-size: var(--text-xs);
+    line-height: 1.5;
+  }
+
+  @media print {
+    .demo {
+      display: none;
+    }
+  }
+</style>

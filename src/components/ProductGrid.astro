@@ -1,0 +1,87 @@
+---
+import T from '../lib/terms';
+import siteConfig from '../../site.config';
+import type { Product } from '../lib/products';
+import ProductCard from './ProductCard.astro';
+
+interface Props {
+  products: Product[];
+  /** 검색 기능에서 DOM 필터링 대상으로 쓰기 위한 데이터 속성 부여 */
+  searchable?: boolean;
+  emptyMessage?: string;
+}
+
+const {
+  products,
+  searchable = false,
+  emptyMessage = T.emptyShort,
+} = Astro.props;
+---
+
+{
+  products.length === 0 ? (
+    <p class="grid__empty">{emptyMessage}</p>
+  ) : (
+    <div class="grid" data-product-grid data-shape={siteConfig.layout.productCard}>
+      {products.map((product, i) => (
+        <div
+          class="grid__item"
+          data-product-item
+          data-search={
+            searchable
+              ? [
+                  product.data.title,
+                  product.data.summary,
+                  ...product.data.tags,
+                ]
+                  .join(' ')
+                  .toLowerCase()
+              : undefined
+          }
+        >
+          <ProductCard product={product} eager={i < 4} />
+        </div>
+      ))}
+    </div>
+  )
+}
+
+<style>
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: var(--space-6);
+  }
+
+  .grid[data-shape='list'] {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+
+  @media (min-width: 1100px) {
+    .grid[data-shape='list'] {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  .grid__item {
+    display: contents;
+  }
+
+  .grid__item[hidden] {
+    display: none;
+  }
+
+  .grid__empty {
+    color: var(--color-text-muted);
+    padding: var(--space-12) 0;
+    text-align: center;
+  }
+
+  @media (max-width: 640px) {
+    .grid {
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: var(--space-4);
+    }
+  }
+</style>

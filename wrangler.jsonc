@@ -1,0 +1,27 @@
+{
+  // ============================================================
+  //  Cloudflare Workers 정적 자산 배포 설정
+  // ============================================================
+  //  Cloudflare가 Pages와 Workers를 통합하면서, 신규 프로젝트는
+  //  Workers 쪽으로 안내됩니다. 이 파일이 있으면 대시보드에서
+  //  출력 디렉토리를 따로 설정하지 않아도 배포됩니다.
+  //
+  //  Pages로 배포할 경우 이 파일은 무시되므로 그대로 두어도 됩니다.
+  //
+  //  name 은 Cloudflare 프로젝트명과 같아야 합니다.
+  // ============================================================
+  "name": "valora",
+  "compatibility_date": "2026-09-18",
+
+  // Cloudflare 대시보드의 "Build command" 가 비어 있으면
+  // npm install 직후 바로 wrangler deploy 로 넘어가 dist 가 없어 실패합니다.
+  //   ✘ The directory specified by the "assets.directory" field ... does not exist
+  // 여기에 빌드 단계를 두면 wrangler 가 배포 전에 직접 실행해 줍니다.
+  // (대시보드에 Build command 를 넣었다면 빌드가 두 번 돌므로 이 블록을 지워도 됩니다)
+  "build": {
+    "command": "npm run build"
+  },
+  "assets": {
+    "directory": "./dist"
+  }
+}

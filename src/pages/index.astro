@@ -1,0 +1,201 @@
+---
+import siteConfig from '../../site.config';
+import T from '../lib/terms';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/Hero.astro';
+import ProductGrid from '../components/ProductGrid.astro';
+import FeaturedRows from '../components/FeaturedRows.astro';
+import PromoBanner from '../components/PromoBanner.astro';
+import { getFeaturedProducts, getCategoriesWithCount } from '../lib/products';
+import { organizationSchema } from '../lib/structured-data';
+
+const featured = await getFeaturedProducts();
+const categories = await getCategoriesWithCount();
+
+/**
+ * 홈은 섹션 배열로 조립됩니다 (site.config.ts 의 layout.homeSections).
+ * 순서를 바꾸거나 빼는 것만으로 고객사별 인상이 크게 달라집니다.
+ */
+const sections = siteConfig.layout.homeSections;
+const { brandMessage } = siteConfig;
+---
+
+<BaseLayout>
+  <script
+    is:inline
+    slot="head"
+    type="application/ld+json"
+    set:html={JSON.stringify(organizationSchema())}
+  />
+
+  <Hero />
+
+  {
+    sections.map((section) => {
+      if (section === 'message' && brandMessage) {
+        return (
+          <section class="section section--subtle">
+            <div class="container message">
+              <h2 class="message__title">{brandMessage.title}</h2>
+              <p class="message__body">{brandMessage.body}</p>
+            </div>
+          </section>
+        );
+      }
+
+      if (section === 'featured' && featured.length > 0) {
+        return (
+          <section class="section">
+            <div class="container">
+              <div class="section__head">
+                <h2 class="section__title">{T.featuredTitle}</h2>
+                <p class="section__desc">{T.featuredDesc}</p>
+              </div>
+
+              {siteConfig.layout.featured === 'rows' ? (
+                <FeaturedRows products={featured} />
+              ) : (
+                <ProductGrid products={featured} />
+              )}
+
+              <div class="more">
+                <a href="/products/" class="btn btn--ghost">
+                  {T.viewAll}
+                </a>
+              </div>
+            </div>
+          </section>
+        );
+      }
+
+      if (section === 'categories' && categories.length > 0) {
+        return (
+          <section class="section section--subtle">
+            <div class="container">
+              <div class="section__head">
+                <h2 class="section__title">카테고리</h2>
+                <p class="section__desc">{T.categoriesDesc}</p>
+              </div>
+              <div class="cats">
+                {categories.map((c) => (
+                  <a href={`/products/category/${c.id}/`} class="cat">
+                    <span class="cat__label">{c.label}</span>
+                    <span class="cat__count">{T.countOf(c.count)}</span>
+                    {c.description && <span class="cat__desc">{c.description}</span>}
+                  </a>
+                ))}
+              </div>
+            </div>
+          </section>
+        );
+      }
+
+      if (section === 'promo' && siteConfig.promo) {
+        return <PromoBanner />;
+      }
+
+      if (section === 'cta') {
+        return (
+          <section class="section">
+            <div class="container cta">
+              <h2 class="cta__title">{T.ctaTitle}</h2>
+              <p class="cta__desc">{T.ctaDesc}</p>
+              <a href="/contact/" class="btn btn--primary">
+                문의하기
+              </a>
+            </div>
+          </section>
+        );
+      }
+
+      return null;
+    })
+  }
+</BaseLayout>
+
+<style>
+  .more {
+    display: flex;
+    justify-content: center;
+    margin-top: var(--space-8);
+  }
+
+  /* ---------- 브랜드 한마디 ---------- */
+
+  .message {
+    max-width: 720px;
+    text-align: center;
+  }
+
+  .message__title {
+    font-size: var(--text-2xl);
+    margin-bottom: var(--space-4);
+  }
+
+  .message__body {
+    color: var(--color-text-muted);
+    font-size: var(--text-lg);
+    line-height: 1.8;
+    margin: 0;
+    white-space: pre-line;
+  }
+
+  /* ---------- 카테고리 ---------- */
+
+  .cats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: var(--space-4);
+  }
+
+  .cat {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    padding: var(--space-6);
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    transition: border-color var(--dur) var(--ease), transform var(--dur) var(--ease);
+  }
+
+  .cat:hover {
+    border-color: var(--color-accent);
+    transform: translateY(-2px);
+  }
+
+  .cat__label {
+    font-size: var(--text-lg);
+    font-weight: 700;
+  }
+
+  .cat__count {
+    font-size: var(--text-xs);
+    color: var(--color-accent);
+    font-weight: 600;
+  }
+
+  .cat__desc {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    margin-top: var(--space-2);
+  }
+
+  /* ---------- 문의 유도 ---------- */
+
+  .cta {
+    text-align: center;
+    padding: var(--space-16) var(--space-6);
+    background: var(--color-bg-muted);
+    border-radius: var(--radius-lg);
+  }
+
+  .cta__title {
+    font-size: var(--text-2xl);
+  }
+
+  .cta__desc {
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-6);
+  }
+</style>

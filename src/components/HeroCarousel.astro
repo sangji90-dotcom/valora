@@ -1,0 +1,354 @@
+---
+import { Image } from 'astro:assets';
+import { getCollection } from 'astro:content';
+
+/**
+ * 풀블리드 슬라이드 배너.
+ * 국내 쇼핑몰 상단에서 흔히 보는 형태입니다.
+ *
+ * 자동 넘김을 쓰되, 이런 경우에는 멈춥니다.
+ *  - 사용자가 배너 위에 마우스를 올렸을 때
+ *  - 키보드 포커스가 배너 안에 있을 때
+ *  - 시스템에서 "동작 줄이기"를 켠 경우 (자동 넘김 자체를 끔)
+ *
+ * 움직이는 배너는 읽는 도중 바뀌면 방해가 되므로 통제권을 넘겨줍니다.
+ */
+
+const all = await getCollection('slides', ({ data }) => !data.draft);
+const slides = all.sort((a, b) => a.data.order - b.data.order);
+
+/** 자동 넘김 간격(ms). 0이면 자동 넘김 없음 */
+const INTERVAL = 6000;
+---
+
+{
+  slides.length > 0 && (
+    <section
+      class="carousel"
+      data-carousel
+      data-interval={INTERVAL}
+      aria-roledescription="캐러셀"
+      aria-label="주요 소식"
+    >
+      <div class="carousel__track" data-track>
+        {slides.map((slide, index) => {
+          const d = slide.data;
+          return (
+            <article
+              class="slide"
+              data-slide
+              data-align={d.align}
+              data-tone={d.textColor}
+              data-overlay={d.overlay}
+              hidden={index !== 0}
+              aria-roledescription="슬라이드"
+              aria-label={`${index + 1} / ${slides.length}`}
+            >
+              <Image
+                src={d.image}
+                alt=""
+                widths={[760, 1200, 1920]}
+                sizes="100vw"
+                loading={index === 0 ? 'eager' : 'lazy'}
+                class="slide__img"
+              />
+
+              {d.overlay !== 'none' && <div class="slide__scrim" aria-hidden="true" />}
+
+              <div class="container slide__inner">
+                <div class="slide__body">
+                  {d.eyebrow && <p class="slide__eyebrow">{d.eyebrow}</p>}
+                  <h2 class="slide__title">{d.title}</h2>
+                  {d.subtitle && <p class="slide__subtitle">{d.subtitle}</p>}
+                  {d.cta && (
+                    <a href={d.href} class="btn btn--primary slide__cta">
+                      {d.cta}
+                    </a>
+                  )}
+                </div>
+              </div>
+            </article>
+          );
+        })}
+      </div>
+
+      {slides.length > 1 && (
+        <>
+          <button class="carousel__arrow carousel__arrow--prev" data-prev type="button">
+            <span class="visually-hidden">이전 슬라이드</span>
+            <span aria-hidden="true">‹</span>
+          </button>
+          <button class="carousel__arrow carousel__arrow--next" data-next type="button">
+            <span class="visually-hidden">다음 슬라이드</span>
+            <span aria-hidden="true">›</span>
+          </button>
+
+          <div class="carousel__dots" role="tablist" aria-label="슬라이드 선택">
+            {slides.map((_, index) => (
+              <button
+                class="carousel__dot"
+                data-dot
+                type="button"
+                role="tab"
+                aria-selected={index === 0 ? 'true' : 'false'}
+              >
+                <span class="visually-hidden">{index + 1}번 슬라이드</span>
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+
+      <noscript>
+        <style>
+          /* JS가 없으면 첫 슬라이드만 그대로 보여줍니다 */
+          [data-slide][hidden] { display: none !important; }
+          .carousel__arrow, .carousel__dots { display: none !important; }
+        </style>
+      </noscript>
+    </section>
+  )
+}
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-carousel]').forEach((root) => {
+    const slides = Array.from(root.querySelectorAll<HTMLElement>('[data-slide]'));
+    const dots = Array.from(root.querySelectorAll<HTMLElement>('[data-dot]'));
+    if (slides.length < 2) return;
+
+    const interval = Number(root.dataset.interval) || 0;
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    let current = 0;
+    let timer: ReturnType<typeof setInterval> | null = null;
+
+    const show = (next: number) => {
+      current = (next + slides.length) % slides.length;
+      slides.forEach((el, i) => (el.hidden = i !== current));
+      dots.forEach((el, i) => el.setAttribute('aria-selected', i === current ? 'true' : 'false'));
+    };
+
+    const stop = () => {
+      if (timer) clearInterval(timer);
+      timer = null;
+    };
+
+    const start = () => {
+      if (!interval || reduceMotion) return;
+      stop();
+      timer = setInterval(() => show(current + 1), interval);
+    };
+
+    root.querySelector('[data-prev]')?.addEventListener('click', () => {
+      show(current - 1);
+      start();
+    });
+    root.querySelector('[data-next]')?.addEventListener('click', () => {
+      show(current + 1);
+      start();
+    });
+    dots.forEach((dot, i) =>
+      dot.addEventListener('click', () => {
+        show(i);
+        start();
+      })
+    );
+
+    // 읽는 동안 바뀌지 않도록
+    root.addEventListener('mouseenter', stop);
+    root.addEventListener('mouseleave', start);
+    root.addEventListener('focusin', stop);
+    root.addEventListener('focusout', start);
+
+    // 다른 탭을 보고 있을 때 돌릴 이유가 없습니다
+    document.addEventListener('visibilitychange', () =>
+      document.hidden ? stop() : start()
+    );
+
+    // 좌우 방향키
+    root.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') show(current - 1);
+      if (e.key === 'ArrowRight') show(current + 1);
+    });
+
+    start();
+  });
+</script>
+
+<style>
+  .carousel {
+    position: relative;
+    background: var(--color-bg-muted);
+  }
+
+  .slide {
+    position: relative;
+    min-height: 420px;
+  }
+
+  .slide :global(.slide__img) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .slide__scrim {
+    position: absolute;
+    inset: 0;
+  }
+
+  .slide[data-overlay='light'] .slide__scrim {
+    background: rgba(0, 0, 0, 0.18);
+  }
+  .slide[data-overlay='medium'] .slide__scrim {
+    background: rgba(0, 0, 0, 0.34);
+  }
+  .slide[data-overlay='strong'] .slide__scrim {
+    background: rgba(0, 0, 0, 0.5);
+  }
+
+  .slide__inner {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-height: 420px;
+    padding-block: var(--space-12);
+  }
+
+  .slide[data-align='left'] .slide__inner {
+    justify-content: flex-start;
+  }
+  .slide[data-align='center'] .slide__inner {
+    justify-content: center;
+    text-align: center;
+  }
+  .slide[data-align='right'] .slide__inner {
+    justify-content: flex-end;
+  }
+
+  .slide__body {
+    max-width: 560px;
+  }
+
+  /* 사진 밝기에 따라 글자색을 뒤집습니다 */
+  .slide[data-tone='dark'] .slide__body {
+    color: var(--gray-900);
+  }
+  .slide[data-tone='light'] .slide__body {
+    color: #fff;
+  }
+
+  .slide__eyebrow {
+    font-size: var(--text-sm);
+    letter-spacing: 0.04em;
+    opacity: 0.8;
+    margin-bottom: var(--space-3);
+    padding-bottom: var(--space-3);
+    border-bottom: 1px solid currentColor;
+    display: inline-block;
+  }
+
+  .slide__title {
+    font-size: clamp(1.75rem, 4vw, 3rem);
+    line-height: 1.25;
+    margin: 0 0 var(--space-4);
+    white-space: pre-line;
+    color: inherit;
+  }
+
+  .slide__subtitle {
+    font-size: var(--text-lg);
+    opacity: 0.85;
+    margin-bottom: var(--space-6);
+  }
+
+  .slide__cta {
+    margin-top: var(--space-2);
+  }
+
+  /* ---------- 조작 ---------- */
+
+  .carousel__arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    line-height: 1;
+    border: 0;
+    border-radius: var(--radius-full);
+    background: color-mix(in srgb, var(--color-bg) 70%, transparent);
+    color: var(--color-text);
+    cursor: pointer;
+    transition: background var(--dur) var(--ease);
+  }
+
+  .carousel__arrow:hover {
+    background: var(--color-bg);
+  }
+
+  .carousel__arrow--prev {
+    left: var(--space-4);
+  }
+  .carousel__arrow--next {
+    right: var(--space-4);
+  }
+
+  .carousel__dots {
+    position: absolute;
+    bottom: var(--space-6);
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: var(--space-2);
+  }
+
+  .carousel__dot {
+    width: 10px;
+    height: 10px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-full);
+    background: color-mix(in srgb, var(--color-text) 30%, transparent);
+    cursor: pointer;
+    transition: background var(--dur) var(--ease);
+  }
+
+  .carousel__dot[aria-selected='true'] {
+    background: var(--color-text);
+  }
+
+  @media (max-width: 720px) {
+    .slide,
+    .slide__inner {
+      min-height: 340px;
+    }
+
+    .slide__body {
+      max-width: none;
+    }
+
+    /* 좁은 화면에서는 문구를 항상 왼쪽으로 */
+    .slide[data-align='right'] .slide__inner,
+    .slide[data-align='center'] .slide__inner {
+      justify-content: flex-start;
+      text-align: left;
+    }
+
+    .carousel__arrow {
+      display: none;
+    }
+  }
+
+  @media print {
+    .carousel {
+      display: none;
+    }
+  }
+</style>

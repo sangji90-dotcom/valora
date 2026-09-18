@@ -1,0 +1,19 @@
+# Cloudflare Pages 보안 헤더.
+#
+# CSP 본문은 여기 있지 않습니다.
+# astro.config.ts 의 security.csp 가 빌드 시 해시를 계산해
+# 각 페이지에 meta 태그로 삽입합니다. CSP를 수정하려면 그쪽을 고치세요.
+#
+# frame-ancestors 는 meta 태그로는 동작하지 않기 때문에
+# X-Frame-Options 로 여기서 처리합니다.
+
+/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: geolocation=(), microphone=(), camera=(), interest-cohort=()
+  Cross-Origin-Opener-Policy: same-origin
+
+# 해시가 붙은 빌드 산출물은 영구 캐시
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable

@@ -1,0 +1,302 @@
+---
+import siteConfig from '../../site.config';
+import T from '../lib/terms';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const { contact, inquiry } = siteConfig;
+---
+
+<BaseLayout
+  title="문의"
+  description={`${siteConfig.company}에 ${T.item}·견적을 문의하실 수 있습니다.`}
+>
+  <section class="section">
+    <div class="container">
+      <div class="section__head">
+        <h1 class="section__title">문의</h1>
+        <p class="section__desc">
+          {`${T.item}, 견적, 납기 관련 문의를 남겨주시면 영업일 기준 1~2일 내에 답변드립니다.`}
+        </p>
+      </div>
+
+      {/*
+        제품 상세에서 넘어온 경우 어느 제품인지 보여줍니다.
+        정적 사이트라 서버에서 쿼리를 읽을 수 없으므로 클라이언트에서 처리합니다.
+      */}
+      <p
+        class="contact__subject"
+        data-inquiry-subject
+        data-template={T.inquiryOf('{name}')}
+        hidden
+      ></p>
+
+      <div class="contact">
+        <div class="contact__info">
+          <dl class="info">
+            <dt>전화</dt>
+            <dd><a href={`tel:${contact.phone.replace(/-/g, '')}`}>{contact.phone}</a></dd>
+
+            <dt>이메일</dt>
+            <dd><a href={`mailto:${contact.email}`}>{contact.email}</a></dd>
+
+            <dt>주소</dt>
+            <dd>{contact.address}</dd>
+          </dl>
+
+          <p class="contact__note">
+            문의 시 수집되는 개인정보의 이용 목적과 보관 기간은
+            <a href="/privacy/">개인정보처리방침</a>에서 확인하실 수 있습니다.
+          </p>
+        </div>
+
+        <div class="contact__form">
+          {
+            inquiry.mode === 'external' && (
+              <iframe
+                src={inquiry.embedUrl}
+                title="문의 양식"
+                loading="lazy"
+                class="contact__iframe"
+                data-inquiry-frame
+                data-base-url={inquiry.embedUrl}
+                data-prefill-entry={inquiry.prefillEntry ?? ''}
+              >
+                양식을 불러오는 중입니다…
+              </iframe>
+            )
+          }
+
+          {
+            inquiry.mode === 'endpoint' && (
+              <form method="POST" action={inquiry.endpoint} class="form">
+                {/* 제품 상세에서 넘어온 제품명을 함께 전송합니다 */}
+                <input type="hidden" name="product" data-inquiry-product />
+
+                <div class="form__row">
+                  <label for="name">이름 / 회사명 *</label>
+                  <input
+                    id="name"
+                    name="name"
+                    type="text"
+                    required
+                    maxlength="60"
+                    autocomplete="name"
+                  />
+                </div>
+
+                <div class="form__row">
+                  <label for="email">회신받을 이메일 *</label>
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    required
+                    maxlength="120"
+                    autocomplete="email"
+                  />
+                </div>
+
+                <div class="form__row">
+                  <label for="phone">연락처</label>
+                  <input id="phone" name="phone" type="tel" maxlength="30" autocomplete="tel" />
+                </div>
+
+                <div class="form__row">
+                  <label for="message">문의 내용 *</label>
+                  <textarea id="message" name="message" rows="6" required maxlength="2000" />
+                </div>
+
+                {inquiry.turnstileSiteKey && (
+                  <>
+                    <div class="cf-turnstile" data-sitekey={inquiry.turnstileSiteKey} />
+                    <script
+                      is:inline
+                      src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+                      async
+                      defer
+                    />
+                  </>
+                )}
+
+                <label class="form__consent">
+                  <input type="checkbox" name="consent" required />
+                  <span>
+                    개인정보 수집·이용에 동의합니다.
+                    (<a href="/privacy/">내용 보기</a>)
+                  </span>
+                </label>
+
+                <button type="submit" class="btn btn--primary">문의 보내기</button>
+              </form>
+            )
+          }
+
+          {
+            inquiry.mode === 'none' && (
+              <div class="contact__fallback">
+                <p>전화 또는 이메일로 문의해 주세요.</p>
+                <a href={`mailto:${contact.email}`} class="btn btn--primary">
+                  이메일 보내기
+                </a>
+              </div>
+            )
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  /**
+   * 제품 상세 → 문의로 넘어올 때 ?product=제품명 이 붙습니다.
+   * 정적 사이트라 서버가 없으므로 여기서 읽어
+   *  1) 어느 제품 문의인지 화면에 표시하고
+   *  2) 폼에 미리 채웁니다.
+   */
+  const params = new URLSearchParams(location.search);
+  const product = (params.get('product') ?? '').trim().slice(0, 100);
+
+  if (product) {
+    const label = document.querySelector<HTMLElement>('[data-inquiry-subject]');
+    if (label) {
+      // textContent 로 넣어 URL에 섞인 마크업이 실행되지 않게 합니다
+      // 라벨 문구는 서버에서 data 속성으로 넘어옵니다 (제품/도서/작품)
+      const tpl = label.dataset.template || '문의 {name}';
+      label.textContent = tpl.replace('{name}', product);
+      label.hidden = false;
+    }
+
+    const hidden = document.querySelector<HTMLInputElement>('[data-inquiry-product]');
+    if (hidden) hidden.value = product;
+
+    // Google Forms 등 외부 폼은 prefill 파라미터로 값을 미리 채울 수 있습니다
+    const frame = document.querySelector<HTMLIFrameElement>('[data-inquiry-frame]');
+    const entry = frame?.dataset.prefillEntry;
+    const baseUrl = frame?.dataset.baseUrl;
+    if (frame && entry && baseUrl) {
+      try {
+        const url = new URL(baseUrl);
+        url.searchParams.set(entry, product);
+        frame.src = url.toString();
+      } catch {
+        // 주소가 잘못돼 있으면 원래 폼을 그대로 둡니다
+      }
+    }
+  }
+</script>
+
+<style>
+  .contact__subject {
+    display: inline-block;
+    margin-bottom: var(--space-6);
+    padding: var(--space-3) var(--space-4);
+    background: var(--color-accent-subtle);
+    color: var(--color-accent);
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    font-weight: 600;
+  }
+
+  .contact {
+    display: grid;
+    grid-template-columns: 1fr 1.4fr;
+    gap: var(--space-12);
+    align-items: start;
+  }
+
+  .info {
+    display: grid;
+    grid-template-columns: 72px 1fr;
+    gap: var(--space-3) var(--space-4);
+    margin: 0 0 var(--space-8);
+    font-size: var(--text-sm);
+  }
+
+  .info dt {
+    color: var(--color-text-muted);
+  }
+
+  .info dd {
+    margin: 0;
+  }
+
+  .info a:hover {
+    color: var(--color-accent);
+  }
+
+  .contact__note {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    padding: var(--space-4);
+    background: var(--color-bg-muted);
+    border-radius: var(--radius-md);
+  }
+
+  .contact__note a {
+    text-decoration: underline;
+  }
+
+  .contact__iframe {
+    width: 100%;
+    min-height: 900px;
+    border: 0;
+  }
+
+  .form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .form__row {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .form__row label {
+    font-size: var(--text-sm);
+    font-weight: 600;
+  }
+
+  .form input[type='text'],
+  .form input[type='email'],
+  .form input[type='tel'],
+  .form textarea {
+    font: inherit;
+    font-size: var(--text-sm);
+    padding: var(--space-3);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-bg);
+    color: var(--color-text);
+    resize: vertical;
+  }
+
+  .form__consent {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+
+  .form__consent a {
+    text-decoration: underline;
+  }
+
+  .contact__fallback {
+    padding: var(--space-12);
+    background: var(--color-bg-muted);
+    border-radius: var(--radius-lg);
+    text-align: center;
+  }
+
+  @media (max-width: 880px) {
+    .contact {
+      grid-template-columns: 1fr;
+      gap: var(--space-8);
+    }
+  }
+</style>

@@ -1,0 +1,32 @@
+---
+import { getEntry, render } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const entry = await getEntry('pages', 'about');
+if (!entry) {
+  throw new Error(
+    'src/content/pages/about.md 가 없습니다. 회사소개 페이지 본문 파일을 만들어주세요.'
+  );
+}
+const { Content } = await render(entry);
+---
+
+<BaseLayout title={entry.data.title} description={entry.data.description}>
+  <section class="section">
+    <div class="container">
+      {
+        entry.data.showHero && (
+          <div class="section__head">
+            <h1 class="section__title">{entry.data.title}</h1>
+            {entry.data.description && (
+              <p class="section__desc">{entry.data.description}</p>
+            )}
+          </div>
+        )
+      }
+      <div class="prose">
+        <Content />
+      </div>
+    </div>
+  </section>
+</BaseLayout>
