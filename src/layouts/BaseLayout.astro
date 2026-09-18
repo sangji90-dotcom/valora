@@ -15,6 +15,9 @@ interface Props {
 }
 
 const { title, description, image, noindex } = Astro.props;
+
+// 사이트 전체 설정이 켜져 있으면 페이지 설정과 무관하게 제외합니다
+const noindexFinal = siteConfig.noindex || noindex;
 ---
 
 <!doctype html>
@@ -23,7 +26,7 @@ const { title, description, image, noindex } = Astro.props;
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <SEO title={title} description={description} image={image} noindex={noindex} />
+    <SEO title={title} description={description} image={image} noindex={noindexFinal} />
     <slot name="head" />
   </head>
   <body>

@@ -18,7 +18,8 @@ export default defineConfig({
   site: siteConfig.site,
   // 정적 출력. 서버·DB 없이 Cloudflare Pages에 그대로 올라갑니다.
   output: 'static',
-  integrations: [sitemap()],
+  // 검색 제외 사이트는 사이트맵 자체를 만들지 않습니다
+  integrations: siteConfig.noindex ? [] : [sitemap()],
   build: {
     // /products/ 형태의 디렉토리 URL (트레일링 슬래시 일관성)
     format: 'directory',

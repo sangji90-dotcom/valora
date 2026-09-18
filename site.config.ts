@@ -105,6 +105,15 @@ export const siteConfig: SiteConfig = {
   // 품목이 4종이라 검색창은 필요 없습니다
   enableSearch: false,
 
+  /**
+   * 검색엔진에서 제외합니다.
+   *
+   * 발로라의 의뢰를 받고 만든 사이트가 아니므로, 검색으로 발견되어
+   * 공식 사이트처럼 읽히는 일을 막습니다.
+   * 회사의 공개 승인을 받으면 이 줄을 지우세요.
+   */
+  noindex: true,
+
   verification: {
     // naver: 'abc123...',
     // google: 'xyz789...',
