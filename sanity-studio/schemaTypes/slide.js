@@ -16,7 +16,7 @@ export const slide = {
   fields: [
     {
       name: 'title',
-      title: '큰 제목',
+      title: '큰 제목 *',
       type: 'text',
       rows: 2,
       description: '줄바꿈이 화면에 그대로 반영됩니다. 두 줄까지가 읽기 좋습니다.',
@@ -43,7 +43,7 @@ export const slide = {
     },
     {
       name: 'image',
-      title: '배경 이미지',
+      title: '배경 이미지 *',
       type: 'image',
       description:
         '가로로 아주 넓게 잘립니다. 가로 1920px 이상을 권장하고, ' +

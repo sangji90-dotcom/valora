@@ -144,6 +144,20 @@ try {
     !/<img src=x onerror=/.test(aboutHtml) && !aboutHtml.includes('alert("page-xss")')
   );
 
+  // ---- CSP: style 속성이 남으면 브라우저가 조용히 막습니다 ----
+  // lqip 블러를 style 속성으로 넣었다가 전량 차단된 적이 있습니다.
+  // 로컬 모드에는 안 나오고 CMS 모드에서만 나오던 경로라 여기서 검사합니다.
+  {
+    const r = spawnSync('node', ['scripts/test-csp.mjs', 'dist'], { cwd: ROOT, encoding: 'utf8' });
+    check('CSP: 빌드 결과에 style 속성 없음', r.status === 0, r.stdout + r.stderr);
+  }
+
+  // ---- 대체 텍스트 ----
+  check(
+    '이미지: CMS에 적은 대체 텍스트가 반영됨',
+    listHtml.includes('alt="CMS에서 적은 대체 텍스트"')
+  );
+
   // ---- 표 (Studio의 table 블록) ----
   check('표: 머리글 행이 th 로 렌더', /<thead><tr><th>단계<\/th><th>걸리는 시간<\/th><\/tr><\/thead>/.test(aboutHtml));
   check('표: 본문 행이 td 로 렌더', /<td>샘플 제작<\/td><td>약 2주<\/td>/.test(aboutHtml));

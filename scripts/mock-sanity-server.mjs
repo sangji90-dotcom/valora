@@ -30,7 +30,7 @@ const products = [
     title: 'CMS 프로쉴드 900',
     summary: 'CMS에서 불러온 산업용 보호 모듈입니다.',
     category: CAT[0],
-    thumbnail: IMG('shield'),
+    thumbnail: { ...IMG('shield'), alt: 'CMS에서 적은 대체 텍스트' },
     gallery: [IMG('shield-2')],
     specs: [
       { key: '모델명', value: 'PS-900' },

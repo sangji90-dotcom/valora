@@ -14,6 +14,7 @@
     "test:sanity": "node scripts/test-sanity-integration.mjs",
     "test:import": "node scripts/test-import.mjs",
     "test:tokens": "node scripts/test-tokens.mjs",
+    "test:csp": "node scripts/test-csp.mjs",
     "import": "node scripts/import-products.mjs",
     "make-template": "node scripts/make-product-template.mjs",
     "gen:og": "node scripts/gen-og.mjs",

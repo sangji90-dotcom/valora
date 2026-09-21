@@ -19,14 +19,14 @@ export const page = {
   fields: [
     {
       name: 'title',
-      title: '페이지 제목',
+      title: '페이지 제목 *',
       type: 'string',
       description: '화면 상단과 브라우저 탭에 표시됩니다.',
       validation: (Rule) => Rule.required(),
     },
     {
       name: 'slug',
-      title: 'URL 주소',
+      title: 'URL 주소 *',
       type: 'slug',
       description:
         '사이트에 만들어 둔 주소만 동작합니다: about(회사소개), privacy(개인정보처리방침). ' +
@@ -54,7 +54,7 @@ export const page = {
     },
     {
       name: 'body',
-      title: '본문',
+      title: '본문 *',
       type: 'array',
       of: [
         { type: 'table' },

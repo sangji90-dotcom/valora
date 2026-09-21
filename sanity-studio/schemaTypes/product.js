@@ -10,6 +10,9 @@
  *  한쪽을 바꾸면 **반드시 다른 쪽도 바꾸세요.**
  *  어긋나면 빌드가 실패합니다 — 조용히 깨지지는 않습니다.
  *
+ *  제목 끝의 * 는 필수 항목입니다. Studio 는 필수 여부를 미리 보여주지 않고
+ *  Publish 를 눌러야 빨간 표시가 뜨기 때문에, 라벨에 직접 표시합니다.
+ *
  *  카테고리 목록은 site.config.ts 에서 자동 생성합니다.
  *  손으로 베껴 적으면 반드시 어긋나기 때문입니다.
  *    npm run studio:sync
@@ -25,28 +28,30 @@ export const product = {
   fields: [
     {
       name: 'title',
-      title: '제품명',
+      title: '제품명 *',
       type: 'string',
       validation: (Rule) => Rule.required().min(1),
     },
     {
       name: 'slug',
-      title: 'URL 주소',
+      title: 'URL 주소 *',
       type: 'slug',
-      description: '영문 소문자와 하이픈만 사용하세요. 예: pro-shield-900',
+      description:
+        '필수. 영문 소문자와 하이픈만 사용하세요. 예: pro-shield-900 — ' +
+        '제목이 한글이면 Generate 가 빈 값을 만듭니다. 직접 영문으로 적으세요.',
       options: { source: 'title', maxLength: 96 },
       validation: (Rule) => Rule.required(),
     },
     {
       name: 'summary',
-      title: '한 줄 설명',
+      title: '한 줄 설명 *',
       type: 'string',
-      description: '목록 카드에 표시됩니다. 120자 이내.',
+      description: '필수. 목록 카드에 표시됩니다. 120자 이내.',
       validation: (Rule) => Rule.required().max(120),
     },
     {
       name: 'category',
-      title: '카테고리',
+      title: '카테고리 *',
       type: 'string',
       options: {
         // site.config.ts 에서 생성된 목록 (npm run studio:sync)
@@ -57,11 +62,22 @@ export const product = {
     },
     {
       name: 'thumbnail',
-      title: '대표 이미지',
+      title: '대표 이미지 *',
       type: 'image',
-      description: '가로 1200px 이상, 4:3 비율 권장',
+      description:
+        '필수. 가로 1200px 이상, 4:3 비율 권장. ' +
+        '사진이 없으면 목록 카드가 빈 상자로 남아 화면이 망가집니다.',
       options: { hotspot: true },
-      fields: [{ name: 'alt', title: '대체 텍스트', type: 'string' }],
+      fields: [
+        {
+          name: 'alt',
+          title: '대체 텍스트',
+          type: 'string',
+          description:
+            '사진이 안 보일 때 대신 읽히는 설명입니다. 시각장애인용 화면낭독기와 ' +
+            '검색엔진이 씁니다. 비우면 제품명이 대신 쓰입니다.',
+        },
+      ],
       validation: (Rule) => Rule.required(),
     },
     {
@@ -72,7 +88,16 @@ export const product = {
         {
           type: 'image',
           options: { hotspot: true },
-          fields: [{ name: 'alt', title: '대체 텍스트', type: 'string' }],
+          fields: [
+        {
+          name: 'alt',
+          title: '대체 텍스트',
+          type: 'string',
+          description:
+            '사진이 안 보일 때 대신 읽히는 설명입니다. 시각장애인용 화면낭독기와 ' +
+            '검색엔진이 씁니다. 비우면 제품명이 대신 쓰입니다.',
+        },
+      ],
         },
       ],
     },

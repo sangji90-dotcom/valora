@@ -505,6 +505,7 @@ npx sanity dataset import ../.sanity-export/export.ndjson production --replace
 - [ ] `npm run check` 에러 0
 - [ ] `npm run test:import` 전부 통과
 - [ ] `npm run test:tokens` 통과 (선언 안 된 CSS 변수 = 무효가 된 스타일)
+- [ ] `npm run test:csp` 통과 (style 속성 = CSP가 조용히 막는 스타일)
 - [ ] (CMS 사용 시) `npm run test:sanity` 전부 통과
 - [ ] (CMS 사용 시) `npm run studio:sync` → `npm run export:sanity` → import 까지 마친 뒤에 `CONTENT_SOURCE` 를 바꿨는지
 - [ ] (CMS 사용 시) Studio에서 회사소개·개인정보처리방침 본문과 표가 그대로 옮겨졌는지 눈으로 확인
@@ -580,6 +581,7 @@ scripts/
 ├─ test-sanity-integration.mjs CMS 연동 검증 44항목
 ├─ export-to-sanity.mjs        마크다운 → Sanity NDJSON 이관
 ├─ test-import.mjs             일괄 등록 검증 43항목
+├─ test-csp.mjs                빌드 결과에 style 속성이 남았는지 검사
 ├─ shoot-presets.mjs           프리셋 조합 렌더·검사
 └─ gen-sample-images.mjs       샘플 이미지 재생성
 public/
