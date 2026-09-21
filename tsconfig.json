@@ -3,10 +3,14 @@
   "include": [".astro/types.d.ts", "**/*"],
   "exclude": ["dist"],
   "compilerOptions": {
-    "baseUrl": ".",
+    /*
+     * baseUrl 은 넣지 마세요.
+     * TypeScript 7.0 에서 제거되는 옵션이라 에디터에 deprecation 경고가 뜹니다.
+     * paths 는 baseUrl 없이도 동작하며, 이 tsconfig.json 위치를 기준으로 해석됩니다.
+     */
     "paths": {
-      "@/*": ["src/*"],
-      "@config": ["site.config.ts"]
+      "@/*": ["./src/*"],
+      "@config": ["./site.config.ts"]
     }
   }
 }
