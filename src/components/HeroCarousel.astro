@@ -1,6 +1,6 @@
 ---
-import { Image } from 'astro:assets';
 import { getCollection } from 'astro:content';
+import ProductImage from './ProductImage.astro';
 
 /**
  * 풀블리드 슬라이드 배너.
@@ -44,8 +44,12 @@ const INTERVAL = 6000;
               aria-roledescription="슬라이드"
               aria-label={`${index + 1} / ${slides.length}`}
             >
-              <Image
-                src={d.image}
+              {/*
+                배너는 장식이라 alt 를 비웁니다 — 같은 내용이 옆에 글자로 있습니다.
+                로컬·CMS 이미지를 같은 컴포넌트가 흡수합니다.
+              */}
+              <ProductImage
+                image={d.image}
                 alt=""
                 widths={[760, 1200, 1920]}
                 sizes="100vw"

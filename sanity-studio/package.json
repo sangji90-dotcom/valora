@@ -1,0 +1,21 @@
+{
+  "name": "studio",
+  "private": true,
+  "version": "1.0.0",
+  "description": "고객사가 상품·페이지·배너를 직접 편집하는 관리화면",
+  "type": "module",
+  "scripts": {
+    "dev": "sanity dev",
+    "start": "sanity start",
+    "build": "sanity build",
+    "deploy": "sanity deploy",
+    "deploy-graphql": "sanity graphql deploy"
+  },
+  "dependencies": {
+    "@sanity/vision": "^6.15.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "sanity": "^6.15.0",
+    "styled-components": "^6.5.3"
+  }
+}

@@ -1,29 +1,61 @@
-# Sanity Studio 설정
+# Sanity Studio — 고객사 관리화면
 
-고객사가 상품을 직접 등록·수정하겠다고 할 때만 진행합니다.
-그럴 필요가 없으면 마크다운(`CONTENT_SOURCE=local`) 그대로 두는 편이 유지보수가 적습니다.
+고객사가 **제품·페이지·배너를 직접 등록·수정·삭제**하는 화면입니다.
+이 폴더가 곧 Studio 프로젝트라, 프로젝트 ID만 넣으면 바로 돌아갑니다.
 
-## 1. Studio 생성 — 반드시 고객사 계정으로
+붙일지 말지부터 판단하세요. 콘텐츠가 분기에 한두 번 바뀌는 고객사라면
+마크다운(`CONTENT_SOURCE=local`) 그대로 두는 편이 관리 포인트가 적습니다.
+월 단위로 바뀌면 붙이는 쪽이 맞습니다 — 안 붙이면 우리가 계속 불려 다닙니다.
+
+## 무엇을 고칠 수 있나
+
+| 문서 종류 | 고객사가 고치는 것 |
+| --- | --- |
+| 제품 | 추가·수정·삭제, 사진, 사양, 가격, 홈 노출 |
+| 홈 배너 | 이미지와 문구, 순서, 잠시 숨기기 |
+| 페이지 | 회사소개·개인정보처리방침 본문 |
+
+카테고리 자체는 못 만듭니다 (사이트 코드와 함께 바뀌어야 합니다).
+
+## 1. Sanity 프로젝트 생성 — 반드시 고객사 계정으로
 
 ```bash
-npm create sanity@latest -- --template clean --create-project "고객사명" --dataset production
+npx sanity@latest login      # ← 고객사 계정으로 로그인
+npx sanity@latest projects create "고객사명"
 ```
 
-> ⚠️ **로그인부터 고객사 계정으로 하세요.** 우리 계정으로 만들면 프로젝트 소유권이 우리에게 남고, 결제·권한 문제로 계속 연락이 옵니다. 나중에 조직 이전이 가능은 하지만 고객사가 결제수단을 등록해야 해서 결국 우리가 처리하게 됩니다.
+> ⚠️ **로그인부터 고객사 계정으로 하세요.** 우리 계정으로 만들면 프로젝트
+> 소유권이 우리에게 남고, 결제·권한 문제로 계속 연락이 옵니다. 조직 이전이
+> 가능은 하지만 고객사가 결제수단을 등록해야 해서 결국 우리가 처리하게 됩니다.
 
-## 2. 스키마 등록
+발급된 **프로젝트 ID**를 적어 두세요.
 
-`product.schema.js` 를 Studio 프로젝트의 `schemaTypes/` 아래로 복사하고 등록합니다.
+## 2. Studio 실행
 
-```js
-// sanity.config.ts
-import { product } from './schemaTypes/product.schema';
-
-export default defineConfig({
-  // ...
-  schema: { types: [product] },
-});
+```bash
+cd sanity-studio
+cp .env.example .env      # SANITY_STUDIO_PROJECT_ID 를 채웁니다
+npm install
+npm run dev               # http://localhost:3333
 ```
+
+카테고리 목록은 `site.config.ts` 에서 생성합니다. 카테고리를 바꿨다면
+사이트 폴더에서 먼저 돌리세요.
+
+```bash
+npm run studio:sync
+```
+
+손으로 베껴 적으면 반드시 어긋납니다. 어긋나면 고객사가 고른 값이 사이트
+스키마에서 거부되어 빌드가 실패합니다.
+
+## 3. Studio 배포
+
+```bash
+npm run deploy            # https://고객사명.sanity.studio
+```
+
+이 주소를 고객사에 전달합니다. 함께 `docs/고객사-사용설명서.md` 도 보내세요.
 
 ## 3. dataset을 공개로 설정
 

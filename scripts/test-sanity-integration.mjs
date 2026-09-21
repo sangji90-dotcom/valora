@@ -134,6 +134,25 @@ try {
   check('목록에 CMS 상품 노출', listHtml.includes('CMS 프로쉴드 900'));
   check('출시 예정 배지 렌더', listHtml.includes('출시 예정'));
   check('가격 포맷팅', listHtml.includes('129,000원'));
+
+  // ---- 페이지 (회사소개·개인정보처리방침) ----
+  const aboutHtml = readFileSync(`${ROOT}dist/about/index.html`, 'utf8');
+  check('페이지: CMS 제목 반영', aboutHtml.includes('CMS 회사소개'));
+  check('페이지: CMS 본문 렌더', aboutHtml.includes('CMS 본문이 정상적으로 렌더되는지'));
+  check(
+    '페이지: 본문 XSS도 이스케이프됨',
+    !/<img src=x onerror=/.test(aboutHtml) && !aboutHtml.includes('alert("page-xss")')
+  );
+
+  const privacyHtml = readFileSync(`${ROOT}dist/privacy/index.html`, 'utf8');
+  check('페이지: 개인정보처리방침도 CMS에서 옴', privacyHtml.includes('CMS 개인정보처리방침'));
+
+  // ---- 홈 배너 ----
+  // 배너는 hero 프리셋이 carousel 일 때만 나오므로, 데이터가 들어왔는지는
+  // 컬렉션 로딩 로그로 확인합니다 (프리셋을 건드리면 다른 검증이 흔들립니다).
+  check('배너: 이미지 없는 문서는 건너뜀', /건너뜀 1개/.test(log));
+  check('배너: 정상 문서는 불러옴', /배너 1개를 불러왔습니다/.test(log));
+  check('페이지 로딩 로그', /페이지 2개를 불러왔습니다/.test(log));
 } finally {
   mock.kill();
 }

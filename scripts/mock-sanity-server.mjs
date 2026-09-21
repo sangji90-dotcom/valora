@@ -136,6 +136,78 @@ const products = [
  * 네거티브 시나리오 — 스키마가 정말로 빌드를 막는지 증명하기 위한 픽스처.
  * MOCK_SCENARIO 환경변수로 선택합니다.
  */
+/**
+ * 페이지 픽스처.
+ * about / privacy 는 사이트에 라우트가 있어야 하므로 반드시 둘 다 필요합니다.
+ */
+const pages = [
+  {
+    id: 'about',
+    title: 'CMS 회사소개',
+    description: 'CMS에서 불러온 회사소개입니다.',
+    showHero: true,
+    draft: false,
+    _updatedAt: '2026-09-01T00:00:00Z',
+    body: [
+      { _type: 'block', style: 'h2', children: [{ _type: 'span', text: '우리가 하는 일' }] },
+      {
+        _type: 'block',
+        style: 'normal',
+        children: [{ _type: 'span', text: 'CMS 본문이 정상적으로 렌더되는지 확인합니다.' }],
+      },
+      // XSS 시도 — 페이지 본문도 상품과 같은 경로로 이스케이프되어야 합니다
+      {
+        _type: 'block',
+        style: 'normal',
+        children: [{ _type: 'span', text: '<img src=x onerror=alert("page-xss")>' }],
+      },
+    ],
+  },
+  {
+    id: 'privacy',
+    title: 'CMS 개인정보처리방침',
+    description: null,
+    showHero: true,
+    draft: false,
+    _updatedAt: '2026-09-01T00:00:00Z',
+    body: [
+      {
+        _type: 'block',
+        style: 'normal',
+        children: [{ _type: 'span', text: '개인정보처리방침 본문입니다.' }],
+      },
+    ],
+  },
+];
+
+/** 홈 배너 픽스처 */
+const slides = [
+  {
+    id: 'cms-banner-1',
+    eyebrow: 'NOTICE',
+    title: 'CMS에서 온 배너\n두 줄까지 나옵니다',
+    subtitle: '보조 설명입니다.',
+    image: IMG('banner'),
+    href: '/products/',
+    cta: '제품 보기',
+    align: 'right',
+    textColor: 'dark',
+    overlay: 'light',
+    order: 1,
+    draft: false,
+    _updatedAt: '2026-09-01T00:00:00Z',
+  },
+  {
+    // 이미지가 없는 배너 — 빌드를 죽이지 않고 건너뛰어야 합니다
+    id: 'cms-banner-broken',
+    title: '이미지 없는 배너',
+    image: null,
+    order: 2,
+    draft: false,
+    _updatedAt: '2026-09-01T00:00:00Z',
+  },
+];
+
 const scenarios = {
   ok: products,
 
@@ -163,6 +235,30 @@ const server = createServer((req, res) => {
 
   if (!url.pathname.includes('/data/query/')) {
     res.writeHead(404).end('not found');
+    return;
+  }
+
+  /**
+   * 어떤 컬렉션을 묻는 쿼리인지 판별합니다.
+   * 예전에는 무엇을 물어도 상품을 돌려줬는데, 컬렉션이 셋이 되면서
+   * 페이지 로더가 상품 문서를 받아 엉뚱하게 실패했습니다.
+   */
+  const query = url.searchParams.get('query') ?? '';
+  const type = query.includes('"page"')
+    ? 'page'
+    : query.includes('"slide"')
+      ? 'slide'
+      : 'product';
+
+  if (type === 'page') {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ result: pages, ms: 1 }));
+    return;
+  }
+
+  if (type === 'slide') {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ result: slides, ms: 1 }));
     return;
   }
 

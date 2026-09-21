@@ -134,3 +134,54 @@ export function productsQuery(includeDrafts: boolean): string {
     _updatedAt
   } | order(order asc, title asc)`;
 }
+
+/**
+ * 단일 페이지(회사소개·개인정보처리방침 등) GROQ.
+ *
+ * slug 가 곧 페이지 주소입니다 — about, privacy 처럼 고정된 값을 씁니다.
+ * 새 slug 를 만들어도 그에 해당하는 라우트가 없으면 화면에는 안 나옵니다.
+ */
+export function pagesQuery(includeDrafts: boolean): string {
+  const filter = includeDrafts
+    ? `_type == "page"`
+    : `_type == "page" && !(_id in path("drafts.**"))`;
+
+  return `*[${filter}]{
+    "id": slug.current,
+    title,
+    description,
+    showHero,
+    draft,
+    body,
+    _updatedAt
+  }`;
+}
+
+/** 홈 슬라이드 배너 GROQ */
+export function slidesQuery(includeDrafts: boolean): string {
+  const filter = includeDrafts
+    ? `_type == "slide"`
+    : `_type == "slide" && !(_id in path("drafts.**"))`;
+
+  return `*[${filter}]{
+    "id": slug.current,
+    eyebrow,
+    title,
+    subtitle,
+    "image": image{
+      "url": asset->url,
+      "width": asset->metadata.dimensions.width,
+      "height": asset->metadata.dimensions.height,
+      "lqip": asset->metadata.lqip,
+      alt
+    },
+    href,
+    cta,
+    align,
+    textColor,
+    overlay,
+    order,
+    draft,
+    _updatedAt
+  } | order(order asc)`;
+}

@@ -1,6 +1,12 @@
 import type { Loader, LoaderContext } from 'astro/loaders';
 import type { SanityEnv } from '../content/source';
-import { sanityQuery, productsQuery, type Fetcher } from './client';
+import {
+  sanityQuery,
+  productsQuery,
+  pagesQuery,
+  slidesQuery,
+  type Fetcher,
+} from './client';
 import { portableTextToHtml } from './portable-text';
 
 /**
@@ -109,6 +115,57 @@ function mapProduct(doc: SanityProductDoc) {
   };
 }
 
+interface SanityPageDoc {
+  id?: string;
+  title?: string;
+  description?: string | null;
+  showHero?: boolean | null;
+  draft?: boolean | null;
+  body?: unknown;
+  _updatedAt?: string;
+}
+
+interface SanitySlideDoc {
+  id?: string;
+  eyebrow?: string | null;
+  title?: string;
+  subtitle?: string | null;
+  image?: SanityImageRow | null;
+  href?: string | null;
+  cta?: string | null;
+  align?: string | null;
+  textColor?: string | null;
+  overlay?: string | null;
+  order?: number | null;
+  draft?: boolean | null;
+  _updatedAt?: string;
+}
+
+function mapPage(doc: SanityPageDoc) {
+  return {
+    title: doc.title,
+    ...(doc.description ? { description: doc.description } : {}),
+    showHero: doc.showHero ?? true,
+    draft: doc.draft ?? false,
+  };
+}
+
+function mapSlide(doc: SanitySlideDoc) {
+  return {
+    ...(doc.eyebrow ? { eyebrow: doc.eyebrow } : {}),
+    title: doc.title,
+    ...(doc.subtitle ? { subtitle: doc.subtitle } : {}),
+    image: mapImage(doc.image),
+    ...(doc.href ? { href: doc.href } : {}),
+    ...(doc.cta ? { cta: doc.cta } : {}),
+    ...(doc.align ? { align: doc.align } : {}),
+    ...(doc.textColor ? { textColor: doc.textColor } : {}),
+    ...(doc.overlay ? { overlay: doc.overlay } : {}),
+    order: doc.order ?? 999,
+    draft: doc.draft ?? false,
+  };
+}
+
 export interface SanityProductsLoaderOptions {
   env: SanityEnv;
   /** 테스트용 주입 지점. 기본은 전역 fetch */
@@ -167,6 +224,102 @@ export function sanityProductsLoader(opts: SanityProductsLoaderOptions): Loader 
           '불러온 상품이 0개입니다. dataset 이름과 문서 타입(product)을 확인하세요.'
         );
       }
+    },
+  };
+}
+
+/**
+ * 페이지 로더 — 회사소개·개인정보처리방침 등.
+ *
+ * 상품과 달리 **본문이 페이지의 전부**라서, slug 가 비면 어느 페이지인지
+ * 알 수 없습니다. 상품처럼 건너뛰고 경고만 남기면 about 페이지가 통째로
+ * 사라진 채 배포될 수 있으므로, 여기서는 빌드를 중단시킵니다.
+ */
+export function sanityPagesLoader(opts: SanityProductsLoaderOptions): Loader {
+  const { env, fetcher } = opts;
+
+  return {
+    name: 'sanity-pages',
+
+    async load({ store, parseData, generateDigest, logger }: LoaderContext) {
+      const docs = await sanityQuery<SanityPageDoc[]>(
+        env,
+        pagesQuery(env.includeDrafts),
+        fetcher
+      );
+
+      store.clear();
+
+      for (const doc of docs ?? []) {
+        const id = doc.id?.trim();
+
+        if (!id) {
+          throw new Error(
+            `page 문서의 slug 가 비어 있습니다: "${doc.title ?? '(제목 없음)'}" — ` +
+              'Studio에서 slug 를 생성하세요 (about, privacy 등).'
+          );
+        }
+
+        const data = await parseData({ id, data: mapPage(doc) });
+
+        store.set({
+          id,
+          data,
+          digest: generateDigest({ ...doc, _updatedAt: doc._updatedAt }),
+          rendered: { html: portableTextToHtml(doc.body) },
+        });
+      }
+
+      logger.info(`페이지 ${docs?.length ?? 0}개를 불러왔습니다`);
+    },
+  };
+}
+
+/**
+ * 슬라이드 배너 로더.
+ *
+ * 배너는 없어도 사이트가 동작하므로(히어로가 통째로 안 나올 뿐),
+ * 이미지가 빠진 문서는 빌드를 죽이는 대신 건너뛰고 경고만 남깁니다.
+ */
+export function sanitySlidesLoader(opts: SanityProductsLoaderOptions): Loader {
+  const { env, fetcher } = opts;
+
+  return {
+    name: 'sanity-slides',
+
+    async load({ store, parseData, generateDigest, logger }: LoaderContext) {
+      const docs = await sanityQuery<SanitySlideDoc[]>(
+        env,
+        slidesQuery(env.includeDrafts),
+        fetcher
+      );
+
+      store.clear();
+      let skipped = 0;
+
+      for (const [index, doc] of (docs ?? []).entries()) {
+        // 배너는 주소가 필요 없으므로 slug 가 없으면 순번으로 대체합니다
+        const id = doc.id?.trim() || `slide-${index + 1}`;
+
+        if (!mapImage(doc.image)) {
+          logger.warn(
+            `이미지가 없어 건너뜁니다: 배너 "${doc.title ?? id}" — Studio에서 이미지를 올려주세요.`
+          );
+          skipped += 1;
+          continue;
+        }
+
+        const data = await parseData({ id, data: mapSlide(doc) });
+
+        store.set({
+          id,
+          data,
+          digest: generateDigest({ ...doc, _updatedAt: doc._updatedAt }),
+        });
+      }
+
+      const loaded = (docs?.length ?? 0) - skipped;
+      logger.info(`배너 ${loaded}개를 불러왔습니다${skipped ? ` (건너뜀 ${skipped}개)` : ''}`);
     },
   };
 }

@@ -1,5 +1,4 @@
 import { z } from 'astro/zod';
-import type { ImageFunction } from 'astro:content';
 import siteConfig from '../../../site.config';
 
 /**
@@ -97,7 +96,7 @@ export function createProductSchema<T extends z.ZodType>(imageField: T) {
  * 홈 슬라이드 배너.
  * 이미지 위에 문구를 얹으므로 대비를 확보할 수단(overlay, textColor)을 둡니다.
  */
-export function slideSchema(image: ImageFunction) {
+export function createSlideSchema<T extends z.ZodType>(imageField: T) {
   return z.object({
     /** 작은 윗줄 문구 (영문 제품명 등). 없으면 생략 */
     eyebrow: z.string().optional(),
@@ -105,7 +104,7 @@ export function slideSchema(image: ImageFunction) {
     title: z.string().min(1),
     /** 보조 설명 */
     subtitle: z.string().optional(),
-    image: image(),
+    image: imageField,
     /** 배너를 누르면 이동할 주소 */
     href: z.string().default('/products/'),
     /** 버튼 문구. 비우면 버튼을 만들지 않습니다 */
@@ -133,4 +132,12 @@ export const pageSchema = z.object({
   title: z.string(),
   description: z.string().optional(),
   showHero: z.boolean().default(true),
+  /**
+   * CMS에서 작성 중인 페이지를 감추기 위한 값입니다.
+   * 마크다운 모드에서는 쓸 일이 거의 없습니다.
+   *
+   * ⚠ 개인정보처리방침은 draft 로 두면 안 됩니다 —
+   *   문의 폼을 운영하는 동안에는 항상 접근 가능해야 합니다.
+   */
+  draft: z.boolean().default(false),
 });

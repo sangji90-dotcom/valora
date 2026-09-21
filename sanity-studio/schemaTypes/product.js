@@ -10,9 +10,13 @@
  *  한쪽을 바꾸면 **반드시 다른 쪽도 바꾸세요.**
  *  어긋나면 빌드가 실패합니다 — 조용히 깨지지는 않습니다.
  *
- *  ⚠️ category의 list는 site.config.ts의 categories와 같아야 합니다.
+ *  카테고리 목록은 site.config.ts 에서 자동 생성합니다.
+ *  손으로 베껴 적으면 반드시 어긋나기 때문입니다.
+ *    npm run studio:sync
  * ============================================================
  */
+
+import { CATEGORY_OPTIONS } from './categories.generated.js';
 
 export const product = {
   name: 'product',
@@ -45,12 +49,8 @@ export const product = {
       title: '카테고리',
       type: 'string',
       options: {
-        list: [
-          // site.config.ts의 categories와 반드시 일치해야 합니다
-          { title: '산업용', value: 'industrial' },
-          { title: '사무용', value: 'office' },
-          { title: '액세서리', value: 'accessory' },
-        ],
+        // site.config.ts 에서 생성된 목록 (npm run studio:sync)
+        list: CATEGORY_OPTIONS,
         layout: 'radio',
       },
       validation: (Rule) => Rule.required(),
