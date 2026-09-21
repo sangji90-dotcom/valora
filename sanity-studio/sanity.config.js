@@ -31,6 +31,9 @@ export default defineConfig({
     structureTool({
       structure: (S) =>
         S.list()
+          // id 는 필수입니다. dev 서버는 없어도 뜨지만 배포본에서
+          // "`id` is required for lists" 로 화면 전체가 막힙니다.
+          .id('root')
           .title('사이트 관리')
           .items([
             S.documentTypeListItem('product').title('제품'),
