@@ -30,7 +30,7 @@ export const product = {
       name: 'title',
       title: '제품명 *',
       type: 'string',
-      validation: (Rule) => Rule.required().min(1),
+      validation: (Rule) => Rule.required().min(1).error('필수 항목입니다. 제품명을 입력하세요.'),
     },
     {
       name: 'slug',
@@ -40,14 +40,19 @@ export const product = {
         '필수. 영문 소문자와 하이픈만 사용하세요. 예: pro-shield-900 — ' +
         '제목이 한글이면 Generate 가 빈 값을 만듭니다. 직접 영문으로 적으세요.',
       options: { source: 'title', maxLength: 96 },
-      validation: (Rule) => Rule.required(),
+      validation: (Rule) =>
+        Rule.required().error('필수 항목입니다. 영문 소문자와 하이픈으로 직접 입력하세요.'),
     },
     {
       name: 'summary',
       title: '한 줄 설명 *',
       type: 'string',
       description: '필수. 목록 카드에 표시됩니다. 120자 이내.',
-      validation: (Rule) => Rule.required().max(120),
+      validation: (Rule) =>
+        Rule.required()
+          .error('필수 항목입니다. 한 줄 설명을 입력하세요.')
+          .max(120)
+          .error('120자를 넘을 수 없습니다.'),
     },
     {
       name: 'category',
@@ -58,7 +63,7 @@ export const product = {
         list: CATEGORY_OPTIONS,
         layout: 'radio',
       },
-      validation: (Rule) => Rule.required(),
+      validation: (Rule) => Rule.required().error('필수 항목입니다. 카테고리를 고르세요.'),
     },
     {
       name: 'thumbnail',
@@ -78,7 +83,7 @@ export const product = {
             '검색엔진이 씁니다. 비우면 제품명이 대신 쓰입니다.',
         },
       ],
-      validation: (Rule) => Rule.required(),
+      validation: (Rule) => Rule.required().error('필수 항목입니다. 대표 이미지를 올리세요.'),
     },
     {
       name: 'gallery',

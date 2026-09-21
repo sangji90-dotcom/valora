@@ -20,7 +20,7 @@ export const slide = {
       type: 'text',
       rows: 2,
       description: '줄바꿈이 화면에 그대로 반영됩니다. 두 줄까지가 읽기 좋습니다.',
-      validation: (Rule) => Rule.required(),
+      validation: (Rule) => Rule.required().error('필수 항목입니다. 배너 제목을 입력하세요.'),
     },
     {
       name: 'slug',
@@ -49,7 +49,7 @@ export const slide = {
         '가로로 아주 넓게 잘립니다. 가로 1920px 이상을 권장하고, ' +
         '중요한 내용은 사진 가운데에 두세요. 좌우 끝은 화면에 따라 잘립니다.',
       options: { hotspot: true },
-      validation: (Rule) => Rule.required(),
+      validation: (Rule) => Rule.required().error('필수 항목입니다. 배경 이미지를 올리세요.'),
     },
     {
       name: 'href',

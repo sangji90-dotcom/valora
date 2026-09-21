@@ -22,7 +22,7 @@ export const page = {
       title: '페이지 제목 *',
       type: 'string',
       description: '화면 상단과 브라우저 탭에 표시됩니다.',
-      validation: (Rule) => Rule.required(),
+      validation: (Rule) => Rule.required().error('필수 항목입니다. 페이지 제목을 입력하세요.'),
     },
     {
       name: 'slug',
@@ -37,7 +37,7 @@ export const page = {
           { title: 'privacy — 개인정보처리방침', value: 'privacy' },
         ],
       },
-      validation: (Rule) => Rule.required(),
+      validation: (Rule) => Rule.required().error('필수 항목입니다. 목록에서 고르세요.'),
     },
     {
       name: 'description',
@@ -97,7 +97,7 @@ export const page = {
           },
         },
       ],
-      validation: (Rule) => Rule.required(),
+      validation: (Rule) => Rule.required().error('필수 항목입니다. 본문을 입력하세요.'),
     },
     {
       name: 'draft',
