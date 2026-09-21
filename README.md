@@ -402,7 +402,7 @@ mock 서버로 연동 경로 전체를 테스트할 수 있습니다. 고객사�
 npm run test:sanity
 ```
 
-34개 항목을 확인합니다 — 빌드 성공, Portable Text 변환, 이미지 URL 생성, CSP 반영, **XSS 차단**, 그리고 잘못된 데이터가 빌드를 제대로 막는지(네거티브 케이스)까지.
+44개 항목을 확인합니다 — 빌드 성공, Portable Text 변환, 이미지 URL 생성, CSP 반영, **XSS 차단**, 그리고 잘못된 데이터가 빌드를 제대로 막는지(네거티브 케이스)까지.
 
 ### CMS 입력값은 신뢰 경계 밖입니다
 
@@ -425,6 +425,45 @@ Sanity 무료 플랜은 문서 10,000개 / 20 seats / 월 250,000 API 요청이�
 
 단, 무료 플랜은 **public dataset만** 제공합니다. 카탈로그는 공개 콘텐츠라 무관하지만 **문의 내역·개인정보는 절대 CMS에 넣지 마세요.**
 
+---
+
+## 7-2. 기존 마크다운을 CMS로 옮기기
+
+`CONTENT_SOURCE=sanity` 로 바꾸는 순간 사이트는 마크다운을 **더 이상 읽지 않습니다.**
+먼저 옮겨두지 않으면 상품 0개짜리 빈 사이트가 되고, `about`·`privacy` 는 항목이
+없어서 빌드 자체가 실패합니다. 전환 **전에** 반드시 이 단계를 밟으세요.
+
+```bash
+npm run studio:sync          # 1) 카테고리를 Studio 스키마로 생성
+npm run export:sanity        # 2) 마크다운 → NDJSON
+cd sanity-studio
+npx sanity dataset import ../.sanity-export/export.ndjson production --replace
+```
+
+**`--replace` 는 최초 1회만.** 같은 `_id` 를 덮어쓰므로, 고객사가 Studio에서
+고친 내용까지 되돌아갑니다. 두 번째부터는 쓰지 마세요.
+
+이미지는 NDJSON에 경로만 적히고, 실제 업로드는 `sanity` CLI 가 합니다.
+그래서 우리가 API 쓰기 토큰을 만들거나 보관할 필요가 없습니다 (`npx sanity login` 만 되어 있으면 됩니다).
+
+### 변환기는 조용히 버리지 않습니다
+
+지원하는 문법만 변환합니다 — 제목 `##`~`####`, 문단, 인용, 글머리·번호 목록,
+표, `**굵게**`, `*기울임*`, `` `코드` ``, `[링크](주소)`.
+
+그 밖의 문법(코드 블록, 구분선, 본문 내 이미지, raw HTML)을 만나면 **파일명과 줄
+번호를 찍고 예외를 던집니다.** 변환 후에는 원문의 모든 줄이 결과에 남았는지 한 번 더
+대조하고, 하나라도 사라졌으면 실패시킵니다. 납품 뒤에 "회사소개 두 문단이 없어졌다"는
+연락을 받는 것보다 지금 실패하는 편이 낫습니다.
+
+### 전환 순서
+
+1. `npm run export:sanity` → import
+2. Studio에서 눈으로 확인 (특히 표와 이미지)
+3. `.env` 에 `CONTENT_SOURCE=sanity` + `SANITY_PROJECT_ID` 넣고 로컬 빌드
+4. Cloudflare 환경변수에 같은 값 넣고 재배포
+5. 웹훅 ↔ 배포 훅 연결
+6. `src/content/` 의 마크다운은 **지우지 말고 그대로 두세요** — 이관이 맞는지 나중에 대조할 원본입니다
 ---
 
 ## 8. 납품 체크리스트
@@ -467,6 +506,8 @@ Sanity 무료 플랜은 문서 10,000개 / 20 seats / 월 250,000 API 요청이�
 - [ ] `npm run test:import` 전부 통과
 - [ ] `npm run test:tokens` 통과 (선언 안 된 CSS 변수 = 무효가 된 스타일)
 - [ ] (CMS 사용 시) `npm run test:sanity` 전부 통과
+- [ ] (CMS 사용 시) `npm run studio:sync` → `npm run export:sanity` → import 까지 마친 뒤에 `CONTENT_SOURCE` 를 바꿨는지
+- [ ] (CMS 사용 시) Studio에서 회사소개·개인정보처리방침 본문과 표가 그대로 옮겨졌는지 눈으로 확인
 - [ ] 모바일(390px)에서 가로 스크롤 없음
 - [ ] 브라우저 콘솔 에러 0 (CSP 위반 포함)
 - [ ] 404 페이지 동작
@@ -536,8 +577,9 @@ scripts/
 ├─ make-product-template.mjs   고객사에 보낼 엑셀 양식 생성
 ├─ lib/                        시트 읽기·값 정규화·이미지 처리
 ├─ mock-sanity-server.mjs      실제 Sanity 없이 테스트용
-├─ test-sanity-integration.mjs CMS 연동 검증 34항목
-├─ test-import.mjs             일괄 등록 검증 35항목
+├─ test-sanity-integration.mjs CMS 연동 검증 44항목
+├─ export-to-sanity.mjs        마크다운 → Sanity NDJSON 이관
+├─ test-import.mjs             일괄 등록 검증 43항목
 ├─ shoot-presets.mjs           프리셋 조합 렌더·검사
 └─ gen-sample-images.mjs       샘플 이미지 재생성
 public/

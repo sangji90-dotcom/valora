@@ -36,6 +36,17 @@ export interface PortableTextBlock {
   markDefs?: PortableTextMarkDef[];
 }
 
+/**
+ * 표 블록.
+ * Portable Text 기본에는 표가 없어서 직접 정의했습니다.
+ * 회사소개의 절차 안내, 제품의 사양 비교처럼 표가 필요한 자리가 흔합니다.
+ */
+interface PortableTextTable {
+  _type: 'table';
+  hasHeader?: boolean;
+  rows?: { cells?: string[] }[];
+}
+
 /** 링크에 허용할 스킴. javascript:, data:, vbscript: 등은 전부 차단됩니다. */
 const ALLOWED_SCHEMES = ['http:', 'https:', 'mailto:', 'tel:'];
 
@@ -120,6 +131,33 @@ function renderSpan(span: PortableTextSpan, markDefs: PortableTextMarkDef[]): st
   return html;
 }
 
+/**
+ * 표 렌더링.
+ * 셀 내용은 **평문으로만** 다룹니다 — 셀 안에서 굵게·링크를 허용하면
+ * CMS 입력을 HTML로 해석해야 하고, 그 순간 이스케이프 구멍이 생깁니다.
+ */
+function renderTable(table: PortableTextTable): string {
+  const rows = (table.rows ?? []).filter((r) => (r.cells ?? []).length > 0);
+  if (rows.length === 0) return '';
+
+  const cell = (text: string, tag: 'th' | 'td') =>
+    `<${tag}>${escapeHtml(text ?? '')}</${tag}>`;
+
+  const useHeader = table.hasHeader !== false;
+  const [first, ...rest] = rows;
+
+  const head = useHeader
+    ? `<thead><tr>${(first.cells ?? []).map((c) => cell(c, 'th')).join('')}</tr></thead>`
+    : '';
+  const bodyRows = useHeader ? rest : rows;
+
+  const body = bodyRows
+    .map((r) => `<tr>${(r.cells ?? []).map((c) => cell(c, 'td')).join('')}</tr>`)
+    .join('');
+
+  return `<table>${head}<tbody>${body}</tbody></table>`;
+}
+
 function renderBlockInner(block: PortableTextBlock): string {
   const markDefs = block.markDefs ?? [];
   return (block.children ?? []).map((span) => renderSpan(span, markDefs)).join('');
@@ -127,7 +165,7 @@ function renderBlockInner(block: PortableTextBlock): string {
 
 /**
  * Portable Text 배열을 HTML 문자열로 변환합니다.
- * 지원: 문단, h2~h4, blockquote, bullet/number 리스트, 링크, 강조
+ * 지원: 문단, h2~h4, blockquote, bullet/number 리스트, 링크, 강조, 표
  * 무시: raw HTML, 임의 커스텀 블록 (보안상 의도적으로 제외)
  */
 export function portableTextToHtml(blocks: unknown): string {
@@ -146,7 +184,14 @@ export function portableTextToHtml(blocks: unknown): string {
   for (const raw of blocks) {
     const block = raw as PortableTextBlock;
 
-    // block 타입 외의 커스텀 타입(image, code 등)은 지원하지 않습니다.
+    // 표는 명시적으로 지원합니다
+    if (block && (block as unknown as PortableTextTable)._type === 'table') {
+      closeList();
+      out.push(renderTable(block as unknown as PortableTextTable));
+      continue;
+    }
+
+    // 그 외 커스텀 타입(image, code 등)은 지원하지 않습니다.
     // 필요해지면 여기에 명시적으로 추가하세요 — 기본은 무시입니다.
     if (!block || block._type !== 'block') {
       closeList();

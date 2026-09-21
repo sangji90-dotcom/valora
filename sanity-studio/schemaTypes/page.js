@@ -57,6 +57,7 @@ export const page = {
       title: '본문',
       type: 'array',
       of: [
+        { type: 'table' },
         {
           type: 'block',
           styles: [

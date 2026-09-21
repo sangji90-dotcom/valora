@@ -144,6 +144,14 @@ try {
     !/<img src=x onerror=/.test(aboutHtml) && !aboutHtml.includes('alert("page-xss")')
   );
 
+  // ---- 표 (Studio의 table 블록) ----
+  check('표: 머리글 행이 th 로 렌더', /<thead><tr><th>단계<\/th><th>걸리는 시간<\/th><\/tr><\/thead>/.test(aboutHtml));
+  check('표: 본문 행이 td 로 렌더', /<td>샘플 제작<\/td><td>약 2주<\/td>/.test(aboutHtml));
+  check(
+    '표: 셀 안의 HTML 이 이스케이프됨',
+    !/<b onmouseover=/.test(aboutHtml) && aboutHtml.includes('&lt;b onmouseover=')
+  );
+
   const privacyHtml = readFileSync(`${ROOT}dist/privacy/index.html`, 'utf8');
   check('페이지: 개인정보처리방침도 CMS에서 옴', privacyHtml.includes('CMS 개인정보처리방침'));
 

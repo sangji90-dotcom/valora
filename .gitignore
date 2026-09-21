@@ -9,3 +9,6 @@ dist/
 
 # 고객사에 보낼 양식 (생성물)
 상품등록_양식.xlsx
+
+# 마크다운 → Sanity 변환 결과 (일회성)
+.sanity-export/

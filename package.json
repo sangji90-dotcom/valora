@@ -17,7 +17,8 @@
     "import": "node scripts/import-products.mjs",
     "make-template": "node scripts/make-product-template.mjs",
     "gen:og": "node scripts/gen-og.mjs",
-    "studio:sync": "node scripts/sync-studio.mjs"
+    "studio:sync": "node scripts/sync-studio.mjs",
+    "export:sanity": "node scripts/export-to-sanity.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.4",

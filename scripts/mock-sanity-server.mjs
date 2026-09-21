@@ -161,6 +161,16 @@ const pages = [
         style: 'normal',
         children: [{ _type: 'span', text: '<img src=x onerror=alert("page-xss")>' }],
       },
+      // 표 — 고객사가 Studio에서 넣는 블록. 셀은 평문이므로 반드시 이스케이프되어야 합니다.
+      {
+        _type: 'table',
+        hasHeader: true,
+        rows: [
+          { _type: 'row', cells: ['단계', '걸리는 시간'] },
+          { _type: 'row', cells: ['샘플 제작', '약 2주'] },
+          { _type: 'row', cells: ['<b onmouseover=alert("cell-xss")>양산</b>', '약 6주'] },
+        ],
+      },
     ],
   },
   {

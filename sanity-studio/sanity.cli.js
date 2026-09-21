@@ -6,5 +6,5 @@ export default defineCliConfig({
     dataset: process.env.SANITY_STUDIO_DATASET || 'production',
   },
   /** 자동 업데이트를 끕니다 — 납품 후 Studio가 스스로 바뀌면 곤란합니다 */
-  autoUpdates: false,
+  deployment: { autoUpdates: false },
 });
