@@ -442,3 +442,141 @@
   border-radius: var(--radius-md);
   overflow: hidden;
 }
+
+/* ------------------------------------------------------------------ *
+ *  제품 상세 상단 — 사진을 키웁니다
+ * ------------------------------------------------------------------ *
+ *  화장품·생활용품은 사진이 설명보다 먼저 일합니다. 템플릿 기본값
+ *  (1.1fr : 1fr)은 규격표가 중요한 산업재 기준이라, 여기서는 사진 쪽에
+ *  무게를 더 싣습니다.
+ *  ⚠ minmax(0, …) 없이 1.35fr 만 쓰면 긴 제품명이 열을 밀어내
+ *    비율이 무너집니다. grid 자식의 min-width 기본값이 auto 라서입니다.
+ * ------------------------------------------------------------------ */
+:root body .detail__top {
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  gap: var(--space-16);
+}
+
+/**
+ * ⚠ 여기서는 :global() 을 쓰면 안 됩니다. 그건 .astro 의 <style> 안에서만
+ *   쓰는 Astro 문법이고, 평범한 .css 파일에서는 잘못된 선택자입니다.
+ *   CSS는 선택자 목록에 하나라도 잘못된 게 섞이면 **규칙 전체**를
+ *   버리기 때문에, 멀쩡한 쪽까지 같이 날아갑니다.
+ */
+:root body .detail__media .detail__img {
+  border: 0;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+}
+
+/* ------------------------------------------------------------------ *
+ *  본문(prose) — 긴 상세 설명이 벽처럼 보이지 않게
+ * ------------------------------------------------------------------ *
+ *  h2 가 전부 같은 크기로 쭉 이어지면 어디서 끊어 읽어야 할지 모릅니다.
+ *  홈 섹션 제목과 같은 장식선을 써서 문법을 통일합니다.
+ * ------------------------------------------------------------------ */
+:root body .prose h2 {
+  font-size: var(--text-2xl);
+  letter-spacing: var(--tracking-tight);
+  line-height: var(--leading-tight);
+  margin-top: var(--space-16);
+}
+
+:root body .prose h2::before {
+  content: '';
+  display: block;
+  width: 28px;
+  height: 2px;
+  margin-bottom: var(--space-4);
+  background: var(--color-accent);
+  opacity: 0.85;
+}
+
+/* 첫 제목 위에는 여백을 다시 줄입니다 — 탭 바로 아래라 이미 떠 있습니다 */
+:root body .prose > h2:first-child {
+  margin-top: 0;
+}
+
+:root body .prose h3 {
+  font-size: var(--text-xl);
+  letter-spacing: var(--tracking-tight);
+  margin-top: var(--space-12);
+}
+
+:root body .prose li::marker {
+  color: var(--color-accent);
+}
+
+:root body .prose li {
+  margin-bottom: var(--space-3);
+  padding-left: var(--space-1);
+}
+
+/* ================================================================== *
+ *  모바일 보정 — ⚠ 반드시 읽고 여기에 추가하세요
+ * ================================================================== *
+ *  명시도를 올려 scoped 스타일을 이기게 만든 대가입니다.
+ *  컴포넌트가 `@media (max-width: 880px)` 로 값을 줄여놓은 곳까지
+ *  브랜드 레이어가 **같이 이겨버립니다.** 미디어쿼리는 명시도를
+ *  바꾸지 않기 때문입니다.
+ *
+ *  실제로 제품 상세가 모바일에서 2열로 남아, 사진은 손톱만 하고
+ *  설명은 한 어절씩 세로로 끊겨 내려갔습니다. 데스크톱만 보면
+ *  절대 안 보입니다.
+ *
+ *  그래서 브랜드 레이어에서 **크기·여백·열 배치**를 건드릴 때마다
+ *  여기에 모바일 값을 같이 적습니다. 색·모서리·그림자는 해당 없습니다.
+ *  새 규칙을 넣었으면 390px 폭에서 눈으로 확인하세요.
+ * ================================================================== */
+@media (max-width: 880px) {
+  /* 상세 상단 — 한 열로 */
+  :root body .detail__top {
+    grid-template-columns: 1fr;
+    gap: var(--space-8);
+  }
+
+  :root body .detail__title {
+    font-size: var(--text-2xl);
+  }
+
+  :root body .detail__summary {
+    font-size: var(--text-base);
+  }
+
+  /* 섹션 리듬 — 96px 상하 여백은 작은 화면에서 빈 화면처럼 보입니다 */
+  :root body .section {
+    padding-block: var(--space-16);
+  }
+
+  :root body .hero {
+    padding-block: var(--space-16) var(--space-12);
+  }
+
+  :root body .section__title,
+  :root body .message__title,
+  :root body .cta__title {
+    font-size: var(--text-2xl);
+  }
+
+  :root body .message__body {
+    font-size: var(--text-base);
+  }
+
+  :root body .row__title {
+    font-size: var(--text-xl);
+  }
+
+  :root body .cta {
+    padding: var(--space-12) var(--space-5);
+  }
+
+  :root body .prose h2 {
+    font-size: var(--text-xl);
+    margin-top: var(--space-12);
+  }
+
+  :root body .prose h3 {
+    font-size: var(--text-lg);
+    margin-top: var(--space-8);
+  }
+}
