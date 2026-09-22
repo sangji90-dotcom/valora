@@ -103,13 +103,7 @@ const INTERVAL = 6000;
         </>
       )}
 
-      <noscript>
-        <style>
-          /* JS가 없으면 첫 슬라이드만 그대로 보여줍니다 */
-          [data-slide][hidden] { display: none !important; }
-          .carousel__arrow, .carousel__dots { display: none !important; }
-        </style>
-      </noscript>
+      {/* JS 없을 때 첫 슬라이드만 남기는 규칙은 public/noscript.css 에 */}
     </section>
   )
 }

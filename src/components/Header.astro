@@ -104,12 +104,7 @@ const showSearch = siteConfig.enableSearch;
     </nav>
   </div>
 
-  <noscript>
-    <style>
-      /* 검색 결과 필터링은 JS가 담당하므로, JS가 없으면 검색창을 숨깁니다 */
-      .header__search { display: none !important; }
-    </style>
-  </noscript>
+  {/* JS 없을 때 검색창을 숨기는 규칙은 public/noscript.css 에 있습니다 */}
 </header>
 
 <style>

@@ -99,13 +99,7 @@ const initial = siteConfig.productsPerPage;
     <button class="btn btn--ghost" type="button" data-more hidden>더 보기</button>
   </div>
 
-  <noscript>
-    <style>
-      /* JS가 꺼져 있으면 전부 노출하고 필터 UI는 숨깁니다 */
-      [data-item][hidden] { display: revert !important; }
-      .browser__bar, .browser__more { display: none !important; }
-    </style>
-  </noscript>
+  {/* JS 없을 때 전부 노출하고 필터 UI를 숨기는 규칙은 public/noscript.css 에 */}
 </div>
 
 <script>

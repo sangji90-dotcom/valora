@@ -14,7 +14,6 @@
  * 템플릿·데모에는 이 파일이 없습니다.
  */
 @import './brand.css';
-
 *,
 *::before,
 *::after {
@@ -36,6 +35,23 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/**
+ * ⚠ 한글 줄바꿈 —
+ * 브라우저 기본값은 한글을 **글자 단위**로 끊습니다. 그래서
+ * "제로웨이스트 디스펜서 (4 / 구)" 처럼 어절 한가운데가 갈라집니다.
+ * 제목이 클수록 눈에 띄고, 고객사 검수에서 반드시 지적받는 부분입니다.
+ *
+ * keep-all 은 어절(띄어쓰기) 단위로만 끊습니다. 대신 끊을 데가 없는
+ * 긴 영문·URL 이 칸을 넘칠 수 있어서 overflow-wrap 을 같이 겁니다.
+ *
+ * lang 이 ko 일 때만 겁니다 — 영문 사이트에 keep-all 을 걸면
+ * 오히려 줄이 들쭉날쭉해집니다.
+ */
+html[lang^='ko'] body {
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
 h1,
 h2,
 h3,
@@ -45,6 +61,8 @@ h4 {
   margin: 0 0 var(--space-4);
   letter-spacing: -0.02em;
   font-weight: 700;
+  /* 두 줄 이상일 때 줄 길이를 고르게 — 지원 안 하면 무시됩니다 */
+  text-wrap: balance;
 }
 
 p {

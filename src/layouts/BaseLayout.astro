@@ -26,6 +26,15 @@ const noindexFinal = siteConfig.noindex || noindex;
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+
+    {/*
+      JS를 끈 방문자에게만 적용되는 스타일 — 내용은 public/noscript.css 에.
+      ⚠ <noscript> 안에 <style> 을 직접 쓰면 안 됩니다. Astro의 CSP 해시
+        수집이 <noscript> 내부를 건너뛰어서, JS 끈 사람에게만 조용히
+        차단됩니다. 외부 스타일시트는 style-src 'self' 로 통과합니다.
+    */}
+    <noscript><link rel="stylesheet" href="/noscript.css" /></noscript>
+
     <SEO title={title} description={description} image={image} noindex={noindexFinal} />
     <slot name="head" />
   </head>

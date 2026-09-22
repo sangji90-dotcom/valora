@@ -1,0 +1,60 @@
+/**
+ * ============================================================
+ *  JS가 꺼져 있을 때만 적용되는 스타일
+ * ============================================================
+ *  BaseLayout.astro 의 <head> 안에서
+ *    <noscript><link rel="stylesheet" href="/noscript.css"></noscript>
+ *  로 불러옵니다. <noscript> 안이므로 JS가 켜져 있으면
+ *  브라우저가 아예 내려받지 않습니다.
+ *
+ *  ⚠ 왜 컴포넌트 안의 <noscript><style> 이 아니라 이 파일인가 —
+ *  우리는 CSP를 해시 기반으로 씁니다(unsafe-inline 없음). 그런데
+ *  Astro의 CSP 해시 수집은 <noscript> **안의** <style> 을 세지
+ *  않습니다. 그래서 컴포넌트에 <noscript><style> 을 두면,
+ *  빌드는 통과하고 JS 켠 상태에서는 아무 문제가 없는데,
+ *  **JS를 끈 방문자에게만** 조용히 차단됩니다.
+ *
+ *  실제로 그랬습니다. 차단됐을 때 벌어진 일 —
+ *   - 검색창이 보이는데 눌러도 아무 일이 없음
+ *   - 필터 막대와 '더 보기' 버튼이 보이는데 동작 안 함
+ *   - 제품이 많은 고객사에서는 첫 페이지 뒤 제품이 **통째로 안 보임**
+ *     (ProductBrowser 가 i >= initial 인 항목을 hidden 으로 내보냄)
+ *
+ *  외부 스타일시트는 style-src 'self' 로 허용되므로 이 방식은 막히지
+ *  않습니다. 깜빡임(FOUC)도 없습니다 — 스크립트가 클래스를 붙이길
+ *  기다리는 방식과 달리, 첫 페인트 전에 이미 적용됩니다.
+ *
+ *  ⚠ 이 파일은 public/ 에 있어 번들러를 거치지 않습니다.
+ *    CSS 변수(var(--x))는 써도 되지만, Astro의 scoped 해시가 없으므로
+ *    선택자는 전역입니다. 클래스명을 바꾸면 여기도 같이 고치세요.
+ *    (npm run test:csp 가 <noscript><style> 재발을 감시합니다)
+ * ============================================================
+ */
+
+/* ---------- Header — 검색창 ---------- */
+/* 검색 결과 필터링은 JS가 담당합니다. 동작 안 하는 입력창은 감춥니다. */
+.header__search {
+  display: none !important;
+}
+
+/* ---------- ProductBrowser — 목록 필터 ---------- */
+/* 전부 노출하고, 동작하지 않는 필터 UI 쪽을 감춥니다. */
+[data-item][hidden] {
+  display: revert !important;
+}
+
+.browser__bar,
+.browser__more {
+  display: none !important;
+}
+
+/* ---------- HeroCarousel — 슬라이드 ---------- */
+/* 첫 슬라이드만 그대로 두고, 넘기는 장치를 감춥니다. */
+[data-slide][hidden] {
+  display: none !important;
+}
+
+.carousel__arrow,
+.carousel__dots {
+  display: none !important;
+}
