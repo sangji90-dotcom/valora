@@ -35,7 +35,66 @@ export const siteConfig: SiteConfig = {
     imageRatio: '4:3',
     // 품목이 4종뿐이라 하나씩 설명하는 rows 가 맞습니다
     featured: 'rows',
-    homeSections: ['message', 'featured', 'categories', 'cta'],
+    homeSections: ['message', 'featured', 'stats', 'categories', 'cta'],
+  },
+
+  /**
+   * 히어로 아래 신뢰 근거 띠.
+   * 전부 제안서에 근거가 있는 사실만 적었습니다.
+   */
+  proof: [
+    {
+      label: '특허',
+      value: '출원 완료',
+      note: '캡슐형 비누 및 그 토출장치 (10-2025-0122876)',
+    },
+    {
+      label: '기술이전',
+      value: '남부대학교 산학협력',
+      note: '식물추출물 유효성분 포함 조성물',
+    },
+    {
+      label: '인증',
+      value: '진행 중',
+      note: '화장품법 기반 인증 절차',
+    },
+    {
+      label: '공급 방식',
+      value: '주문 제작',
+      note: '용도와 수량에 맞춰 구성·색상 맞춤',
+    },
+  ],
+
+  /**
+   * 숫자 띠.
+   * ⚠ 기준(basis)과 면책(disclaimer)을 비우지 마세요 —
+   *   수치만 크게 써두면 근거 없는 환경 주장이 됩니다.
+   */
+  stats: {
+    title: '도입하면 얼마나 줄어드나',
+    basis: '캡슐 1만 개를 도입했을 때를 기준으로 한 추정치입니다.',
+    items: [
+      {
+        label: '플라스틱 폐기물',
+        value: '80',
+        unit: 'kg',
+        note: '소형 어메니티 용기·파우치 대체 기준',
+      },
+      {
+        label: '이산화탄소 배출',
+        value: '216~280',
+        unit: 'kg',
+        note: '플라스틱 1kg당 2.7~3.5kg CO₂e 적용',
+      },
+      {
+        label: '세정제 과다 사용',
+        value: '20~30',
+        unit: '%',
+        note: '1회 정량 제공에 따른 남용 감소',
+      },
+    ],
+    disclaimer:
+      '도입 수량에 비례한 추정치입니다. 실제 산출 근거가 필요하시면 문의 시 요청해 주세요. UN 지속가능발전목표 12번·13번에 해당하는 항목이라 ESG 보고서에 수치로 적을 수 있습니다.',
   },
 
   brandMessage: {

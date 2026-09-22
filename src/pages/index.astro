@@ -6,6 +6,9 @@ import Hero from '../components/Hero.astro';
 import ProductGrid from '../components/ProductGrid.astro';
 import FeaturedRows from '../components/FeaturedRows.astro';
 import PromoBanner from '../components/PromoBanner.astro';
+import ProofStrip from '../components/ProofStrip.astro';
+import StatBand from '../components/StatBand.astro';
+import Reveal from '../components/Reveal.astro';
 import { getFeaturedProducts, getCategoriesWithCount } from '../lib/products';
 import { organizationSchema } from '../lib/structured-data';
 
@@ -29,6 +32,9 @@ const { brandMessage } = siteConfig;
   />
 
   <Hero />
+
+  {/* 히어로 직후 — "이 회사 믿을 만한가"에 먼저 답합니다 */}
+  <ProofStrip />
 
   {
     sections.map((section) => {
@@ -94,6 +100,10 @@ const { brandMessage } = siteConfig;
         return <PromoBanner />;
       }
 
+      if (section === 'stats') {
+        return <StatBand />;
+      }
+
       if (section === 'cta') {
         return (
           <section class="section">
@@ -111,6 +121,8 @@ const { brandMessage } = siteConfig;
       return null;
     })
   }
+  {/* 스크롤 등장 — [data-reveal] 이 붙은 요소에만 적용됩니다 */}
+  <Reveal />
 </BaseLayout>
 
 <style>

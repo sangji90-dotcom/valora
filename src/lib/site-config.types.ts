@@ -92,7 +92,9 @@ export interface LayoutPreset {
    *
    * 히어로는 항상 맨 위에 옵니다.
    */
-  homeSections: Array<'message' | 'featured' | 'categories' | 'promo' | 'cta'>;
+  homeSections: Array<
+    'message' | 'featured' | 'categories' | 'promo' | 'stats' | 'cta'
+  >;
 }
 
 export interface SiteConfig {
@@ -183,6 +185,48 @@ export interface SiteConfig {
     ctaDesc?: string;
     /** 검색창 안내 문구. 기본 '{item}명·모델명 검색' */
     searchPlaceholder?: string;
+  };
+
+  /**
+   * 히어로 바로 아래 신뢰 근거 띠 (발로라 전용 확장).
+   *
+   * ⚠ **검증 가능한 사실만** 적습니다.
+   *   특허 출원번호, 기술이전 기관명처럼 상대가 직접 확인할 수 있는 것.
+   *   "업계 1위" 같은 문구는 근거를 댈 수 없으면 부당 표시가 됩니다.
+   *
+   * 비우면 띠가 나오지 않습니다.
+   */
+  proof?: Array<{
+    /** 위에 붙는 작은 라벨. 예: 특허 */
+    label: string;
+    /** 굵게 표시될 본문 */
+    value: string;
+    /** 아래 한 줄 보충 설명 */
+    note?: string;
+  }>;
+
+  /**
+   * 숫자 띠 (발로라 전용 확장).
+   * homeSections 에 'stats' 를 넣어야 나옵니다.
+   *
+   * ⚠ basis(기준)를 반드시 채우세요. "80kg 절감"만 크게 써두면
+   *   무슨 기준인지 알 수 없고 그 자체로 과장 표시가 됩니다.
+   */
+  stats?: {
+    title: string;
+    /** 무엇을 기준으로 한 숫자인지. 예: 캡슐 1만 개 도입 기준 */
+    basis?: string;
+    items: Array<{
+      label: string;
+      /** 숫자 부분만. 예: 80 또는 216~280 */
+      value: string;
+      /** 단위. 예: kg */
+      unit?: string;
+      /** 산출 근거 */
+      note?: string;
+    }>;
+    /** 아래 작게 붙는 면책 문구 */
+    disclaimer?: string;
   };
 
   /**

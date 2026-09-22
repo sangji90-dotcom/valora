@@ -1,0 +1,106 @@
+---
+/**
+ * ============================================================
+ *  스크롤 등장 — 발로라 전용
+ * ============================================================
+ *  ⚠ 이 컴포넌트는 발로라에만 있습니다. 템플릿에는 넣지 마세요.
+ *
+ *  `data-reveal` 이 붙은 요소가 화면에 들어올 때 한 번만 나타납니다.
+ *  "있어 보이는" 인상의 큰 부분이 이 한 겹에서 나옵니다.
+ *
+ *  설계 —
+ *   - **감추는 일은 스크립트가 합니다.** CSS로 먼저 감추면 JS가 막혔을 때
+ *     내용이 영영 안 보입니다. 스크립트가 도는 것을 확인한 뒤에만 감춥니다.
+ *   - 한 번 나타나면 관찰을 해제합니다. 스크롤할 때마다 다시 사라지면
+ *     읽는 사람을 괴롭힙니다.
+ *   - prefers-reduced-motion 이면 아무것도 하지 않습니다.
+ *   - IntersectionObserver 가 없는 브라우저에서도 그냥 보입니다.
+ * ============================================================
+ */
+---
+
+<script>
+  /**
+   * 기존 컴포넌트(템플릿과 공유)의 마크업은 건드리지 않습니다.
+   * 대신 스크립트가 여기 적힌 자리에 data-reveal 을 붙입니다.
+   * 속성만 추가하므로 CSP와 무관합니다(style 속성이 아님).
+   */
+  const AUTO = [
+    '.section__head',
+    '.rows > .row',
+    '.cats > .cat',
+    '.grid > .grid__item',
+    '.cta',
+    '.message',
+  ];
+
+  for (const sel of AUTO) {
+    for (const el of document.querySelectorAll(sel)) {
+      el.setAttribute('data-reveal', '');
+    }
+  }
+
+  const items = document.querySelectorAll<HTMLElement>('[data-reveal]');
+
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (items.length && !reduce && 'IntersectionObserver' in window) {
+    // 스크립트가 여기까지 왔을 때만 감춥니다
+    document.documentElement.classList.add('reveal-ready');
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          entry.target.classList.add('is-revealed');
+          io.unobserve(entry.target);
+        }
+      },
+      // 요소가 조금 보이기 시작할 때 — 다 올라온 뒤에 나타나면 늦습니다
+      { rootMargin: '0px 0px -12% 0px', threshold: 0.05 }
+    );
+
+    // 지연은 CSS(:nth-child)가 맡습니다 — el.style 로 넣으면 style 속성이
+    // 생기고, 우리 CSP 운영 방식에서는 피해야 할 패턴입니다.
+    items.forEach((el) => io.observe(el));
+  }
+</script>
+
+<style is:global>
+  /*
+   * .reveal-ready 는 스크립트가 붙입니다.
+   * JS가 없으면 이 규칙이 적용되지 않아 모든 요소가 그대로 보입니다.
+   */
+  .reveal-ready [data-reveal] {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+
+  /* 같은 줄의 항목이 계단식으로 들어오게 살짝씩 늦춥니다 */
+  .reveal-ready [data-reveal]:nth-child(2) {
+    --reveal-delay: 70ms;
+  }
+
+  .reveal-ready [data-reveal]:nth-child(3) {
+    --reveal-delay: 140ms;
+  }
+
+  .reveal-ready [data-reveal]:nth-child(4) {
+    --reveal-delay: 210ms;
+  }
+
+  .reveal-ready [data-reveal].is-revealed {
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity 620ms var(--ease) var(--reveal-delay, 0ms),
+      transform 620ms var(--ease) var(--reveal-delay, 0ms);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reveal-ready [data-reveal] {
+      opacity: 1;
+      transform: none;
+    }
+  }
+</style>

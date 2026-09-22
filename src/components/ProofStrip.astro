@@ -1,0 +1,95 @@
+---
+import siteConfig from '../../site.config';
+
+/**
+ * ============================================================
+ *  신뢰 근거 띠 — 발로라 전용
+ * ============================================================
+ *  ⚠ 이 컴포넌트는 발로라에만 있습니다. 템플릿에는 넣지 마세요.
+ *
+ *  왜 필요한가 —
+ *  B2B 카탈로그에서 첫 화면 다음에 오는 질문은 "이 회사 믿을 만한가"
+ *  입니다. 커머스 사이트라면 리뷰 수와 판매량이 그 자리를 채우지만,
+ *  우리는 리뷰를 만들 수 없습니다(없는 후기를 지어내는 건 논외).
+ *
+ *  대신 **검증 가능한 사실**을 같은 자리에 놓습니다. 특허 출원번호,
+ *  기술이전 기관명처럼 상대가 직접 확인할 수 있는 것이라야 합니다.
+ *
+ *  ⚠ 여기 적는 내용은 전부 근거가 있어야 합니다.
+ *    "업계 1위" 같은 검증 불가능한 문구를 넣으면 부당 표시가 됩니다.
+ * ============================================================
+ */
+
+const items = siteConfig.proof ?? [];
+---
+
+{
+  items.length > 0 && (
+    <section class="proof" aria-label="회사 신뢰 근거">
+      <div class="container proof__grid">
+        {items.map((item) => (
+          <div class="proof__item" data-reveal>
+            <p class="proof__label">{item.label}</p>
+            <p class="proof__value">{item.value}</p>
+            {item.note && <p class="proof__note">{item.note}</p>}
+          </div>
+        ))}
+      </div>
+    </section>
+  )
+}
+
+<style>
+  .proof {
+    background: var(--color-surface);
+    border-block: 1px solid var(--color-border);
+    padding-block: var(--space-12);
+  }
+
+  .proof__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--space-8);
+  }
+
+  .proof__item {
+    position: relative;
+    padding-left: var(--space-5);
+  }
+
+  /* 항목마다 세로선 — 표처럼 읽히게 만듭니다 */
+  .proof__item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.25em;
+    bottom: 0.25em;
+    width: 2px;
+    background: var(--color-accent);
+    opacity: 0.55;
+  }
+
+  .proof__label {
+    margin: 0 0 var(--space-2);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+
+  .proof__value {
+    margin: 0;
+    font-size: var(--text-xl);
+    font-weight: 700;
+    letter-spacing: var(--tracking-tight);
+    line-height: 1.35;
+  }
+
+  .proof__note {
+    margin: var(--space-2) 0 0;
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    line-height: 1.6;
+  }
+</style>
