@@ -29,6 +29,26 @@ import { pathToFileURL, fileURLToPath } from 'node:url';
 import { parse as parseYaml } from 'yaml';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+
+/**
+ * --only <id> : 특정 문서 하나만 내보냅니다.
+ *
+ * 왜 필요한가 —
+ * 이미 CMS를 쓰고 있는 상태에서 문서 하나만 다시 밀어넣고 싶을 때가 있습니다.
+ * 전체를 --replace 로 import 하면 고객사가 고친 다른 문서까지 되돌아갑니다.
+ *
+ * 쉘에서 골라내면 되지 않느냐 —
+ * PowerShell 의 Get-Content 는 UTF-8 파일을 시스템 코드페이지(CP949)로 읽어서
+ * 한글이 깨지고, 깨진 바이트가 뒤따르는 따옴표를 삼켜 JSON 이 망가집니다.
+ * 텍스트를 쉘로 옮기지 않는 것이 유일하게 안전한 방법입니다.
+ */
+const onlyIndex = process.argv.indexOf('--only');
+const ONLY = onlyIndex !== -1 ? process.argv[onlyIndex + 1] : null;
+
+if (onlyIndex !== -1 && !ONLY) {
+  console.error('--only 뒤에 문서 id를 적어주세요. 예: --only product-dispenser');
+  process.exit(1);
+}
 const CONTENT = join(ROOT, 'src', 'content');
 const OUT_DIR = join(ROOT, '.sanity-export');
 const OUT_FILE = join(OUT_DIR, 'export.ndjson');
@@ -462,28 +482,39 @@ function buildSlide(entry) {
 /* ------------------------------------------------------------------ *
  *  실행
  * ------------------------------------------------------------------ */
-const docs = [
+const all = [
   ...readCollection('products').map(buildProduct),
   ...readCollection('pages').map(buildPage),
   ...readCollection('slides').map(buildSlide),
 ];
+
+const docs = ONLY ? all.filter((d) => d._id === ONLY) : all;
+
+if (ONLY && docs.length === 0) {
+  console.error(`--only ${ONLY} 에 해당하는 문서가 없습니다.`);
+  console.error('가능한 id:');
+  for (const d of all) console.error(`  ${d._id}`);
+  process.exit(1);
+}
 
 if (!docs.length) {
   console.error('옮길 문서가 없습니다. src/content/ 아래를 확인하세요.');
   process.exit(1);
 }
 
+const outFile = ONLY ? join(OUT_DIR, `${ONLY}.ndjson`) : OUT_FILE;
+
 mkdirSync(OUT_DIR, { recursive: true });
-writeFileSync(OUT_FILE, docs.map((d) => JSON.stringify(d)).join('\n') + '\n', 'utf8');
+writeFileSync(outFile, docs.map((d) => JSON.stringify(d)).join('\n') + '\n', 'utf8');
 
 const counts = docs.reduce((acc, d) => ({ ...acc, [d._type]: (acc[d._type] ?? 0) + 1 }), {});
 
-console.log(`${OUT_FILE}`);
+console.log(`${outFile}`);
 for (const [type, n] of Object.entries(counts)) console.log(`  ${type} ${n}개`);
 console.log(`
 다음 단계 —
   1) cd sanity-studio
-  2) npx sanity dataset import ../.sanity-export/export.ndjson production --replace
+  2) npx sanity dataset import ../${outFile.slice(ROOT.length + 1).replace(/\\/g, '/')} --dataset production --replace
 
   --replace 는 같은 _id 의 문서를 덮어씁니다. 여러 번 돌려도 중복되지 않습니다.
   고객사가 Studio에서 고친 내용까지 되돌아가므로, **최초 1회만** 쓰세요.
