@@ -1,0 +1,363 @@
+---
+import siteConfig from '../../site.config';
+import ProductImage from './ProductImage.astro';
+import type { Product } from '../lib/products';
+import { getCategoryLabel, STATUS_LABEL } from '../lib/products';
+
+/**
+ * ============================================================
+ *  대표 제품 쇼케이스 — 발로라 전용
+ * ============================================================
+ *  ⚠ 이 컴포넌트는 발로라에만 있습니다. 템플릿에는 넣지 마세요.
+ *    템플릿은 FeaturedRows(지그재그 나열)를 그대로 씁니다.
+ *
+ *  한 화면에 제품 하나만 둡니다 — 큰 사진, 큰 제목, 한 줄.
+ *  아래 동그라미로 다음 제품으로 넘깁니다.
+ *
+ *  ⚠ 왜 JS 슬라이더가 아니라 가로 스크롤인가 —
+ *  트랙 자체가 `overflow-x: auto` + `scroll-snap` 입니다. 즉 **스크립트가
+ *  하나도 없어도** 손가락으로 밀거나 동그라미(앵커 링크)를 눌러 넘길 수
+ *  있습니다. JS는 그 위에 부드러운 이동과 현재 위치 표시만 얹습니다.
+ *  슬라이드를 JS로 숨기는 방식이었다면, 스크립트가 막히는 순간
+ *  대표 제품 3개가 통째로 사라집니다.
+ *
+ *  ⚠ 자동 재생은 넣지 않았습니다. 읽는 도중에 화면이 바뀌면
+ *    저시력·운동장애 사용자에게 특히 불리하고, 멈춤 버튼까지 얹으면
+ *    유지보수할 게 늘어납니다.
+ * ============================================================
+ */
+
+interface Props {
+  products: Product[];
+}
+
+const { products } = Astro.props;
+
+/**
+ * 한 줄만 씁니다. summary 가 두 문장이면 앞 문장만 가져옵니다.
+ * (자르는 게 아니라 문장 경계에서 끊습니다 — 말줄임표로 뭉개지 않으려고.
+ *  전체 설명은 제품 상세 페이지에 그대로 있습니다.)
+ */
+function firstSentence(text: string): string {
+  const m = text.match(/^[^.!?]*[.!?]/);
+  return m ? m[0].trim() : text.trim();
+}
+
+const ratio = siteConfig.layout.imageRatio;
+const total = products.length;
+---
+
+<section
+  class="show"
+  aria-roledescription="캐러셀"
+  aria-label="대표 제품"
+  data-reveal
+>
+  {/* tabindex="0" — 키보드로도 좌우 스크롤이 되어야 합니다 */}
+  <div class="show__track" tabindex="0" role="group" aria-label="대표 제품 목록">
+    {
+      products.map((product, index) => {
+        const { data } = product;
+        const statusLabel = STATUS_LABEL[data.status];
+        const href = `/products/${product.id}/`;
+
+        return (
+          <article
+            class="show__slide"
+            id={`feat-${index + 1}`}
+            aria-label={`${index + 1} / ${total} ${data.title}`}
+          >
+            {/* 사진에도 링크를 걸되 스크린리더는 제목에서 한 번만 읽게 합니다 */}
+            <a href={href} class="show__media" data-ratio={ratio} tabindex="-1" aria-hidden="true">
+              <ProductImage
+                image={data.thumbnail}
+                alt={data.title}
+                widths={[560, 880, 1200]}
+                sizes="(max-width: 880px) 100vw, 720px"
+                loading={index === 0 ? 'eager' : 'lazy'}
+                class="show__img"
+              />
+            </a>
+
+            <div class="show__body">
+              <p class="show__meta">
+                <span class="badge">{getCategoryLabel(data.category)}</span>
+                {data.badge && <span class="badge badge--promo">{data.badge}</span>}
+                {statusLabel && <span class="badge badge--status">{statusLabel}</span>}
+              </p>
+
+              <h3 class="show__title">
+                <a href={href}>{data.title}</a>
+              </h3>
+
+              <p class="show__line">{firstSentence(data.summary)}</p>
+
+              <a href={href} class="btn btn--ghost show__more">
+                자세히 보기
+              </a>
+            </div>
+          </article>
+        );
+      })
+    }
+  </div>
+
+  {/*
+    동그라미는 button 이 아니라 **앵커 링크**입니다.
+    JS가 없으면 브라우저가 알아서 해당 슬라이드로 이동시켜 줍니다.
+    button 이었다면 스크립트 없이는 아무 일도 안 일어납니다.
+  */}
+  <nav class="show__dots" aria-label="대표 제품 넘기기">
+    {
+      products.map((product, index) => (
+        <a
+          class="show__dot"
+          href={`#feat-${index + 1}`}
+          data-dot={index}
+          aria-label={`${index + 1}번째 제품 — ${product.data.title}`}
+        />
+      ))
+    }
+  </nav>
+</section>
+
+<script>
+  /**
+   * 여기서 하는 일은 두 가지뿐입니다.
+   *  1) 동그라미를 누르면 세로 점프 없이 가로로만 부드럽게 이동
+   *  2) 지금 보고 있는 슬라이드의 동그라미를 채워서 표시
+   *
+   * 둘 다 "없어도 되는" 기능입니다. 그래서 스크립트가 여기까지
+   * 실행됐을 때만 .is-ready 를 붙이고, 그 클래스가 있을 때만
+   * 채워진 동그라미 스타일이 걸립니다.
+   */
+  const show = document.querySelector<HTMLElement>('.show');
+  const track = show?.querySelector<HTMLElement>('.show__track');
+  const dots = show ? [...show.querySelectorAll<HTMLAnchorElement>('.show__dot')] : [];
+  const slides = track ? [...track.querySelectorAll<HTMLElement>('.show__slide')] : [];
+
+  if (track && dots.length && slides.length === dots.length) {
+    show!.classList.add('is-ready');
+
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function setActive(index: number) {
+      dots.forEach((dot, i) => {
+        if (i === index) dot.setAttribute('aria-current', 'true');
+        else dot.removeAttribute('aria-current');
+      });
+    }
+
+    setActive(0);
+
+    dots.forEach((dot, i) => {
+      dot.addEventListener('click', (event) => {
+        /**
+         * ⚠ scrollIntoView 를 쓰면 안 됩니다.
+         *   block: 'nearest' 를 줘도, 슬라이드가 화면보다 크면 브라우저가
+         *   "보이게" 만들려고 **페이지까지 세로로** 끌어당깁니다.
+         *   (실측: 1280×900 에서 484px 튐)
+         *   트랙의 scrollLeft 만 직접 움직이면 세로는 절대 안 건드립니다.
+         */
+        event.preventDefault();
+        const slide = slides[i];
+        const left = slide.offsetLeft - (track!.clientWidth - slide.clientWidth) / 2;
+        track!.scrollTo({ left, behavior: reduce ? 'auto' : 'smooth' });
+        setActive(i);
+      });
+    });
+
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (!entry.isIntersecting) continue;
+            const i = slides.indexOf(entry.target as HTMLElement);
+            if (i !== -1) setActive(i);
+          }
+        },
+        // 트랙 안에서만 판단합니다 — 페이지 스크롤과 섞이면 안 됩니다
+        { root: track, threshold: 0.6 }
+      );
+
+      slides.forEach((slide) => io.observe(slide));
+    }
+  }
+</script>
+
+<style>
+  .show {
+    /* 트랙이 컨테이너 밖으로 흘러도 잘리지 않게 여백을 줍니다 */
+    margin-inline: calc(var(--space-4) * -1);
+  }
+
+  /* ---------- 트랙 ---------- */
+
+  .show__track {
+    display: flex;
+    gap: var(--space-6);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    /* 첫·끝 슬라이드도 가운데에 설 수 있게 */
+    scroll-padding-inline: var(--space-4);
+    padding-inline: var(--space-4);
+    padding-block: var(--space-2);
+    /* 동그라미가 위치를 알려주므로 막대는 감춥니다 */
+    scrollbar-width: none;
+  }
+
+  .show__track::-webkit-scrollbar {
+    display: none;
+  }
+
+  .show__track:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 4px;
+    border-radius: var(--radius-lg);
+  }
+
+  .show__slide {
+    flex: 0 0 100%;
+    max-width: 100%;
+    scroll-snap-align: center;
+    text-align: center;
+  }
+
+  /* ---------- 사진 ---------- */
+
+  .show__media {
+    display: block;
+    max-width: 720px;
+    margin-inline: auto;
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    background: var(--color-bg-subtle);
+    box-shadow: var(--shadow-md);
+  }
+
+  /* prop 으로 넘긴 class 에는 scoped 해시가 안 붙으므로 :global 필요 */
+  .show__media :global(.show__img) {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    transition: transform 520ms var(--ease);
+  }
+
+  .show__media[data-ratio='1:1'] :global(.show__img) { aspect-ratio: 1 / 1; }
+  .show__media[data-ratio='3:4'] :global(.show__img) { aspect-ratio: 3 / 4; }
+  .show__media[data-ratio='2:3'] :global(.show__img) { aspect-ratio: 2 / 3; }
+  .show__media[data-ratio='16:9'] :global(.show__img) { aspect-ratio: 16 / 9; }
+
+  .show__media:hover :global(.show__img) {
+    transform: scale(1.03);
+  }
+
+  /* ---------- 글 ---------- */
+
+  .show__body {
+    max-width: 44rem;
+    margin: var(--space-8) auto 0;
+  }
+
+  .show__meta {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-2);
+    margin: 0 0 var(--space-4);
+  }
+
+  .show__title {
+    font-size: var(--text-4xl);
+    letter-spacing: var(--tracking-tight);
+    line-height: var(--leading-tight);
+    margin: 0 0 var(--space-4);
+  }
+
+  .show__title a:hover {
+    color: var(--color-accent);
+  }
+
+  .show__line {
+    font-size: var(--text-lg);
+    line-height: var(--leading-normal);
+    color: var(--color-text-muted);
+    margin: 0 0 var(--space-8);
+  }
+
+  /* ---------- 동그라미 ---------- */
+
+  .show__dots {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-3);
+    margin-top: var(--space-8);
+  }
+
+  .show__dot {
+    /* 보이는 원은 12px 이지만 누르는 면적은 44px 입니다 (손가락 기준) */
+    position: relative;
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-full);
+  }
+
+  .show__dot::after {
+    content: '';
+    position: absolute;
+    inset: 50% auto auto 50%;
+    width: 12px;
+    height: 12px;
+    margin: -6px 0 0 -6px;
+    border-radius: var(--radius-full);
+    border: 1.5px solid var(--color-accent);
+    background: transparent;
+    transition:
+      background-color var(--dur) var(--ease),
+      transform var(--dur) var(--ease);
+  }
+
+  .show__dot:hover::after {
+    background: var(--color-accent-subtle);
+  }
+
+  .show__dot:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: -8px;
+  }
+
+  /*
+   * 채워진 표시는 .is-ready 안에서만 — 스크립트가 현재 위치를
+   * 갱신해 줄 때만 의미가 있습니다. JS가 없으면 모두 빈 원이고,
+   * 그래도 링크로서는 정상 동작합니다.
+   */
+  .show.is-ready .show__dot[aria-current='true']::after {
+    background: var(--color-accent);
+    transform: scale(1.25);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .show__media :global(.show__img),
+    .show__dot::after {
+      transition: none;
+    }
+
+    .show__media:hover :global(.show__img) {
+      transform: none;
+    }
+  }
+
+  @media (max-width: 880px) {
+    .show__body {
+      margin-top: var(--space-6);
+    }
+
+    .show__title {
+      font-size: var(--text-2xl);
+    }
+
+    .show__line {
+      font-size: var(--text-base);
+      margin-bottom: var(--space-6);
+    }
+  }
+</style>

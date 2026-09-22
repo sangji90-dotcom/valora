@@ -4,7 +4,9 @@ import T from '../lib/terms';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Hero from '../components/Hero.astro';
 import ProductGrid from '../components/ProductGrid.astro';
-import FeaturedRows from '../components/FeaturedRows.astro';
+// 발로라는 지그재그 나열(FeaturedRows) 대신 한 화면에 하나씩 보여줍니다.
+// FeaturedRows.astro 는 템플릿과 공유하므로 건드리지 않고 그대로 둡니다.
+import FeaturedShowcase from '../components/FeaturedShowcase.astro';
 import PromoBanner from '../components/PromoBanner.astro';
 import ProofStrip from '../components/ProofStrip.astro';
 import StatBand from '../components/StatBand.astro';
@@ -59,7 +61,7 @@ const { brandMessage } = siteConfig;
               </div>
 
               {siteConfig.layout.featured === 'rows' ? (
-                <FeaturedRows products={featured} />
+                <FeaturedShowcase products={featured} />
               ) : (
                 <ProductGrid products={featured} />
               )}
