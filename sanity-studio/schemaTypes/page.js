@@ -58,6 +58,7 @@ export const page = {
       type: 'array',
       of: [
         { type: 'table' },
+        { type: 'calculator' },
         {
           type: 'block',
           styles: [

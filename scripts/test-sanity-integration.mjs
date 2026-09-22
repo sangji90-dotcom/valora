@@ -158,6 +158,17 @@ try {
     listHtml.includes('alt="CMS에서 적은 대체 텍스트"')
   );
 
+  // ---- 절감량 계산기 ----
+  check('계산기: 기준 수량 값이 HTML에 이미 들어 있음(JS 없이도 읽힘)', /<output[^>]*>80<\/output>/.test(aboutHtml));
+  check('계산기: 범위 값이 "216~280" 으로 렌더', aboutHtml.includes('216~280'));
+  check('계산기: 계수가 data-min/data-max 로 전달됨', /data-min="216"[\s\S]{0,40}data-max="280"/.test(aboutHtml));
+  check('계산기: 수량 입력칸 존재', /<input[^>]*data-calc-input/.test(aboutHtml));
+  check(
+    '계산기: 산출 기준의 HTML 이 이스케이프됨',
+    !/<b onmouseover=/.test(aboutHtml) && aboutHtml.includes('&lt;b onmouseover=')
+  );
+  check('계산기: 안내 문구 렌더', aboutHtml.includes('추정치입니다.'));
+
   // ---- 표 (Studio의 table 블록) ----
   check('표: 머리글 행이 th 로 렌더', /<thead><tr><th>단계<\/th><th>걸리는 시간<\/th><\/tr><\/thead>/.test(aboutHtml));
   check('표: 본문 행이 td 로 렌더', /<td>샘플 제작<\/td><td>약 2주<\/td>/.test(aboutHtml));

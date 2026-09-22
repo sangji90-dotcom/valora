@@ -495,6 +495,8 @@ npx sanity dataset import ../.sanity-export/export.ndjson production --replace
 - [ ] `listPrice`를 쓴 상품은 **실제 판매 이력이 있는 정가**인지 고객사에 확인받기
 - [ ] `quickLinks`의 전화번호가 실제 번호인지 (`tel:` 링크)
 - [ ] `terms.item` 이 고객사 업종에 맞는지 (제품/도서/메뉴/작품…)
+- [ ] `productNotice` 를 고객사 업종에 맞게 교체 (비우면 유의사항 탭이 안 나옴)
+- [ ] (계산기 사용 시) 수치의 **산출 근거를 고객사에서 받아두기** — 환경 수치는 과장 시 문제가 됩니다
 - [ ] `externalLinks` 주소가 **실제로 열리는지** 한 번씩 눌러볼 것 (죽은 링크 방지)
 - [ ] 문의 폼 연결 및 **실제 수신 테스트**
 - [ ] (external 모드) `prefillEntry` 설정 — 제품 상세에서 넘어온 제품명이 폼에 채워지는지 확인

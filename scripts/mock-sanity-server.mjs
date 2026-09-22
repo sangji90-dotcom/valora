@@ -161,6 +161,28 @@ const pages = [
         style: 'normal',
         children: [{ _type: 'span', text: '<img src=x onerror=alert("page-xss")>' }],
       },
+      // 절감량 계산기 — 수량 입력에 따라 값이 다시 계산되어야 합니다
+      {
+        _type: 'calculator',
+        _key: 'calc1',
+        title: '도입하면 얼마나 줄어드나',
+        baseQuantity: 10000,
+        defaultQuantity: 10000,
+        unitLabel: '캡슐',
+        rows: [
+          { _key: 'r1', label: '플라스틱 폐기물', valueMin: 80, unit: 'kg' },
+          {
+            _key: 'r2',
+            label: '이산화탄소 배출',
+            valueMin: 216,
+            valueMax: 280,
+            unit: 'kg',
+            note: '<b onmouseover=alert("calc-xss")>산출 기준</b>',
+          },
+        ],
+        disclaimer: '추정치입니다.',
+      },
+
       // 표 — 고객사가 Studio에서 넣는 블록. 셀은 평문이므로 반드시 이스케이프되어야 합니다.
       {
         _type: 'table',

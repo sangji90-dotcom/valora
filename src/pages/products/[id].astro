@@ -4,6 +4,9 @@ import { render } from 'astro:content';
 import siteConfig from '../../../site.config';
 import T from '../../lib/terms';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import ProductTabs from '../../components/ProductTabs.astro';
+import StickyInquiry from '../../components/StickyInquiry.astro';
+import ProseCalculator from '../../components/ProseCalculator.astro';
 import ProductCard from '../../components/ProductCard.astro';
 import ProductImage from '../../components/ProductImage.astro';
 import {
@@ -31,6 +34,21 @@ const specEntries = Object.entries(data.specs);
 const statusLabel = STATUS_LABEL[data.status];
 const price = getPriceView(data);
 const ratio = siteConfig.layout.imageRatio;
+
+/**
+ * 탭 구성.
+ * 내용이 없는 탭은 아예 만들지 않습니다 — 눌렀더니 빈 화면이 나오는 것보다
+ * 탭이 없는 편이 낫습니다.
+ */
+const notice = siteConfig.productNotice?.items ?? [];
+
+const tabs: Array<{ id: 'detail' | 'specs' | 'notice'; label: string }> = [
+  { id: 'detail' as const, label: '상세정보' },
+  ...(specEntries.length > 0 ? [{ id: 'specs' as const, label: T.specTab }] : []),
+  ...(notice.length > 0
+    ? [{ id: 'notice' as const, label: siteConfig.productNotice?.label ?? '유의사항' }]
+    : []),
+];
 
 // 구조화 데이터 — 구글 검색결과에 제품 카드로 노출될 수 있게 함
 const jsonLd = {
@@ -130,22 +148,6 @@ const breadcrumb = breadcrumbSchema([
           </span>
         </p>
 
-        {
-          specEntries.length > 0 && (
-            <table class="specs">
-              <caption class="visually-hidden">{T.specCaption(data.title)}</caption>
-              <tbody>
-                {specEntries.map(([key, value]) => (
-                  <tr>
-                    <th scope="row">{key}</th>
-                    <td>{value}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )
-        }
-
         <div class="detail__actions">
           {/*
             어느 제품에 대한 문의인지 문의 페이지로 넘깁니다.
@@ -195,9 +197,37 @@ const breadcrumb = breadcrumbSchema([
       </div>
     </div>
 
-    <div class="detail__body prose">
-      <Content />
-    </div>
+    {/*
+      상세 설명 / 사양 / 유의사항을 탭으로 나눕니다.
+      JS가 없으면 셋 다 제목과 함께 펼쳐진 채로 보입니다 — 내용이 사라지지 않습니다.
+    */}
+    <ProductTabs tabs={tabs} notice={notice}>
+      <div slot="detail" class="detail__body prose">
+        <Content />
+      </div>
+
+      {
+        specEntries.length > 0 && (
+          <table slot="specs" class="specs">
+            <caption class="visually-hidden">{T.specCaption(data.title)}</caption>
+            <tbody>
+              {specEntries.map(([key, value]) => (
+                <tr>
+                  <th scope="row">{key}</th>
+                  <td>{value}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )
+      }
+    </ProductTabs>
+
+    {/* 본문에 절감량 계산기를 넣은 제품이 있을 때만 동작합니다 */}
+    <ProseCalculator />
+
+    {/* 좁은 화면에서만 나오는 하단 고정 문의 바 */}
+    <StickyInquiry productTitle={data.title} />
 
     {
       related.length > 0 && (

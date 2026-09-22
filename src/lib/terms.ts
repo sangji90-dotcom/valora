@@ -86,6 +86,8 @@ export const T = {
   askThis: `이 ${item} 문의하기`,
   related: `함께 보는 ${item}`,
   specCaption: (title: string) => `${title} 사양`,
+  /** 상세 탭 이름 */
+  specTab: '사양',
   inquiryOf: (title: string) => `문의 ${item}: ${title}`,
 
   /** 카테고리 페이지 */

@@ -1,0 +1,133 @@
+---
+import siteConfig from '../../site.config';
+import T from '../lib/terms';
+
+/**
+ * ============================================================
+ *  모바일 하단 고정 문의 바
+ * ============================================================
+ *  국내 쇼핑몰의 "옵션 선택" 바와 같은 자리입니다.
+ *  결제가 없는 카탈로그라 그 자리를 **문의**가 씁니다.
+ *
+ *  왜 필요한가 —
+ *  제품 상세는 사진·설명·사양으로 길어집니다. 다 읽고 문의하려면
+ *  화면 위로 다시 올라가야 하는데, 그 한 번의 스크롤에서 이탈합니다.
+ *
+ *  경계 —
+ *   - **좁은 화면에서만** 나옵니다. 넓은 화면에는 이미 우측에 버튼이 있고,
+ *     QuickBar 와 겹칩니다.
+ *   - 본문 마지막이 바에 가리지 않도록 아래 여백을 만듭니다.
+ *   - 인쇄물에는 나오지 않습니다.
+ * ============================================================
+ */
+
+interface Props {
+  /** 어느 제품에 대한 문의인지 문의 폼으로 넘깁니다 */
+  productTitle: string;
+}
+
+const { productTitle } = Astro.props;
+const phone = siteConfig.contact.phone;
+---
+
+<div class="sticky-cta">
+  <div class="sticky-cta__inner">
+    <a
+      href={`tel:${phone.replace(/-/g, '')}`}
+      class="sticky-cta__tel"
+      aria-label={`전화 ${phone}`}
+    >
+      전화
+    </a>
+    <a
+      href={`/contact/?product=${encodeURIComponent(productTitle)}`}
+      class="sticky-cta__main"
+    >
+      {T.askThis}
+    </a>
+  </div>
+</div>
+
+<style>
+  .sticky-cta {
+    display: none;
+  }
+
+  @media (max-width: 880px) {
+    .sticky-cta {
+      display: block;
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 40;
+      background: var(--color-bg);
+      border-top: 1px solid var(--color-border);
+      /* 홈 인디케이터가 있는 기기에서 버튼이 가려지지 않게 */
+      padding-bottom: env(safe-area-inset-bottom, 0);
+    }
+
+    .sticky-cta__inner {
+      display: flex;
+      gap: var(--space-2);
+      padding: var(--space-3) var(--space-4);
+    }
+
+    .sticky-cta__tel,
+    .sticky-cta__main {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      /* 손가락으로 누를 수 있는 최소 크기 */
+      min-height: 48px;
+      border-radius: var(--radius-sm);
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .sticky-cta__tel {
+      flex: 0 0 5.5rem;
+      border: 1px solid var(--color-border);
+      color: var(--color-text);
+    }
+
+    .sticky-cta__main {
+      flex: 1;
+      background: var(--color-accent);
+      color: var(--color-accent-text);
+    }
+
+    .sticky-cta__tel:focus-visible,
+    .sticky-cta__main:focus-visible {
+      outline: 2px solid var(--color-accent);
+      outline-offset: 2px;
+    }
+  }
+
+  @media print {
+    .sticky-cta {
+      display: none;
+    }
+  }
+</style>
+
+<style is:global>
+  @media (max-width: 880px) {
+    /*
+     * 고정 바가 본문 마지막 줄을 가리지 않도록 여백을 둡니다.
+     */
+    body:has(.sticky-cta) {
+      padding-bottom: 5.5rem;
+    }
+
+    /*
+     * QuickBar 도 좁은 화면에서 하단 가로 막대가 됩니다.
+     * 둘을 함께 두면 바가 두 겹으로 쌓이고, 같은 "문의/전화"가 중복됩니다.
+     * 제품 상세에서는 **제품명을 들고 가는** 이쪽이 더 유용하므로
+     * QuickBar 를 감춥니다. 넓은 화면에서는 둘 다 그대로 둡니다.
+     */
+    body:has(.sticky-cta) .quick {
+      display: none;
+    }
+  }
+</style>
