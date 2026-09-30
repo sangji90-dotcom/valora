@@ -13,6 +13,22 @@
  * ============================================================
  */
 
+/**
+ * 브랜드 선 도식의 이름. BrandIcon.astro 가 그립니다.
+ * ⚠ 여기 없는 이름을 쓰면 아이콘 자리가 비어 버립니다 — 컴포넌트에도
+ *   같은 유니온이 있으니 둘을 같이 고치세요.
+ */
+export type BrandIconName =
+  | 'take'
+  | 'water'
+  | 'dissolve'
+  | 'clean'
+  | 'capsule'
+  | 'carry'
+  | 'store'
+  | 'dispense';
+
+
 export interface NavItem {
   label: string;
   href: string;
@@ -93,7 +109,15 @@ export interface LayoutPreset {
    * 히어로는 항상 맨 위에 옵니다.
    */
   homeSections: Array<
-    'message' | 'featured' | 'categories' | 'promo' | 'stats' | 'sustainability' | 'cta'
+    | 'message'
+    | 'featured'
+    | 'categories'
+    | 'promo'
+    | 'stats'
+    | 'system'
+    | 'howItWorks'
+    | 'sustainability'
+    | 'cta'
   >;
 }
 
@@ -227,6 +251,42 @@ export interface SiteConfig {
     }>;
     /** 아래 작게 붙는 면책 문구 */
     disclaimer?: string;
+  };
+
+  /**
+   * VALORA SYSTEM — 제품이 이어지는 체계 (발로라 전용 확장).
+   * homeSections 에 'system' 을 넣어야 나옵니다.
+   *
+   * ⚠ 아직 개발 중인 제품이 섞여 있으면 disclaimer 로 반드시 밝히세요.
+   */
+  productSystem?: {
+    title: string;
+    lead?: string;
+    items: Array<{
+      icon: BrandIconName;
+      /** 영문 키워드. 예: CAPSULE */
+      key: string;
+      label: string;
+      /** 개발 단계 표기 등 */
+      note?: string;
+    }>;
+    disclaimer?: string;
+  };
+
+  /**
+   * HOW IT WORKS — 4단계 사용 방법 (발로라 전용 확장).
+   * homeSections 에 'howItWorks' 를 넣어야 나옵니다.
+   *
+   * ⚠ label 은 한 줄로 쓰세요. 길어지면 이 섹션을 만든 의미가 없습니다.
+   */
+  howItWorks?: {
+    title: string;
+    lead?: string;
+    items: Array<{
+      icon: BrandIconName;
+      key: string;
+      label: string;
+    }>;
   };
 
   /**

@@ -1,0 +1,194 @@
+---
+/**
+ * ============================================================
+ *  브랜드 선 도식 — 발로라 전용
+ * ============================================================
+ *  ⚠ 이 컴포넌트는 발로라에만 있습니다. 템플릿에는 넣지 마세요.
+ *
+ *  왜 PNG가 아니라 인라인 SVG인가 —
+ *   - 어느 크기에서도 선명합니다. 레티나용 2배 파일이 필요 없습니다.
+ *   - 색을 CSS 변수로 받으므로 **다크 모드에서 알아서 바뀝니다.**
+ *     PNG로 구웠다면 라이트용·다크용 두 벌을 관리해야 합니다.
+ *   - 파일 요청이 0건입니다.
+ *
+ *  ⚠ style **속성**은 절대 쓰지 마세요 — CSP가 조용히 막습니다.
+ *    fill·stroke 같은 건 style 속성이 아니라 presentation attribute 라
+ *    안전합니다. (npm run test:csp 가 감시합니다)
+ *
+ *  ⚠ 이건 제품 사진이 아니라 도식입니다.
+ *    실제 제품 사진이 도착하면 사진 쪽이 우선입니다. 도식은 "과정"을
+ *    설명하는 자리(HOW IT WORKS)에만 남깁니다.
+ * ============================================================
+ */
+
+interface Props {
+  name:
+    | 'take'
+    | 'water'
+    | 'dissolve'
+    | 'clean'
+    | 'capsule'
+    | 'carry'
+    | 'store'
+    | 'dispense';
+  class?: string;
+}
+
+const { name, class: cls } = Astro.props;
+---
+
+<svg
+  class:list={['bi', cls]}
+  viewBox="0 0 120 120"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2.2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"
+  focusable="false"
+>
+  {
+    name === 'capsule' && (
+      <>
+        <rect x="30" y="36" width="60" height="48" rx="21" class="bi__fill" />
+        <path d="M30 60h60" class="bi__hair" stroke-dasharray="5 5" />
+        <path d="M45 50c4-4 9-5 13-4" class="bi__hair" />
+      </>
+    )
+  }
+
+  {
+    name === 'take' && (
+      <>
+        {/* 케이스 — 아래쪽 */}
+        <rect x="24" y="66" width="72" height="34" rx="9" class="bi__fill" />
+        <path d="M60 66v34M24 83h72" class="bi__hair" />
+        {/* 집어 올린 캡슐 하나 */}
+        <rect x="46" y="20" width="28" height="22" rx="10" class="bi__solid" />
+        {/* 올라오는 자취 */}
+        <path d="M60 50v8" class="bi__hair" />
+      </>
+    )
+  }
+
+  {
+    name === 'water' && (
+      <>
+        {/* 떨어지는 캡슐 */}
+        <rect x="45" y="18" width="30" height="24" rx="11" class="bi__solid" />
+        <path d="M60 48v9" class="bi__hair" />
+        {/* 수면 */}
+        <path d="M18 74c9-7 16-7 24 0s16 7 24 0 16-7 24 0 8 6 12 3" />
+        <path d="M18 88c9-7 16-7 24 0s16 7 24 0 16-7 24 0 8 6 12 3" class="bi__hair" />
+      </>
+    )
+  }
+
+  {
+    name === 'dissolve' && (
+      <>
+        {/* 반쯤 열린 필름 */}
+        <path
+          d="M40 44a20 20 0 0 1 20-8c11 0 20 8 20 18 0 6-3 11-8 15"
+          stroke-dasharray="7 6"
+        />
+        <path d="M40 44c-3 4-4 9-4 14 0 12 11 22 24 22" stroke-dasharray="7 6" class="bi__hair" />
+        {/* 흩어지는 내용물 */}
+        <circle cx="50" cy="86" r="4.5" class="bi__solid" />
+        <circle cx="68" cy="92" r="3.2" class="bi__fill" />
+        <circle cx="82" cy="80" r="2.6" class="bi__fill" />
+        <circle cx="36" cy="74" r="2.6" class="bi__fill" />
+      </>
+    )
+  }
+
+  {
+    name === 'clean' && (
+      <>
+        {/* 손바닥 — 단순화한 그릇 형태 */}
+        <path d="M26 74c0 14 15 24 34 24s34-10 34-24" class="bi__fill" />
+        <path d="M26 74h68" />
+        {/* 거품 */}
+        <circle cx="46" cy="50" r="9" class="bi__fill" />
+        <circle cx="68" cy="42" r="12" class="bi__solid" />
+        <circle cx="84" cy="56" r="6" class="bi__fill" />
+      </>
+    )
+  }
+
+  {
+    name === 'carry' && (
+      <>
+        {/*
+          ⚠ 처음엔 위에서 본 원형 4분할로 그렸는데 디스펜서와 거의
+            똑같아 보였습니다. 열어 놓은 팩트로 바꿔 형태를 갈랐습니다.
+        */}
+        {/* 왼쪽 — 뚜껑 */}
+        <circle cx="36" cy="60" r="26" class="bi__fill" />
+        <path d="M26 52c4-5 10-8 16-8" class="bi__hair" />
+        {/* 오른쪽 — 캡슐이 담기는 쪽 */}
+        <circle cx="88" cy="60" r="26" class="bi__fill" />
+        <circle cx="80" cy="52" r="7" class="bi__solid" />
+        <circle cx="96" cy="52" r="7" class="bi__solid" />
+        <circle cx="80" cy="68" r="7" class="bi__solid" />
+        <circle cx="96" cy="68" r="7" class="bi__solid" />
+        {/* 경첩 */}
+        <path d="M62 54v12" stroke-width="3.6" />
+      </>
+    )
+  }
+
+  {
+    name === 'store' && (
+      <>
+        {/* 쌓아 쓰는 원통 — 옆에서 본 모습 */}
+        <rect x="36" y="24" width="48" height="26" rx="8" class="bi__fill" />
+        <rect x="36" y="52" width="48" height="26" rx="8" class="bi__fill" />
+        <rect x="36" y="80" width="48" height="24" rx="8" class="bi__solid" />
+        <path d="M44 37h32M44 65h32" class="bi__hair" />
+      </>
+    )
+  }
+
+  {
+    name === 'dispense' && (
+      <>
+        {/* 원형 4구 — 칸마다 채우기를 달리해 '나뉜 통'으로 읽히게 합니다 */}
+        <circle cx="60" cy="46" r="30" />
+        <path d="M60 16v60M30 46h60" class="bi__hair" />
+        <path d="M60 46 60 16A30 30 0 0 1 90 46Z" class="bi__solid" />
+        <path d="M60 46 30 46A30 30 0 0 1 60 16Z" class="bi__fill" />
+        {/* 본체와 떨어지는 한 알 */}
+        <rect x="38" y="82" width="44" height="16" rx="7" class="bi__fill" />
+        <rect x="50" y="104" width="20" height="14" rx="7" class="bi__solid" />
+      </>
+    )
+  }
+</svg>
+
+<style>
+  .bi {
+    width: 100%;
+    height: auto;
+    color: var(--color-accent);
+  }
+
+  /* 옅게 채우는 면 — 세이지 */
+  .bi__fill {
+    fill: var(--accent-sage);
+    fill-opacity: 0.3;
+  }
+
+  /* 강조하는 면 — 브랜드 색 */
+  .bi__solid {
+    fill: var(--color-accent);
+    fill-opacity: 0.18;
+  }
+
+  /* 보조선 */
+  .bi__hair {
+    stroke-width: 1.6;
+    opacity: 0.6;
+  }
+</style>

@@ -1,0 +1,118 @@
+---
+import siteConfig from '../../site.config';
+import BrandIcon from './BrandIcon.astro';
+
+/**
+ * ============================================================
+ *  HOW IT WORKS — 발로라 전용 (요청서 9번)
+ * ============================================================
+ *  ⚠ 이 컴포넌트는 발로라에만 있습니다. 템플릿에는 넣지 마세요.
+ *
+ *  "긴 설명보다 이미지와 모션 중심으로" 라는 요청에 맞춰,
+ *  단계마다 한 줄씩만 둡니다. 문장을 늘리면 이 섹션의 의미가
+ *  사라집니다 — 읽지 않고 보게 하는 자리입니다.
+ *
+ *  ⚠ 번호는 CSS 카운터가 아니라 마크업에 씁니다.
+ *    화면낭독기가 순서를 읽어야 하고, CSS로 만든 글자는 읽히지 않습니다.
+ * ============================================================
+ */
+
+const how = siteConfig.howItWorks;
+---
+
+{
+  how && how.items.length > 0 && (
+    <section class="how section section--subtle" aria-label={how.title}>
+      <div class="container">
+        <div class="section__head" data-reveal>
+          <h2 class="section__title">{how.title}</h2>
+          {how.lead && <p class="section__desc">{how.lead}</p>}
+        </div>
+
+        <ol class="how__steps">
+          {how.items.map((item, i) => (
+            <li class="how__step" data-reveal>
+              <div class="how__art">
+                <BrandIcon name={item.icon} />
+              </div>
+              <p class="how__no">
+                <span class="visually-hidden">{i + 1}단계 — </span>
+                {String(i + 1).padStart(2, '0')}
+              </p>
+              <h3 class="how__key">{item.key}</h3>
+              <p class="how__line">{item.label}</p>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </section>
+  )
+}
+
+<style>
+  .how__steps {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-8);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: none;
+  }
+
+  .how__step {
+    position: relative;
+    padding: var(--space-8) var(--space-5) var(--space-6);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    text-align: center;
+  }
+
+  .how__art {
+    width: 100px;
+    margin: 0 auto var(--space-5);
+  }
+
+  .how__no {
+    margin: 0 0 var(--space-2);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: var(--tracking-wide);
+    color: var(--color-accent);
+  }
+
+  .how__key {
+    margin: 0 0 var(--space-3);
+    font-size: var(--text-lg);
+    letter-spacing: var(--tracking-wide);
+  }
+
+  .how__line {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    line-height: 1.7;
+  }
+
+  @media (max-width: 880px) {
+    .how__steps {
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-4);
+    }
+
+    .how__step {
+      padding: var(--space-6) var(--space-4) var(--space-5);
+    }
+
+    .how__art {
+      width: 76px;
+      margin-bottom: var(--space-4);
+    }
+
+    .how__key {
+      font-size: var(--text-base);
+    }
+  }
+</style>

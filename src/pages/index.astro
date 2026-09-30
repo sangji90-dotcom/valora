@@ -11,6 +11,8 @@ import PromoBanner from '../components/PromoBanner.astro';
 import ProofStrip from '../components/ProofStrip.astro';
 // StatBand 는 메인에서 내렸습니다 (요청서 11번) — ESG DATA 영역이 생기면 다시 씁니다
 import SustainBand from '../components/SustainBand.astro';
+import ValoraSystem from '../components/ValoraSystem.astro';
+import HowItWorks from '../components/HowItWorks.astro';
 import Reveal from '../components/Reveal.astro';
 import { getFeaturedProducts, getCategoriesWithCount } from '../lib/products';
 import { organizationSchema } from '../lib/structured-data';
@@ -101,6 +103,14 @@ const { brandMessage } = siteConfig;
 
       if (section === 'promo' && siteConfig.promo) {
         return <PromoBanner />;
+      }
+
+      if (section === 'system') {
+        return <ValoraSystem />;
+      }
+
+      if (section === 'howItWorks') {
+        return <HowItWorks />;
       }
 
       if (section === 'sustainability') {

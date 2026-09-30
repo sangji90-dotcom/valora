@@ -35,7 +35,20 @@ export const siteConfig: SiteConfig = {
     imageRatio: '4:3',
     // 품목이 4종뿐이라 하나씩 설명하는 rows 가 맞습니다
     featured: 'rows',
-    homeSections: ['message', 'featured', 'sustainability', 'categories', 'cta'],
+    /**
+     * 요청서 20번의 11단 구성으로 가는 중간 단계입니다.
+     * HERO → BRAND MESSAGE → VALORA SYSTEM → PRODUCT → HOW IT WORKS
+     *   → SUSTAINABILITY → CATEGORY → CONTACT
+     */
+    homeSections: [
+      'message',
+      'system',
+      'featured',
+      'howItWorks',
+      'sustainability',
+      'categories',
+      'cta',
+    ],
   },
 
   /**
@@ -113,6 +126,57 @@ export const siteConfig: SiteConfig = {
     body: `발로라는 필요한 만큼의 세정 성분을 수용성 필름 한 알에 담습니다.
 물과 만나면 필름은 녹고, 필요한 양만 쓰입니다.
 매번 버리는 일회용 용기를 줄입니다.`,
+  },
+
+  /**
+   * VALORA SYSTEM (요청서 6번).
+   * 제품을 나열하지 않고 이어지는 하나의 체계로 보여줍니다.
+   */
+  productSystem: {
+    title: '하나로 이어지는 체계',
+    lead: '캡슐을 쓰려면 담을 것이 필요하고, 담으면 보관할 것이 필요합니다. 제품이 늘어나는 순서가 곧 쓰는 순서입니다.',
+    items: [
+      {
+        icon: 'capsule',
+        key: 'CAPSULE',
+        label: '수용성 필름에 1회분을 담은 캡슐',
+      },
+      {
+        icon: 'carry',
+        key: 'CARRY',
+        label: '들고 다니는 휴대용 케이스',
+        note: '개발 중',
+      },
+      {
+        icon: 'store',
+        key: 'STORE',
+        label: '쌓아서 쓰는 보관 케이스',
+        note: '개발 중',
+      },
+      {
+        icon: 'dispense',
+        key: 'DISPENSE',
+        label: '버튼 한 번에 한 알이 나오는 디스펜서',
+        note: '시안 단계',
+      },
+    ],
+    disclaimer:
+      '화면의 그림은 형태를 단순화한 도식이며 실제 제품 사진이 아닙니다. 개발 단계는 항목마다 표시했습니다.',
+  },
+
+  /**
+   * HOW IT WORKS (요청서 9번).
+   * ⚠ 한 줄씩만 씁니다. 길어지면 이 섹션을 만든 이유가 사라집니다.
+   */
+  howItWorks: {
+    title: '쓰는 방법',
+    lead: '네 단계가 전부입니다.',
+    items: [
+      { icon: 'take', key: 'TAKE', label: '캡슐 한 알을 꺼냅니다' },
+      { icon: 'water', key: 'WATER', label: '물에 닿게 합니다' },
+      { icon: 'dissolve', key: 'DISSOLVE', label: '3~5초 만에 필름이 녹습니다' },
+      { icon: 'clean', key: 'CLEAN', label: '정량만 그대로 쓰입니다' },
+    ],
   },
 
   /**
