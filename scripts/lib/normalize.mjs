@@ -112,6 +112,18 @@ export function parseImageList(raw) {
  * 고객사는 한글 이름("산업용")을 쓰고, 스키마는 id("industrial")를 요구합니다.
  * label과 id 양쪽으로 찾고, 못 찾으면 null을 돌려 호출부가 경고합니다.
  */
+/**
+ * label 은 문자열이거나 { ko, en } 형태입니다 (site-config 의 Localized).
+ * 어느 언어로 적어 와도 찾히도록 전부 후보로 봅니다.
+ */
+function labelsOf(category) {
+  const v = category.label;
+  const list = v && typeof v === 'object' && !Array.isArray(v) ? Object.values(v) : [v];
+  return list
+    .filter((x) => typeof x === 'string' && x.trim())
+    .map((x) => x.toLowerCase().replace(/\s/g, ''));
+}
+
 export function matchCategory(raw, categories) {
   const text = String(raw ?? '').trim();
   if (!text) return null;
@@ -121,16 +133,13 @@ export function matchCategory(raw, categories) {
   const byId = categories.find((c) => c.id.toLowerCase() === compact);
   if (byId) return byId.id;
 
-  const byLabel = categories.find(
-    (c) => c.label.toLowerCase().replace(/\s/g, '') === compact
-  );
+  const byLabel = categories.find((c) => labelsOf(c).includes(compact));
   if (byLabel) return byLabel.id;
 
   // 부분 일치 (예: "산업용 제품" → 산업용)
-  const partial = categories.find((c) => {
-    const label = c.label.toLowerCase().replace(/\s/g, '');
-    return compact.includes(label) || label.includes(compact);
-  });
+  const partial = categories.find((c) =>
+    labelsOf(c).some((label) => compact.includes(label) || label.includes(compact))
+  );
 
   return partial ? partial.id : null;
 }

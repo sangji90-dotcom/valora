@@ -20,6 +20,61 @@
  */
 
 import { CATEGORY_OPTIONS } from './categories.generated.js';
+import { SHOW_EN, EN_NOTE } from './i18n.generated.js';
+
+/**
+ * 영문 칸 공통 규칙.
+ *  - 영문 사이트를 끈 상태(site.config 의 i18n.published 에 'en' 없음)에서는 숨깁니다.
+ *  - 절대 필수로 만들지 마세요. 비면 한국어로 떨어지도록 사이트가 처리합니다.
+ *    필수로 걸면 영문 준비가 안 된 제품을 한국어 사이트에도 못 올리게 됩니다.
+ */
+const en = (field) => ({ ...field, hidden: !SHOW_EN, description: EN_NOTE });
+
+/**
+ * 상세 본문에서 허용하는 블록.
+ * 사이트(src/lib/content/) 가 처리할 수 있는 것만 넣습니다.
+ * 여기에 없는 타입을 추가하면 사이트에서는 조용히 무시됩니다.
+ * 한국어 본문과 영문 본문이 같은 정의를 씁니다.
+ */
+const RICH_TEXT = [
+  {
+    type: 'block',
+    styles: [
+      { title: '본문', value: 'normal' },
+      { title: '제목 2', value: 'h2' },
+      { title: '제목 3', value: 'h3' },
+      { title: '제목 4', value: 'h4' },
+      { title: '인용', value: 'blockquote' },
+    ],
+    lists: [
+      { title: '글머리 기호', value: 'bullet' },
+      { title: '번호', value: 'number' },
+    ],
+    marks: {
+      decorators: [
+        { title: '굵게', value: 'strong' },
+        { title: '기울임', value: 'em' },
+        { title: '밑줄', value: 'underline' },
+        { title: '코드', value: 'code' },
+      ],
+      annotations: [
+        {
+          name: 'link',
+          title: '링크',
+          type: 'object',
+          fields: [
+            {
+              name: 'href',
+              title: 'URL',
+              type: 'url',
+              validation: (Rule) => Rule.uri({ scheme: ['http', 'https', 'mailto', 'tel'] }),
+            },
+          ],
+        },
+      ],
+    },
+  },
+];
 
 export const product = {
   name: 'product',
@@ -32,6 +87,7 @@ export const product = {
       type: 'string',
       validation: (Rule) => Rule.required().min(1).error('필수 항목입니다. 제품명을 입력하세요.'),
     },
+    en({ name: 'titleEn', title: '제품명 (English)', type: 'string' }),
     {
       name: 'slug',
       title: 'URL 주소 *',
@@ -54,6 +110,12 @@ export const product = {
           .max(120)
           .error('120자를 넘을 수 없습니다.'),
     },
+    en({
+      name: 'summaryEn',
+      title: '한 줄 설명 (English)',
+      type: 'string',
+      validation: (Rule) => Rule.max(160).error('160자를 넘을 수 없습니다.'),
+    }),
     {
       name: 'category',
       title: '카테고리 *',
@@ -134,6 +196,21 @@ export const product = {
         },
       ],
     },
+    en({
+      name: 'specsEn',
+      title: '제품 사양 (English)',
+      type: 'array',
+      of: [
+        {
+          type: 'object',
+          fields: [
+            { name: 'key', title: 'Label', type: 'string', validation: (Rule) => Rule.required() },
+            { name: 'value', title: 'Value', type: 'string', validation: (Rule) => Rule.required() },
+          ],
+          preview: { select: { title: 'key', subtitle: 'value' } },
+        },
+      ],
+    }),
     {
       name: 'tags',
       title: '검색 키워드',
@@ -142,6 +219,13 @@ export const product = {
       of: [{ type: 'string' }],
       options: { layout: 'tags' },
     },
+    en({
+      name: 'tagsEn',
+      title: '검색 키워드 (English)',
+      type: 'array',
+      of: [{ type: 'string' }],
+      options: { layout: 'tags' },
+    }),
     {
       name: 'price',
       title: '가격 (원)',
@@ -155,6 +239,7 @@ export const product = {
       type: 'string',
       initialValue: '가격 문의',
     },
+    en({ name: 'priceNoteEn', title: '가격 안내 문구 (English)', type: 'string' }),
     {
       name: 'listPrice',
       title: '정가 (원)',
@@ -171,6 +256,12 @@ export const product = {
       description: 'BEST, NEW, 한정수량 등. 6자 이내를 권장합니다.',
       validation: (Rule) => Rule.max(12),
     },
+    en({
+      name: 'badgeEn',
+      title: '배지 문구 (English)',
+      type: 'string',
+      validation: (Rule) => Rule.max(16),
+    }),
     {
       name: 'externalLinks',
       title: '외부 구매처',
@@ -245,49 +336,14 @@ export const product = {
       name: 'body',
       title: '상세 내용',
       type: 'array',
-      // 사이트에서 지원하는 블록만 허용합니다.
-      // 여기에 없는 타입을 추가하면 사이트에서는 무시됩니다.
-      of: [
-        {
-          type: 'block',
-          styles: [
-            { title: '본문', value: 'normal' },
-            { title: '제목 2', value: 'h2' },
-            { title: '제목 3', value: 'h3' },
-            { title: '제목 4', value: 'h4' },
-            { title: '인용', value: 'blockquote' },
-          ],
-          lists: [
-            { title: '글머리 기호', value: 'bullet' },
-            { title: '번호', value: 'number' },
-          ],
-          marks: {
-            decorators: [
-              { title: '굵게', value: 'strong' },
-              { title: '기울임', value: 'em' },
-              { title: '밑줄', value: 'underline' },
-              { title: '코드', value: 'code' },
-            ],
-            annotations: [
-              {
-                name: 'link',
-                title: '링크',
-                type: 'object',
-                fields: [
-                  {
-                    name: 'href',
-                    title: 'URL',
-                    type: 'url',
-                    validation: (Rule) =>
-                      Rule.uri({ scheme: ['http', 'https', 'mailto', 'tel'] }),
-                  },
-                ],
-              },
-            ],
-          },
-        },
-      ],
+      of: RICH_TEXT,
     },
+    en({
+      name: 'bodyEn',
+      title: '상세 내용 (English)',
+      type: 'array',
+      of: RICH_TEXT,
+    }),
   ],
 
   orderings: [

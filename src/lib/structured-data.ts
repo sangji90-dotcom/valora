@@ -1,4 +1,5 @@
 import siteConfig from '../../site.config';
+import { companyAddress, companyName, DEFAULT_LOCALE, ps, type Locale } from './i18n';
 
 /**
  * 검색엔진용 구조화 데이터(JSON-LD).
@@ -13,13 +14,13 @@ const origin = siteConfig.site.replace(/\/$/, '');
 const abs = (pathname: string) => `${origin}${pathname}`;
 
 /** 회사 정보 — 홈에만 넣습니다 */
-export function organizationSchema() {
+export function organizationSchema(locale: Locale = DEFAULT_LOCALE) {
   return {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: siteConfig.company,
+    name: companyName(locale),
     url: origin,
-    description: siteConfig.description,
+    description: ps(siteConfig.description, locale),
     logo: abs(siteConfig.logo ?? siteConfig.ogImage),
     ...(siteConfig.contact.phone
       ? {
@@ -29,7 +30,7 @@ export function organizationSchema() {
             contactType: 'sales',
             email: siteConfig.contact.email,
             areaServed: 'KR',
-            availableLanguage: ['Korean'],
+            availableLanguage: locale === 'en' ? ['English', 'Korean'] : ['Korean'],
           },
         }
       : {}),
@@ -37,7 +38,7 @@ export function organizationSchema() {
       ? {
           address: {
             '@type': 'PostalAddress',
-            streetAddress: siteConfig.contact.address,
+            streetAddress: companyAddress(locale),
             addressCountry: 'KR',
           },
         }

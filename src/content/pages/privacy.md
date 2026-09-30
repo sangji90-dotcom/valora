@@ -1,6 +1,8 @@
 ---
 title: 개인정보처리방침
 description: 문의 과정에서 수집되는 개인정보의 처리 기준입니다.
+titleEn: Privacy Policy
+descriptionEn: How personal data submitted through the enquiry form is handled.
 showHero: false
 ---
 

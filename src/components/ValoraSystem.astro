@@ -1,6 +1,7 @@
 ---
 import siteConfig from '../../site.config';
 import BrandIcon from './BrandIcon.astro';
+import { localeFromPath, ps } from '../lib/i18n';
 
 /**
  * ============================================================
@@ -20,15 +21,18 @@ import BrandIcon from './BrandIcon.astro';
  */
 
 const sys = siteConfig.productSystem;
+
+/** 설정 본문에서 현재 언어를 꺼냅니다 (i18n.ts 의 Localized 참고) */
+const S = (v: Parameters<typeof ps>[0]) => ps(v, localeFromPath(Astro.url.pathname));
 ---
 
 {
   sys && sys.items.length > 0 && (
-    <section class="sys section" aria-label={sys.title}>
+    <section class="sys section" aria-label={S(sys.title)}>
       <div class="container">
         <div class="section__head" data-reveal>
-          <h2 class="section__title">{sys.title}</h2>
-          {sys.lead && <p class="section__desc">{sys.lead}</p>}
+          <h2 class="section__title">{S(sys.title)}</h2>
+          {sys.lead && <p class="section__desc">{S(sys.lead)}</p>}
         </div>
 
         <ol class="sys__list">
@@ -39,13 +43,13 @@ const sys = siteConfig.productSystem;
               </div>
               <p class="sys__no">{String(i + 1).padStart(2, '0')}</p>
               <h3 class="sys__key">{item.key}</h3>
-              <p class="sys__label">{item.label}</p>
-              {item.note && <p class="sys__note">{item.note}</p>}
+              <p class="sys__label">{S(item.label)}</p>
+              {item.note && <p class="sys__note">{S(item.note)}</p>}
             </li>
           ))}
         </ol>
 
-        {sys.disclaimer && <p class="sys__disclaimer">{sys.disclaimer}</p>}
+        {sys.disclaimer && <p class="sys__disclaimer">{S(sys.disclaimer)}</p>}
       </div>
     </section>
   )

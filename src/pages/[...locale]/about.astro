@@ -1,9 +1,9 @@
 ---
 import type { GetStaticPaths } from 'astro';
-import { getEntry, render } from 'astro:content';
+import { getCollection, getEntry, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ProseCalculator from '../../components/ProseCalculator.astro';
-import { localeParams } from '../../lib/i18n';
+import { localeParams, localeFromPath } from '../../lib/i18n';
 
 const entry = await getEntry('pages', 'about');
 if (!entry) {
@@ -11,7 +11,15 @@ if (!entry) {
     'src/content/pages/about.md 가 없습니다. 회사소개 페이지 본문 파일을 만들어주세요.'
   );
 }
-const { Content } = await render(entry);
+const locale = localeFromPath(Astro.url.pathname);
+/** 영문 본문은 <id>.en.md 에 둡니다. 없으면 한국어 본문을 씁니다. */
+const all = await getCollection('pages');
+const bodyEntry =
+  locale === 'ko' ? entry : (all.find((p) => p.id === `about.en`) ?? entry);
+const pageTitle = (locale === 'en' && bodyEntry.data.titleEn) || bodyEntry.data.title;
+const pageDesc =
+  (locale === 'en' && bodyEntry.data.descriptionEn) || bodyEntry.data.description;
+const { Content } = await render(bodyEntry);
 
 /**
  * 이 한 파일이 언어별 페이지를 전부 내보냅니다.
@@ -27,8 +35,8 @@ export const getStaticPaths = (() => localeParams()) satisfies GetStaticPaths;
   라우트가 사라지면 메뉴 링크가 404가 되어 오히려 알아채기 어렵습니다.
 */}
 <BaseLayout
-  title={entry.data.title}
-  description={entry.data.description}
+  title={pageTitle}
+  description={pageDesc}
   noindex={entry.data.draft}
 >
   <section class="section">
@@ -36,10 +44,8 @@ export const getStaticPaths = (() => localeParams()) satisfies GetStaticPaths;
       {
         entry.data.showHero && (
           <div class="section__head">
-            <h1 class="section__title">{entry.data.title}</h1>
-            {entry.data.description && (
-              <p class="section__desc">{entry.data.description}</p>
-            )}
+            <h1 class="section__title">{pageTitle}</h1>
+            {pageDesc && <p class="section__desc">{pageDesc}</p>}
           </div>
         )
       }

@@ -1,6 +1,11 @@
 ---
 import siteConfig from '../../site.config';
 import BrandIcon from './BrandIcon.astro';
+import { getTerms } from '../lib/terms';
+import { localeFromPath, ps } from '../lib/i18n';
+
+/** 주소에서 언어를 읽어 화면 문구를 고릅니다 (i18n.ts 참고) */
+const T = getTerms(localeFromPath(Astro.url.pathname));
 
 /**
  * ============================================================
@@ -18,15 +23,18 @@ import BrandIcon from './BrandIcon.astro';
  */
 
 const how = siteConfig.howItWorks;
+
+/** 설정 본문에서 현재 언어를 꺼냅니다 (i18n.ts 의 Localized 참고) */
+const S = (v: Parameters<typeof ps>[0]) => ps(v, localeFromPath(Astro.url.pathname));
 ---
 
 {
   how && how.items.length > 0 && (
-    <section class="how section section--subtle" aria-label={how.title}>
+    <section class="how section section--subtle" aria-label={S(how.title)}>
       <div class="container">
         <div class="section__head" data-reveal>
-          <h2 class="section__title">{how.title}</h2>
-          {how.lead && <p class="section__desc">{how.lead}</p>}
+          <h2 class="section__title">{S(how.title)}</h2>
+          {how.lead && <p class="section__desc">{S(how.lead)}</p>}
         </div>
 
         <ol class="how__steps">
@@ -36,11 +44,11 @@ const how = siteConfig.howItWorks;
                 <BrandIcon name={item.icon} />
               </div>
               <p class="how__no">
-                <span class="visually-hidden">{i + 1}단계 — </span>
+                <span class="visually-hidden">{T.ui.stepN(i + 1)}</span>
                 {String(i + 1).padStart(2, '0')}
               </p>
               <h3 class="how__key">{item.key}</h3>
-              <p class="how__line">{item.label}</p>
+              <p class="how__line">{S(item.label)}</p>
             </li>
           ))}
         </ol>

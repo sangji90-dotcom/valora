@@ -1,4 +1,9 @@
 ---
+import { getTerms } from '../lib/terms';
+import { localeFromPath } from '../lib/i18n';
+
+/** 주소에서 언어를 읽어 화면 문구를 고릅니다 (i18n.ts 참고) */
+const T = getTerms(localeFromPath(Astro.url.pathname));
 /**
  * ============================================================
  *  제품 상세 탭 — 동작과 모양
@@ -39,7 +44,7 @@ const has = (id: string) => tabs.some((t) => t.id === id);
     탭 줄은 처음에 hidden 입니다. 스크립트가 돌 때만 드러납니다.
     JS가 없으면 누를 수 없는 버튼만 남아 혼란을 주기 때문입니다.
   */}
-  <div class="tabs__list" role="tablist" aria-label="제품 정보" hidden data-tabs-list>
+  <div class="tabs__list" role="tablist" aria-label={T.ui.itemInfo} hidden data-tabs-list>
     {tabs.map((t, i) => (
       <button
         type="button"

@@ -46,9 +46,9 @@ const L = (p: string) => localePath(p, localeFromPath(Astro.url.pathname));
     <a
       href={`tel:${phone.replace(/-/g, '')}`}
       class="sticky-cta__tel"
-      aria-label={`전화 ${phone}`}
+      aria-label={T.ui.callTo(phone)}
     >
-      전화
+      {T.ui.call}
     </a>
     <a
       href={L(`/contact/?product=${encodeURIComponent(productTitle)}`)}

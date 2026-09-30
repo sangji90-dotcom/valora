@@ -129,3 +129,56 @@ export function alternateLinks(pathname: string): Array<{ locale: Locale; path: 
   const bare = stripLocale(pathname);
   return publishedLocales().map((locale) => ({ locale, path: localePath(bare, locale) }));
 }
+
+/**
+ * ============================================================
+ *  설정 본문의 다국어
+ * ============================================================
+ *  site.config.ts 의 문자열은 두 가지 모양을 다 받습니다.
+ *
+ *    title: '용기를 줄입니다'                       ← 한국어만
+ *    title: { ko: '용기를 줄입니다', en: 'Less …' } ← 두 언어
+ *
+ *  그래서 기존 설정을 한 줄도 안 고쳐도 그대로 돌아가고,
+ *  영문이 필요한 항목만 객체로 바꾸면 됩니다.
+ *
+ *  ⚠ 영문이 비어 있으면 **한국어로 떨어집니다.** 빈 화면보다는 낫지만,
+ *    영문 사이트에 한국어가 섞인다는 뜻이기도 합니다. 무엇이 안 채워져
+ *    있는지는 npm run test:i18n 이 세어 줍니다.
+ * ============================================================
+ */
+export type Localized<T = string> = T | Partial<Record<Locale, T>>;
+
+/** 설정 값에서 해당 언어를 꺼냅니다 */
+export function pick<T>(value: Localized<T> | undefined, locale: Locale): T | undefined {
+  if (value === undefined || value === null) return undefined;
+  if (typeof value === 'object' && !Array.isArray(value)) {
+    const map = value as Partial<Record<Locale, T>>;
+    // ko/en 이외의 키만 있는 평범한 객체는 그대로 돌려줍니다
+    if (DEFAULT_LOCALE in map || LOCALES.some((l) => l in map)) {
+      return map[locale] ?? map[DEFAULT_LOCALE];
+    }
+  }
+  return value as T;
+}
+
+/** pick 의 문자열 전용 축약형 — 없으면 빈 문자열 */
+export function ps(value: Localized<string> | undefined, locale: Locale): string {
+  return pick(value, locale) ?? '';
+}
+
+/**
+ * 회사명·주소는 화면 거의 모든 곳(헤더·푸터·SEO·JSON-LD)에 나옵니다.
+ * 매번 ps(siteConfig.company, locale) 를 적으면 한 군데씩 빠지므로
+ * 전용 헬퍼로 둡니다.
+ *
+ * ⚠ 법인명 영문 표기는 번역이 아니라 등기 표기입니다.
+ *   site.config 에 적힌 값을 그대로 쓰고, 여기서 만들어내지 않습니다.
+ */
+export function companyName(locale: Locale = DEFAULT_LOCALE): string {
+  return ps(siteConfig.company, locale);
+}
+
+export function companyAddress(locale: Locale = DEFAULT_LOCALE): string {
+  return ps(siteConfig.contact.address, locale);
+}

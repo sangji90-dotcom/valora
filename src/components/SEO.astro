@@ -1,6 +1,6 @@
 ---
 import siteConfig from '../../site.config';
-import { alternateLinks, localeFromPath, OG_LOCALE, LOCALE_TAG } from '../lib/i18n';
+import { alternateLinks, companyName, localeFromPath, OG_LOCALE, LOCALE_TAG, ps } from '../lib/i18n';
 
 interface Props {
   title?: string;
@@ -12,12 +12,15 @@ interface Props {
 
 const { title, description, image, noindex = false } = Astro.props;
 
-const pageTitle = title ? `${title} | ${siteConfig.company}` : `${siteConfig.company} — ${siteConfig.tagline}`;
-const pageDesc = description ?? siteConfig.description;
+const locale0 = localeFromPath(Astro.url.pathname);
+const tagline = ps(siteConfig.tagline, locale0);
+const company = companyName(locale0);
+const pageTitle = title ? `${title} | ${company}` : `${company} — ${tagline}`;
+const pageDesc = description ?? ps(siteConfig.description, locale0);
 const canonical = new URL(Astro.url.pathname, Astro.site ?? siteConfig.site);
 const ogImage = new URL(image ?? siteConfig.ogImage, Astro.site ?? siteConfig.site);
 
-const locale = localeFromPath(Astro.url.pathname);
+const locale = locale0;
 
 /**
  * 같은 내용의 다른 언어 판본을 검색엔진에 알려줍니다.
@@ -60,7 +63,7 @@ const alternates = alternateLinks(Astro.url.pathname).map((a) => ({
 }
 
 <meta property="og:type" content="website" />
-<meta property="og:site_name" content={siteConfig.company} />
+<meta property="og:site_name" content={company} />
 <meta property="og:title" content={pageTitle} />
 <meta property="og:description" content={pageDesc} />
 <meta property="og:url" content={canonical} />

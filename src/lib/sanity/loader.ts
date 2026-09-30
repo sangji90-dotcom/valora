@@ -58,6 +58,13 @@ interface SanityProductDoc {
   draft?: boolean | null;
   seoDescription?: string | null;
   body?: unknown;
+  titleEn?: string | null;
+  summaryEn?: string | null;
+  bodyEn?: unknown;
+  specsEn?: SanitySpecRow[] | null;
+  tagsEn?: string[] | null;
+  priceNoteEn?: string | null;
+  badgeEn?: string | null;
   _updatedAt?: string;
 }
 
@@ -112,7 +119,22 @@ function mapProduct(doc: SanityProductDoc) {
     status: doc.status ?? 'active',
     draft: doc.draft ?? false,
     ...(doc.seoDescription ? { seoDescription: doc.seoDescription } : {}),
+    ...(doc.titleEn ? { titleEn: doc.titleEn } : {}),
+    ...(doc.summaryEn ? { summaryEn: doc.summaryEn } : {}),
+    specsEn: mapSpecs(doc.specsEn),
+    tagsEn: doc.tagsEn ?? [],
+    ...(doc.priceNoteEn ? { priceNoteEn: doc.priceNoteEn } : {}),
+    ...(doc.badgeEn ? { badgeEn: doc.badgeEn } : {}),
   };
+}
+
+/**
+ * Portable Text 배열이 실제로 내용을 담고 있는지.
+ * Studio 에서 문단을 만들었다 지우면 빈 배열이 남아, 그대로 두면
+ * 영문 본문이 "있는데 비어 있는" 상태가 되어 영문 페이지가 백지가 됩니다.
+ */
+function hasBlocks(value: unknown): boolean {
+  return Array.isArray(value) && value.length > 0;
 }
 
 interface SanityPageDoc {
@@ -122,6 +144,9 @@ interface SanityPageDoc {
   showHero?: boolean | null;
   draft?: boolean | null;
   body?: unknown;
+  titleEn?: string | null;
+  descriptionEn?: string | null;
+  bodyEn?: unknown;
   _updatedAt?: string;
 }
 
@@ -147,6 +172,8 @@ function mapPage(doc: SanityPageDoc) {
     ...(doc.description ? { description: doc.description } : {}),
     showHero: doc.showHero ?? true,
     draft: doc.draft ?? false,
+    ...(doc.titleEn ? { titleEn: doc.titleEn } : {}),
+    ...(doc.descriptionEn ? { descriptionEn: doc.descriptionEn } : {}),
   };
 }
 
@@ -214,6 +241,21 @@ export function sanityProductsLoader(opts: SanityProductsLoaderOptions): Loader 
           digest: generateDigest({ ...doc, _updatedAt: doc._updatedAt }),
           rendered: { html: portableTextToHtml(doc.body) },
         });
+
+        /*
+         * 영문 본문은 별도 항목 <id>.en 으로 저장합니다.
+         * 로컬(md) 모드의 <id>.en.md 와 같은 자리라서, 화면 쪽 코드는
+         * 어느 소스를 쓰는지 몰라도 됩니다 (products.ts 의 getProductBodyEntry).
+         * 목록·주소 생성에서는 products.ts 가 .en 을 걸러냅니다.
+         */
+        if (hasBlocks(doc.bodyEn)) {
+          store.set({
+            id: `${id}.en`,
+            data,
+            digest: generateDigest({ id: `${id}.en`, body: doc.bodyEn, _updatedAt: doc._updatedAt }),
+            rendered: { html: portableTextToHtml(doc.bodyEn) },
+          });
+        }
       }
 
       const loaded = (docs?.length ?? 0) - skipped;
@@ -268,6 +310,16 @@ export function sanityPagesLoader(opts: SanityProductsLoaderOptions): Loader {
           digest: generateDigest({ ...doc, _updatedAt: doc._updatedAt }),
           rendered: { html: portableTextToHtml(doc.body) },
         });
+
+        /* 영문 본문 — about.en / privacy.en 으로 저장 (로컬 about.en.md 와 같은 자리) */
+        if (hasBlocks(doc.bodyEn)) {
+          store.set({
+            id: `${id}.en`,
+            data,
+            digest: generateDigest({ id: `${id}.en`, body: doc.bodyEn, _updatedAt: doc._updatedAt }),
+            rendered: { html: portableTextToHtml(doc.bodyEn) },
+          });
+        }
       }
 
       logger.info(`페이지 ${docs?.length ?? 0}개를 불러왔습니다`);

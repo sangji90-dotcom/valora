@@ -25,16 +25,31 @@ export function createProductSchema<T extends z.ZodType>(imageField: T) {
   return z.object({
     title: z.string().min(1),
     summary: z.string().min(1).max(120),
+
+    /**
+     * 영문판 (요청서 3번).
+     * ⚠ 비워두면 영문 사이트에서 한국어가 그대로 나옵니다.
+     *   빈 화면보다는 낫다는 판단이지만, 영문을 공개하기 전에는
+     *   npm run test:i18n 으로 빠진 항목을 확인하세요.
+     * 본문 영문은 같은 폴더의 <id>.en.md 파일에 씁니다.
+     */
+    titleEn: z.string().optional(),
+    summaryEn: z.string().max(200).optional(),
     category: categoryField,
 
     thumbnail: imageField,
     gallery: z.array(imageField).default([]),
 
     specs: z.record(z.string(), z.string()).default({}),
+    /** 사양표 영문판. 항목명까지 통째로 바꾸므로 한국어와 줄 수가 달라도 됩니다 */
+    specsEn: z.record(z.string(), z.string()).default({}),
     tags: z.array(z.string()).default([]),
+    /** 검색 키워드 영문판. 비면 한국어 태그를 씁니다 */
+    tagsEn: z.array(z.string()).default([]),
 
     price: z.number().int().nonnegative().optional(),
     priceNote: z.string().default('가격 문의'),
+    priceNoteEn: z.string().optional(),
 
     /**
      * 정가. price 보다 클 때만 취소선과 할인율이 함께 표시됩니다.
@@ -48,6 +63,7 @@ export function createProductSchema<T extends z.ZodType>(imageField: T) {
 
     /** 카드 좌상단 배지 문구 (BEST, NEW, 한정수량 등). 6자 이내 권장 */
     badge: z.string().max(12).optional(),
+    badgeEn: z.string().max(16).optional(),
 
     /**
      * 외부 구매처 링크 (상세 페이지 하단에 버튼으로 노출).
@@ -131,6 +147,9 @@ export function createSlideSchema<T extends z.ZodType>(imageField: T) {
 export const pageSchema = z.object({
   title: z.string(),
   description: z.string().optional(),
+  /** 영문판. 본문 영문은 <id>.en.md 에 씁니다 */
+  titleEn: z.string().optional(),
+  descriptionEn: z.string().optional(),
   showHero: z.boolean().default(true),
   /**
    * CMS에서 작성 중인 페이지를 감추기 위한 값입니다.

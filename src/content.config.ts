@@ -30,6 +30,16 @@ import {
  * ============================================================
  */
 
+/**
+ * 파일 이름을 그대로 id 로 씁니다.
+ *
+ * ⚠ Astro 기본 generateId 는 파일명을 slugify 하면서 점을 지웁니다.
+ *   그래서 about.en.md → "abouten" 이 되어 영문 본문 파일이 별도 페이지처럼
+ *   취급됩니다 (실제로 /products/box-4capsuleen/ 이 생겼습니다).
+ *   영문 본문은 <id>.en 이라는 약속으로 찾으므로 점을 살려야 합니다.
+ */
+const fileId = ({ entry }: { entry: string }) => entry.replace(/\.md$/, '');
+
 const source = getContentSource();
 
 /** sanity 모드에서만 환경변수를 읽습니다 (local 모드에서 불필요한 검증을 피함) */
@@ -42,7 +52,7 @@ const products =
         schema: createProductSchema(remoteImageSchema),
       })
     : defineCollection({
-        loader: glob({ base: './src/content/products', pattern: '**/*.md' }),
+        loader: glob({ base: './src/content/products', pattern: '**/*.md', generateId: fileId }),
         schema: ({ image }) => createProductSchema(localImageSchema(image)),
       });
 
@@ -58,7 +68,7 @@ const pages = sanityEnv
       schema: pageSchema,
     })
   : defineCollection({
-      loader: glob({ base: './src/content/pages', pattern: '**/*.md' }),
+      loader: glob({ base: './src/content/pages', pattern: '**/*.md', generateId: fileId }),
       schema: pageSchema,
     });
 
@@ -76,7 +86,7 @@ const slides = sanityEnv
       schema: createSlideSchema(remoteImageSchema),
     })
   : defineCollection({
-      loader: glob({ base: './src/content/slides', pattern: '**/*.md' }),
+      loader: glob({ base: './src/content/slides', pattern: '**/*.md', generateId: fileId }),
       schema: ({ image }) => createSlideSchema(localImageSchema(image)),
     });
 

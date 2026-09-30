@@ -12,6 +12,52 @@
  * ============================================================
  */
 
+import { SHOW_EN, EN_NOTE } from './i18n.generated.js';
+
+/** 영문 칸 — 영문 사이트를 끄면 숨깁니다. 절대 필수로 만들지 마세요. */
+const en = (field) => ({ ...field, hidden: !SHOW_EN, description: EN_NOTE });
+
+/** 본문에서 허용하는 블록. 한국어 본문과 영문 본문이 같은 정의를 씁니다. */
+const PAGE_BODY = [
+  { type: 'table' },
+  { type: 'calculator' },
+  {
+    type: 'block',
+    styles: [
+      { title: '본문', value: 'normal' },
+      { title: '제목 2', value: 'h2' },
+      { title: '제목 3', value: 'h3' },
+      { title: '인용', value: 'blockquote' },
+    ],
+    lists: [
+      { title: '글머리 기호', value: 'bullet' },
+      { title: '번호 매기기', value: 'number' },
+    ],
+    marks: {
+      decorators: [
+        { title: '굵게', value: 'strong' },
+        { title: '기울임', value: 'em' },
+      ],
+      annotations: [
+        {
+          name: 'link',
+          type: 'object',
+          title: '링크',
+          fields: [
+            {
+              name: 'href',
+              type: 'url',
+              title: '주소',
+              validation: (Rule) =>
+                Rule.uri({ scheme: ['http', 'https', 'mailto', 'tel'], allowRelative: true }),
+            },
+          ],
+        },
+      ],
+    },
+  },
+];
+
 export const page = {
   name: 'page',
   title: '페이지',
@@ -24,6 +70,7 @@ export const page = {
       description: '화면 상단과 브라우저 탭에 표시됩니다.',
       validation: (Rule) => Rule.required().error('필수 항목입니다. 페이지 제목을 입력하세요.'),
     },
+    en({ name: 'titleEn', title: '페이지 제목 (English)', type: 'string' }),
     {
       name: 'slug',
       title: 'URL 주소 *',
@@ -45,6 +92,7 @@ export const page = {
       type: 'string',
       description: '제목 아래에 표시되고, 검색결과 요약으로도 쓰입니다.',
     },
+    en({ name: 'descriptionEn', title: '한 줄 설명 (English)', type: 'string' }),
     {
       name: 'showHero',
       title: '제목을 화면에 표시',
@@ -56,50 +104,10 @@ export const page = {
       name: 'body',
       title: '본문 *',
       type: 'array',
-      of: [
-        { type: 'table' },
-        { type: 'calculator' },
-        {
-          type: 'block',
-          styles: [
-            { title: '본문', value: 'normal' },
-            { title: '제목 2', value: 'h2' },
-            { title: '제목 3', value: 'h3' },
-            { title: '인용', value: 'blockquote' },
-          ],
-          lists: [
-            { title: '글머리 기호', value: 'bullet' },
-            { title: '번호 매기기', value: 'number' },
-          ],
-          marks: {
-            decorators: [
-              { title: '굵게', value: 'strong' },
-              { title: '기울임', value: 'em' },
-            ],
-            annotations: [
-              {
-                name: 'link',
-                type: 'object',
-                title: '링크',
-                fields: [
-                  {
-                    name: 'href',
-                    type: 'url',
-                    title: '주소',
-                    validation: (Rule) =>
-                      Rule.uri({
-                        scheme: ['http', 'https', 'mailto', 'tel'],
-                        allowRelative: true,
-                      }),
-                  },
-                ],
-              },
-            ],
-          },
-        },
-      ],
+      of: PAGE_BODY,
       validation: (Rule) => Rule.required().error('필수 항목입니다. 본문을 입력하세요.'),
     },
+    en({ name: 'bodyEn', title: '본문 (English)', type: 'array', of: PAGE_BODY }),
     {
       name: 'draft',
       title: '작성 중 (검색에서 제외)',

@@ -1,6 +1,8 @@
 ---
 title: 제로웨이스트 디스펜서 (4구)
 summary: 원판을 4칸으로 나눠 버튼 한 번에 캡슐 한 알이 떨어지는 정량 토출 디스펜서입니다.
+titleEn: Zero-Waste Dispenser (4-Bay)
+summaryEn: A rotating four-bay dispenser that releases exactly one capsule per press.
 category: amenity
 thumbnail: ../../assets/products/dispenser-4.jpg
 specs:
@@ -11,8 +13,18 @@ specs:
   충전: 캡슐 리필만 채우면 됨
   용도: 객실 어메니티, 공용 샤워장, 피트니스
   진행 단계: 시안 (실물 제작 전)
+specsEn:
+  Bays: Circular 4-bay (shampoo / conditioner / body wash / hand wash)
+  Dispensing: One press releases one capsule
+  Bay selection: Turn the disc to align the bay with the outlet
+  Mounting: Wall-mounted or placed on the counter
+  Refilling: Top up with capsules only
+  Use: Guest room amenities, shared showers, fitness facilities
+  Stage: Design concept, not yet in production
 tags: [디스펜서, 어메니티, 호텔, 숙박, 설비, 욕실, 4구]
+tagsEn: [dispenser, amenity, hotel, hospitality, fixture, bathroom, 4-bay]
 priceNote: 수량별 견적
+priceNoteEn: Quoted by volume
 featured: true
 order: 4
 status: coming-soon

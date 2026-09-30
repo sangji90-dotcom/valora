@@ -20,10 +20,19 @@ export type { NavItem, Category, LayoutPreset, SiteConfig };
 
 export const siteConfig: SiteConfig = {
   site: 'https://example.com',
-  company: '주식회사 발로라',
-  tagline: '플라스틱 없는 정량 위생',
-  description:
-    '발로라는 물에 녹는 수용성 필름으로 만든 캡슐 세정제와 전용 디스펜서를 공급합니다. 기업 ESG 판촉물과 숙박업소 어메니티에 맞는 구성을 안내해 드립니다.',
+  company: {
+    ko: '주식회사 발로라',
+    // ⚠ 등기된 영문 법인명을 확인해 바꿔야 합니다. 아래는 잠정 표기입니다.
+    en: 'VALORA Inc.',
+  },
+  tagline: {
+    ko: '플라스틱 없는 정량 위생',
+    en: 'Measured hygiene, without the plastic',
+  },
+  description: {
+    ko: '발로라는 물에 녹는 수용성 필름으로 만든 캡슐 세정제와 전용 디스펜서를 공급합니다. 기업 ESG 판촉물과 숙박업소 어메니티에 맞는 구성을 안내해 드립니다.',
+    en: 'VALORA supplies capsule cleansers made with water-soluble film, and the dispensers built for them. We put together configurations for corporate ESG gifting and for hospitality amenities.',
+  },
   logo: null,
   ogImage: '/og-default.png',
   lang: 'ko',
@@ -34,7 +43,7 @@ export const siteConfig: SiteConfig = {
    * /en/ 아래에 통째로 생깁니다. 번역을 받기 전까지는 넣지 마세요.
    */
   i18n: {
-    published: ['ko'],
+    published: ['ko', 'en'],
   },
 
   layout: {
@@ -66,24 +75,36 @@ export const siteConfig: SiteConfig = {
    */
   proof: [
     {
-      label: '특허',
-      value: '출원 완료',
-      note: '캡슐형 비누 및 그 토출장치 (10-2025-0122876)',
+      label: { ko: '특허', en: 'PATENT' },
+      value: { ko: '출원 완료', en: 'Application filed' },
+      note: {
+        ko: '캡슐형 비누 및 그 토출장치 (10-2025-0122876)',
+        en: 'Capsule soap and dispensing device (KR 10-2025-0122876)',
+      },
     },
     {
-      label: '기술이전',
-      value: '남부대학교 산학협력',
-      note: '식물추출물 유효성분 포함 조성물',
+      label: { ko: '기술이전', en: 'TECH TRANSFER' },
+      value: { ko: '남부대학교 산학협력', en: 'Nambu University' },
+      note: {
+        ko: '식물추출물 유효성분 포함 조성물',
+        en: 'Plant-extract active compound formulation',
+      },
     },
     {
-      label: '인증',
-      value: '진행 중',
-      note: '화장품법 기반 인증 절차',
+      label: { ko: '인증', en: 'CERTIFICATION' },
+      value: { ko: '진행 중', en: 'In progress' },
+      note: {
+        ko: '화장품법 기반 인증 절차',
+        en: 'Under the Korean Cosmetics Act',
+      },
     },
     {
-      label: '공급 방식',
-      value: '주문 제작',
-      note: '용도와 수량에 맞춰 구성·색상 맞춤',
+      label: { ko: '공급 방식', en: 'SUPPLY' },
+      value: { ko: '주문 제작', en: 'Made to order' },
+      note: {
+        ko: '용도와 수량에 맞춰 구성·색상 맞춤',
+        en: 'Configuration and colour matched to use and quantity',
+      },
     },
   ],
 
@@ -132,9 +153,14 @@ export const siteConfig: SiteConfig = {
    */
   brandMessage: {
     title: 'SMALL CAPSULE, BIG CHANGE.',
-    body: `발로라는 필요한 만큼의 세정 성분을 수용성 필름 한 알에 담습니다.
+    body: {
+      ko: `발로라는 필요한 만큼의 세정 성분을 수용성 필름 한 알에 담습니다.
 물과 만나면 필름은 녹고, 필요한 양만 쓰입니다.
 매번 버리는 일회용 용기를 줄입니다.`,
+      en: `VALORA puts a single dose of cleanser inside a water-soluble film.
+The film dissolves on contact and only the amount needed is used.
+Fewer single-use bottles thrown away, every time.`,
+    },
   },
 
   /**
@@ -142,35 +168,40 @@ export const siteConfig: SiteConfig = {
    * 제품을 나열하지 않고 이어지는 하나의 체계로 보여줍니다.
    */
   productSystem: {
-    title: '하나로 이어지는 체계',
-    lead: '캡슐을 쓰려면 담을 것이 필요하고, 담으면 보관할 것이 필요합니다. 제품이 늘어나는 순서가 곧 쓰는 순서입니다.',
+    title: { ko: '하나로 이어지는 체계', en: 'One connected system' },
+    lead: {
+      ko: '캡슐을 쓰려면 담을 것이 필요하고, 담으면 보관할 것이 필요합니다. 제품이 늘어나는 순서가 곧 쓰는 순서입니다.',
+      en: 'A capsule needs something to carry it, and carrying it needs somewhere to keep it. The order the range grows in is the order you use it in.',
+    },
     items: [
       {
         icon: 'capsule',
         key: 'CAPSULE',
-        label: '수용성 필름에 1회분을 담은 캡슐',
+        label: { ko: '수용성 필름에 1회분을 담은 캡슐', en: 'A single dose sealed in water-soluble film' },
       },
       {
         icon: 'carry',
         key: 'CARRY',
-        label: '들고 다니는 휴대용 케이스',
-        note: '개발 중',
+        label: { ko: '들고 다니는 휴대용 케이스', en: 'A pocket case to carry them in' },
+        note: { ko: '개발 중', en: 'In development' },
       },
       {
         icon: 'store',
         key: 'STORE',
-        label: '쌓아서 쓰는 보관 케이스',
-        note: '개발 중',
+        label: { ko: '쌓아서 쓰는 보관 케이스', en: 'Stacking cases for storage' },
+        note: { ko: '개발 중', en: 'In development' },
       },
       {
         icon: 'dispense',
         key: 'DISPENSE',
-        label: '버튼 한 번에 한 알이 나오는 디스펜서',
-        note: '시안 단계',
+        label: { ko: '버튼 한 번에 한 알이 나오는 디스펜서', en: 'One press, one capsule' },
+        note: { ko: '시안 단계', en: 'Concept stage' },
       },
     ],
-    disclaimer:
-      '화면의 그림은 형태를 단순화한 도식이며 실제 제품 사진이 아닙니다. 개발 단계는 항목마다 표시했습니다.',
+    disclaimer: {
+      ko: '화면의 그림은 형태를 단순화한 도식이며 실제 제품 사진이 아닙니다. 개발 단계는 항목마다 표시했습니다.',
+      en: 'The drawings above are simplified diagrams, not photographs of finished products. Development stage is marked on each item.',
+    },
   },
 
   /**
@@ -178,13 +209,13 @@ export const siteConfig: SiteConfig = {
    * ⚠ 한 줄씩만 씁니다. 길어지면 이 섹션을 만든 이유가 사라집니다.
    */
   howItWorks: {
-    title: '쓰는 방법',
-    lead: '네 단계가 전부입니다.',
+    title: { ko: '쓰는 방법', en: 'How it works' },
+    lead: { ko: '네 단계가 전부입니다.', en: 'Four steps, that is all.' },
     items: [
-      { icon: 'take', key: 'TAKE', label: '캡슐 한 알을 꺼냅니다' },
-      { icon: 'water', key: 'WATER', label: '물에 닿게 합니다' },
-      { icon: 'dissolve', key: 'DISSOLVE', label: '3~5초 만에 필름이 녹습니다' },
-      { icon: 'clean', key: 'CLEAN', label: '정량만 그대로 쓰입니다' },
+      { icon: 'take', key: 'TAKE', label: { ko: '캡슐 한 알을 꺼냅니다', en: 'Take one capsule' } },
+      { icon: 'water', key: 'WATER', label: { ko: '물에 닿게 합니다', en: 'Let it meet water' } },
+      { icon: 'dissolve', key: 'DISSOLVE', label: { ko: '3~5초 만에 필름이 녹습니다', en: 'The film dissolves in 3–5 seconds' } },
+      { icon: 'clean', key: 'CLEAN', label: { ko: '정량만 그대로 쓰입니다', en: 'Exactly one dose is used' } },
     ],
   },
 
@@ -193,45 +224,57 @@ export const siteConfig: SiteConfig = {
    * 숫자는 여기 두지 않습니다 — 아래 stats 주석을 보세요.
    */
   sustainability: {
-    title: '구조가 만드는 지속가능성',
-    lead: '캠페인 문구가 아니라 제품이 생긴 방식에서 나옵니다.',
+    title: { ko: '구조가 만드는 지속가능성', en: 'Sustainability by design' },
+    lead: {
+      ko: '캠페인 문구가 아니라 제품이 생긴 방식에서 나옵니다.',
+      en: 'Not a slogan — it follows from how the product is made.',
+    },
     items: [
       {
         key: 'LESS PACKAGING',
-        label: '불필요한 일회용 포장을 줄입니다',
-        body: '1회분이 필름 한 알에 들어갑니다. 용량마다 따로 용기를 만들 필요가 없습니다.',
+        label: { ko: '불필요한 일회용 포장을 줄입니다', en: 'Less single-use packaging' },
+        body: {
+          ko: '1회분이 필름 한 알에 들어갑니다. 용량마다 따로 용기를 만들 필요가 없습니다.',
+          en: 'One dose fits in one film capsule. No separate bottle per volume.',
+        },
       },
       {
         key: 'EXACT DOSE',
-        label: '필요한 만큼 사용합니다',
-        body: '한 번에 한 캡슐만 쓰입니다. 펌프처럼 눌린 만큼 나와 남는 일이 없습니다.',
+        label: { ko: '필요한 만큼 사용합니다', en: 'Only what is needed' },
+        body: {
+          ko: '한 번에 한 캡슐만 쓰입니다. 펌프처럼 눌린 만큼 나와 남는 일이 없습니다.',
+          en: 'One capsule at a time. Nothing is left over the way it is with a pump.',
+        },
       },
       {
         key: 'REFILL SYSTEM',
-        label: '케이스와 디스펜서는 반복해 사용합니다',
-        body: '본체는 그대로 두고 캡슐만 채웁니다. 쓰는 동안 버려지는 것은 필름뿐입니다.',
+        label: { ko: '케이스와 디스펜서는 반복해 사용합니다', en: 'Cases and dispensers are reused' },
+        body: {
+          ko: '본체는 그대로 두고 캡슐만 채웁니다. 쓰는 동안 버려지는 것은 필름뿐입니다.',
+          en: 'The body stays; you refill the capsules. Only the film is discarded in use.',
+        },
       },
     ],
   },
 
   nav: [
-    { label: '제품', href: '/products' },
-    { label: '회사소개', href: '/about' },
-    { label: '문의', href: '/contact' },
+    { label: { ko: '제품', en: 'Products' }, href: '/products' },
+    { label: { ko: '회사소개', en: 'About' }, href: '/about' },
+    { label: { ko: '문의', en: 'Contact' }, href: '/contact' },
   ],
 
   utilityNav: {
-    left: [{ label: '발로라 소개', href: '/about/' }],
+    left: [{ label: { ko: '발로라 소개', en: 'About VALORA' }, href: '/about/' }],
     right: [
-      { label: '샘플 신청', href: '/contact/' },
-      { label: '도입 문의', href: '/contact/' },
-      { label: '개인정보처리방침', href: '/privacy/' },
+      { label: { ko: '샘플 신청', en: 'Request a sample' }, href: '/contact/' },
+      { label: { ko: '도입 문의', en: 'Enquire' }, href: '/contact/' },
+      { label: { ko: '개인정보처리방침', en: 'Privacy policy' }, href: '/privacy/' },
     ],
   },
 
   quickLinks: [
-    { label: '도입 문의', href: '/contact/' },
-    { label: '샘플 신청', href: '/contact/' },
+    { label: { ko: '도입 문의', en: 'Enquire' }, href: '/contact/' },
+    { label: { ko: '샘플 신청', en: 'Request a sample' }, href: '/contact/' },
   ],
 
   /**
@@ -240,29 +283,38 @@ export const siteConfig: SiteConfig = {
    */
   productNotice: {
     items: [
-      '최소 주문 수량은 제품에 따라 다릅니다. 문의 시 안내해 드립니다.',
-      '로고 인쇄에는 인쇄용 원본 파일(AI·PDF)이 필요합니다.',
-      '샘플 제작에 약 2주, 본 양산에 약 4~6주가 걸립니다. 발주 시점에 따라 달라질 수 있습니다.',
-      '캡슐 색상 맞춤 제작은 발주 수량에 따라 가능 여부가 달라집니다.',
-      '이 사이트에서는 결제가 이루어지지 않습니다. 견적과 계약은 별도로 진행됩니다.',
+      { ko: '최소 주문 수량은 제품에 따라 다릅니다. 문의 시 안내해 드립니다.', en: 'Minimum order quantity varies by product. We will confirm it when you enquire.' },
+      { ko: '로고 인쇄에는 인쇄용 원본 파일(AI·PDF)이 필요합니다.', en: 'Logo printing requires print-ready artwork (AI or PDF).' },
+      { ko: '샘플 제작에 약 2주, 본 양산에 약 4~6주가 걸립니다. 발주 시점에 따라 달라질 수 있습니다.', en: 'Samples take about two weeks and production four to six, depending on when the order is placed.' },
+      { ko: '캡슐 색상 맞춤 제작은 발주 수량에 따라 가능 여부가 달라집니다.', en: 'Custom capsule colours depend on the order quantity.' },
+      { ko: '이 사이트에서는 결제가 이루어지지 않습니다. 견적과 계약은 별도로 진행됩니다.', en: 'No payment is taken on this site. Quotations and contracts are handled separately.' },
     ],
   },
 
   categories: [
     {
       id: 'gift',
-      label: '기업 판촉·기프트',
-      description: 'ESG 캠페인 키트와 브랜드 굿즈로 쓰이는 구성입니다. 로고 인쇄와 캡슐 색상 맞춤이 가능합니다.',
+      label: { ko: '기업 판촉·기프트', en: 'Corporate gifting' },
+      description: {
+        ko: 'ESG 캠페인 키트와 브랜드 굿즈로 쓰이는 구성입니다. 로고 인쇄와 캡슐 색상 맞춤이 가능합니다.',
+        en: 'Kits for ESG campaigns and branded gifts. Logo printing and custom capsule colours are available.',
+      },
     },
     {
       id: 'amenity',
-      label: '숙박 어메니티',
-      description: '객실 욕실의 일회용 어메니티를 대체하는 설비입니다. 설치 후 캡슐만 채우면 됩니다.',
+      label: { ko: '숙박 어메니티', en: 'Hospitality amenities' },
+      description: {
+        ko: '객실 욕실의 일회용 어메니티를 대체하는 설비입니다. 설치 후 캡슐만 채우면 됩니다.',
+        en: 'Equipment that replaces single-use bathroom amenities. Once installed, you only refill capsules.',
+      },
     },
     {
       id: 'refill',
-      label: '리필 캡슐',
-      description: '디스펜서와 케이스에 공통으로 들어가는 소모품입니다.',
+      label: { ko: '리필 캡슐', en: 'Refill capsules' },
+      description: {
+        ko: '디스펜서와 케이스에 공통으로 들어가는 소모품입니다.',
+        en: 'The consumable that goes into both the dispensers and the cases.',
+      },
     },
   ],
 
@@ -272,7 +324,7 @@ export const siteConfig: SiteConfig = {
     //   특히 대표 개인 휴대전화는 공개 사이트에 올리면 안 됩니다.
     email: 'contact@example.com',
     phone: '000-0000-0000',
-    address: '광주광역시 서구',
+    address: { ko: '광주광역시 서구', en: 'Seo-gu, Gwangju, Republic of Korea' },
     businessNumber: '000-00-00000',
     ceo: '000',
   },
@@ -308,8 +360,10 @@ export const siteConfig: SiteConfig = {
 
   demoBanner: {
     enabled: true,
-    text:
-      '이 사이트는 템플릿 시연용으로 제작한 샘플입니다. 주식회사 발로라의 공식 사이트가 아니며, 회사의 의뢰 없이 공개 자료만으로 구성했습니다.',
+    text: {
+      ko: '이 사이트는 템플릿 시연용으로 제작한 샘플입니다. 주식회사 발로라의 공식 사이트가 아니며, 회사의 의뢰 없이 공개 자료만으로 구성했습니다.',
+      en: 'This is a template demonstration built from public information only. It is not an official site of VALORA and was not commissioned by the company.',
+    },
   },
 };
 

@@ -1,7 +1,10 @@
 ---
 import siteConfig from '../../site.config';
 import { getTerms } from '../lib/terms';
-import { localeFromPath, localePath } from '../lib/i18n';
+import { companyAddress, companyName, localeFromPath, localePath, ps } from '../lib/i18n';
+
+/** 주소에서 읽은 현재 언어 */
+const locale = localeFromPath(Astro.url.pathname);
 import { getCategoriesWithCount } from '../lib/products';
 
 /** 주소에서 언어를 읽어 화면 문구를 고릅니다 (i18n.ts 참고) */
@@ -17,48 +20,49 @@ const { contact } = siteConfig;
  *   (빌드는 멀쩡히 통과합니다 — 눈으로만 잡히는 종류입니다)
  */
 const L = (p: string) => localePath(p, localeFromPath(Astro.url.pathname));
+
+/** 설정 본문에서 현재 언어를 꺼냅니다 (i18n.ts 의 Localized 참고) */
+const S = (v: Parameters<typeof ps>[0]) => ps(v, localeFromPath(Astro.url.pathname));
 ---
 
 <footer class="footer">
   <div class="container footer__grid">
     <div>
-      <p class="footer__brand">{siteConfig.company}</p>
-      <p class="footer__muted">{siteConfig.tagline}</p>
+      <p class="footer__brand">{companyName(locale)}</p>
+      <p class="footer__muted">{S(siteConfig.tagline)}</p>
     </div>
 
-    <nav class="footer__col" aria-label={`${T.item} 카테고리`}>
+    <nav class="footer__col" aria-label={T.ui.categoriesTitle}>
       <p class="footer__head">{T.item}</p>
       {
         categories.map((c) => (
           <a href={L(`/products/category/${c.id}/`)} class="footer__link">
-            {c.label}
+            {S(c.label)}
           </a>
         ))
       }
     </nav>
 
     <div class="footer__col">
-      <p class="footer__head">연락처</p>
+      <p class="footer__head">{T.ui.contactLabel}</p>
       <a href={`tel:${contact.phone.replace(/-/g, '')}`} class="footer__link">{contact.phone}</a>
       <a href={`mailto:${contact.email}`} class="footer__link">{contact.email}</a>
-      <p class="footer__muted footer__address">{contact.address}</p>
+      <p class="footer__muted footer__address">{companyAddress(locale)}</p>
     </div>
   </div>
 
   <div class="container footer__bottom">
     <p class="footer__legal">
-      대표 {contact.ceo} · 사업자등록번호 {contact.businessNumber}
+      {T.ui.ceoLine(contact.ceo, contact.businessNumber)}
     </p>
     <p class="footer__legal">
-      © {year} {siteConfig.company}. All rights reserved.
-      <a href={L("/privacy/")} class="footer__legal-link">개인정보처리방침</a>
+      © {year} {companyName(locale)}. All rights reserved.
+      <a href={L("/privacy/")} class="footer__legal-link">{T.ui.privacyPolicy}</a>
     </p>
 
     {/* 국내 사이트 관행 — 이메일 주소 자동 수집을 거부한다는 표시 */}
     <p class="footer__legal footer__notice">
-      본 사이트에 게시된 이메일 주소가 전자우편 수집 프로그램이나 그 밖의 기술적 장치를
-      이용하여 무단으로 수집되는 것을 거부하며, 이를 위반 시 정보통신망법에 의해
-      형사처벌됨을 유념하시기 바랍니다.
+      {T.ui.emailNotice}
     </p>
   </div>
 </footer>

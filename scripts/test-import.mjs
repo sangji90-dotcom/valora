@@ -43,6 +43,12 @@ const { default: siteConfig } = await import(
 );
 const CATEGORIES = siteConfig.categories;
 const CAT = CATEGORIES[0];
+/** label 은 문자열이거나 { ko, en } 입니다 (Localized) */
+const koLabel = (c) =>
+  c.label && typeof c.label === 'object' && !Array.isArray(c.label) ? c.label.ko : c.label;
+const CAT_KO = koLabel(CAT);
+const CAT_EN =
+  CAT.label && typeof CAT.label === 'object' && !Array.isArray(CAT.label) ? CAT.label.en : null;
 
 // ---------------------------------------------------------------- 값 변환
 
@@ -60,9 +66,12 @@ check('대표: "O" → true', parseBoolean('O') === true);
 check('대표: "예" → true', parseBoolean('예') === true);
 check('대표: 빈 값 → false', parseBoolean('') === false);
 
-check(`카테고리: 한글 label 매칭 ("${CAT.label}")`, matchCategory(CAT.label, CATEGORIES) === CAT.id);
+check(`카테고리: 한글 label 매칭 ("${CAT_KO}")`, matchCategory(CAT_KO, CATEGORIES) === CAT.id);
+if (CAT_EN) {
+  check(`카테고리: 영문 label 매칭 ("${CAT_EN}")`, matchCategory(CAT_EN, CATEGORIES) === CAT.id);
+}
 check('카테고리: id 직접 입력', matchCategory(CATEGORIES[1].id, CATEGORIES) === CATEGORIES[1].id);
-check('카테고리: 부분 일치', matchCategory(`${CAT.label} 제품`, CATEGORIES) === CAT.id);
+check('카테고리: 부분 일치', matchCategory(`${CAT_KO} 제품`, CATEGORIES) === CAT.id);
 check('카테고리: 없는 값 → null', matchCategory('존재하지않는분류', CATEGORIES) === null);
 
 check(

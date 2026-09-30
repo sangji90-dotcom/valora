@@ -19,6 +19,7 @@
  *   <a href={L(`/products/${id}/`)}> ✓
  */
 import { readFile, readdir } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
 import path from 'node:path';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
@@ -79,3 +80,60 @@ if (hits.length) {
 }
 
 console.log(`내부 링크 전부 언어 접두어 처리됨 (.astro ${files.length}개 검사)`);
+
+/* ============================================================
+ *  2) 영문 페이지에 한국어가 남아 있는지
+ * ============================================================
+ *  빌드 결과가 있을 때만 돕니다 (없으면 조용히 건너뜀).
+ *
+ *  왜 필요한가 — 화면 문구를 terms.ts 로 옮기는 작업은 한 군데씩
+ *  빠지기 쉽고, 빠져도 빌드는 통과합니다. /en/ 을 열어 눈으로 봐야만
+ *  드러나는 종류라서, 여기서 기계가 대신 봅니다.
+ *
+ *  본문뿐 아니라 alt·aria-label·data 속성까지 봅니다. 화면에 안 보이는
+ *  자리에 남은 한국어는 스크린리더와 검색엔진에는 그대로 읽힙니다.
+ * ============================================================ */
+const DIST = path.join(ROOT, 'dist', 'en');
+const HANGUL = /[가-힣]/;
+
+async function walkHtml(dir) {
+  const out = [];
+  for (const e of await readdir(dir, { withFileTypes: true })) {
+    const p = path.join(dir, e.name);
+    if (e.isDirectory()) out.push(...(await walkHtml(p)));
+    else if (p.endsWith('.html')) out.push(p);
+  }
+  return out;
+}
+
+if (existsSync(DIST)) {
+  const pages = await walkHtml(DIST);
+  const leaks = [];
+
+  for (const f of pages) {
+    const html = await readFile(f, 'utf8');
+    // 태그 바깥(본문)과 태그 안(속성) 을 모두 훑습니다
+    for (const chunk of html.match(/[^<>]+/g) ?? []) {
+      if (!HANGUL.test(chunk)) continue;
+      const at = chunk.search(HANGUL);
+      leaks.push(
+        `${path.relative(ROOT, f)}  …${chunk.slice(Math.max(0, at - 40), at + 40).trim()}…`
+      );
+    }
+  }
+
+  if (leaks.length) {
+    console.log(`\n영문 페이지에 한국어가 남아 있습니다 (${leaks.length}곳):`);
+    for (const l of leaks.slice(0, 25)) console.log(`  ✗ ${l}`);
+    if (leaks.length > 25) console.log(`  … 외 ${leaks.length - 25}곳`);
+    console.log(
+      '\n화면 문구는 src/lib/terms.ts, 설정 본문은 site.config.ts 의 { ko, en },\n' +
+        '제품·페이지 본문은 <id>.en.md 에 넣으세요.'
+    );
+    process.exit(1);
+  }
+
+  console.log(`영문 페이지에 한국어 없음 (HTML ${pages.length}개 검사)`);
+} else {
+  console.log('dist/en 이 없어 영문 잔존 검사는 건너뜁니다 (npm run build 후 다시 확인하세요)');
+}

@@ -389,6 +389,29 @@ function readCollection(dir) {
     });
 }
 
+/**
+ * 영문 본문 파일(<id>.en.md)은 별도 문서가 아니라 같은 문서의 bodyEn 입니다.
+ * 걸러내지 않으면 Sanity 에 product-dispenser.en 같은 유령 문서가 생기고,
+ * 고객사 화면에 제품이 두 배로 보입니다.
+ */
+function readCollectionWithTranslations(dir) {
+  const all = readCollection(dir);
+  const en = new Map(
+    all.filter((e) => e.slug.endsWith('.en')).map((e) => [e.slug.slice(0, -3), e])
+  );
+  return all
+    .filter((e) => !e.slug.endsWith('.en'))
+    .map((e) => ({ ...e, en: en.get(e.slug) ?? null }));
+}
+
+/** 영문 본문을 Portable Text 로. 영문 파일이 없으면 필드를 만들지 않습니다 */
+function enBlocks(entry) {
+  if (!entry.en) return {};
+  const blocks = markdownToPortableText(entry.en.body, entry.en.where);
+  assertNothingLost(entry.en.body, blocks, entry.en.where);
+  return blocks.length ? { bodyEn: blocks } : {};
+}
+
 function specsToRows(specs, key) {
   return Object.entries(specs ?? {}).map(([k, v]) => ({
     _type: 'object',
@@ -420,6 +443,15 @@ function buildProduct(entry) {
     status: data.status ?? 'active',
     draft: Boolean(data.draft),
     body: blocks,
+    ...(data.badge ? { badge: data.badge } : {}),
+    ...(data.seoDescription ? { seoDescription: data.seoDescription } : {}),
+    ...(data.titleEn ? { titleEn: data.titleEn } : {}),
+    ...(data.summaryEn ? { summaryEn: data.summaryEn } : {}),
+    ...(data.specsEn ? { specsEn: specsToRows(data.specsEn, key) } : {}),
+    ...(data.tagsEn?.length ? { tagsEn: data.tagsEn } : {}),
+    ...(data.priceNoteEn ? { priceNoteEn: data.priceNoteEn } : {}),
+    ...(data.badgeEn ? { badgeEn: data.badgeEn } : {}),
+    ...enBlocks(entry),
   };
 
   if (Array.isArray(data.gallery) && data.gallery.length) {
@@ -427,8 +459,6 @@ function buildProduct(entry) {
   }
   if (typeof data.price === 'number') doc.price = data.price;
   if (typeof data.listPrice === 'number') doc.listPrice = data.listPrice;
-  if (data.badge) doc.badge = data.badge;
-  if (data.seoDescription) doc.seoDescription = data.seoDescription;
   if (Array.isArray(data.externalLinks) && data.externalLinks.length) {
     doc.externalLinks = data.externalLinks.map((l) => ({
       _type: 'object',
@@ -455,6 +485,9 @@ function buildPage(entry) {
     showHero: data.showHero ?? true,
     draft: Boolean(data.draft),
     body: blocks,
+    ...(data.titleEn ? { titleEn: data.titleEn } : {}),
+    ...(data.descriptionEn ? { descriptionEn: data.descriptionEn } : {}),
+    ...enBlocks(entry),
   };
 }
 
@@ -483,8 +516,8 @@ function buildSlide(entry) {
  *  실행
  * ------------------------------------------------------------------ */
 const all = [
-  ...readCollection('products').map(buildProduct),
-  ...readCollection('pages').map(buildPage),
+  ...readCollectionWithTranslations('products').map(buildProduct),
+  ...readCollectionWithTranslations('pages').map(buildPage),
   ...readCollection('slides').map(buildSlide),
 ];
 

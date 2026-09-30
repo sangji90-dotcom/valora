@@ -7,6 +7,9 @@ import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { chromium } from 'playwright';
 import { serveDist } from './lib/serve.mjs';
 
+/** label 은 문자열이거나 { ko, en } 입니다 (site-config 의 Localized). 화면·콘솔은 한국어를 씁니다 */
+const koLabel = (v) => (v && typeof v === 'object' && !Array.isArray(v) ? (v.ko ?? v.en ?? '') : v);
+
 // 카테고리는 고객사마다 바뀌므로 설정에서 읽습니다
 const { default: siteConfig } = await import(
   new URL('../site.config.ts', import.meta.url).href
@@ -95,7 +98,7 @@ try {
       const vis = await page.locator('[data-item]:not([hidden])').count();
       if (vis !== expected) {
         problems.push(
-          `${hero}/${productCard}: ${TEST_CATEGORY.label} 필터 결과 ${vis} (기대 ${expected})`
+          `${hero}/${productCard}: ${koLabel(TEST_CATEGORY.label)} 필터 결과 ${vis} (기대 ${expected})`
         );
       }
 

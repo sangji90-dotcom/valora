@@ -2,8 +2,21 @@
 import siteConfig from '../../site.config';
 import ProductImage from './ProductImage.astro';
 import type { Product } from '../lib/products';
-import { getCategoryLabel, getPriceView, STATUS_LABEL } from '../lib/products';
+import {
+  getCategoryLabel,
+  getPriceView,
+  productBadge,
+  productSummary,
+  productTitle,
+  statusLabel,
+} from '../lib/products';
 import { localeFromPath, localePath } from '../lib/i18n';
+import { getTerms } from '../lib/terms';
+
+/** 주소에서 언어를 읽어 화면 문구를 고릅니다 (i18n.ts 참고) */
+const T = getTerms(localeFromPath(Astro.url.pathname));
+
+const locale = localeFromPath(Astro.url.pathname);
 
 interface Props {
   product: Product;
@@ -24,8 +37,8 @@ const shape = variant ?? siteConfig.layout.productCard;
 const ratio = siteConfig.layout.imageRatio;
 
 const { data } = product;
-const statusLabel = STATUS_LABEL[data.status];
-const price = getPriceView(data);
+const status = statusLabel(data.status, locale);
+const price = getPriceView(data, locale);
 
 // 구조에 따라 필요한 이미지 폭이 다릅니다.
 const widths = shape === 'list' ? [240, 360, 480] : [320, 480, 640];
@@ -47,25 +60,25 @@ const L = (p: string) => localePath(p, localeFromPath(Astro.url.pathname));
     <div class="card__media">
       <ProductImage
         image={data.thumbnail}
-        alt={data.title}
+        alt={productTitle(product, locale)}
         widths={widths}
         sizes={sizes}
         loading={eager ? 'eager' : 'lazy'}
         class="card__img"
       />
-      {data.badge && <span class="card__badge">{data.badge}</span>}
-      {statusLabel && <span class="card__status">{statusLabel}</span>}
+      {productBadge(data, locale) && <span class="card__badge">{productBadge(data, locale)}</span>}
+      {status && <span class="card__status">{status}</span>}
     </div>
 
     <div class="card__body">
-      <span class="card__cat">{getCategoryLabel(data.category)}</span>
-      <h3 class="card__title">{data.title}</h3>
-      <p class="card__summary">{data.summary}</p>
+      <span class="card__cat">{getCategoryLabel(data.category, locale)}</span>
+      <h3 class="card__title">{productTitle(product, locale)}</h3>
+      <p class="card__summary">{productSummary(product, locale)}</p>
       <p class="card__price">
         {
           price.listText && (
             <span class="card__list-price">
-              <span class="visually-hidden">정가</span>
+              <span class="visually-hidden">{T.ui.listPrice}</span>
               {price.listText}
             </span>
           )

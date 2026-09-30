@@ -1,6 +1,8 @@
 ---
 title: 4캡슐 프리미엄 박스형
 summary: 하드케이스에 캡슐 4개를 담은 구성입니다. 임직원 선물과 VIP 판촉물에 씁니다.
+titleEn: 4-Capsule Premium Box
+summaryEn: Four capsules in a hard case — built for employee gifts and VIP campaign kits.
 category: gift
 thumbnail: ../../assets/products/box-4capsule.jpg
 specs:
@@ -11,8 +13,18 @@ specs:
   최소 주문 수량: 1,000개
   샘플 제작: 약 2주
   본 양산: 약 4~6주
+specsEn:
+  Contents: 4 capsules + hard case
+  Case finish: Matte pink / matte black
+  Logo printing: Available on the case exterior
+  Capsule colour: Matched to corporate CI on large orders
+  Minimum order: 1,000 units
+  Sampling: About 2 weeks
+  Production: About 4-6 weeks
 tags: [판촉물, ESG, 기프트, 기업선물, 캠페인키트]
+tagsEn: [promotional, ESG, gift, corporate gift, campaign kit]
 priceNote: 수량별 견적
+priceNoteEn: Quoted by volume
 featured: true
 order: 1
 status: active

@@ -2,6 +2,10 @@
 import { getCollection } from 'astro:content';
 import ProductImage from './ProductImage.astro';
 import { localeFromPath, localePath } from '../lib/i18n';
+import { getTerms } from '../lib/terms';
+
+/** 주소에서 언어를 읽어 화면 문구를 고릅니다 (i18n.ts 참고) */
+const T = getTerms(localeFromPath(Astro.url.pathname));
 
 /**
  * 풀블리드 슬라이드 배너.
@@ -35,8 +39,8 @@ const L = (p: string) => localePath(p, localeFromPath(Astro.url.pathname));
       class="carousel"
       data-carousel
       data-interval={INTERVAL}
-      aria-roledescription="캐러셀"
-      aria-label="주요 소식"
+      aria-roledescription={T.ui.carousel}
+      aria-label={T.ui.news}
     >
       <div class="carousel__track" data-track>
         {slides.map((slide, index) => {
@@ -49,7 +53,7 @@ const L = (p: string) => localePath(p, localeFromPath(Astro.url.pathname));
               data-tone={d.textColor}
               data-overlay={d.overlay}
               hidden={index !== 0}
-              aria-roledescription="슬라이드"
+              aria-roledescription={T.ui.slide}
               aria-label={`${index + 1} / ${slides.length}`}
             >
               {/*
@@ -87,15 +91,15 @@ const L = (p: string) => localePath(p, localeFromPath(Astro.url.pathname));
       {slides.length > 1 && (
         <>
           <button class="carousel__arrow carousel__arrow--prev" data-prev type="button">
-            <span class="visually-hidden">이전 슬라이드</span>
+            <span class="visually-hidden">{T.ui.prevSlide}</span>
             <span aria-hidden="true">‹</span>
           </button>
           <button class="carousel__arrow carousel__arrow--next" data-next type="button">
-            <span class="visually-hidden">다음 슬라이드</span>
+            <span class="visually-hidden">{T.ui.nextSlide}</span>
             <span aria-hidden="true">›</span>
           </button>
 
-          <div class="carousel__dots" role="tablist" aria-label="슬라이드 선택">
+          <div class="carousel__dots" role="tablist" aria-label={T.ui.slideSelect}>
             {slides.map((_, index) => (
               <button
                 class="carousel__dot"
@@ -104,7 +108,7 @@ const L = (p: string) => localePath(p, localeFromPath(Astro.url.pathname));
                 role="tab"
                 aria-selected={index === 0 ? 'true' : 'false'}
               >
-                <span class="visually-hidden">{index + 1}번 슬라이드</span>
+                <span class="visually-hidden">{T.ui.nthSlide(index + 1)}</span>
               </button>
             ))}
           </div>

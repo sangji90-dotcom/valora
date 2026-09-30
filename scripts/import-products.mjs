@@ -40,6 +40,9 @@ import {
 } from './lib/normalize.mjs';
 import { indexImageDir, resolveImages, optimizeInto, makePlaceholder } from './lib/images.mjs';
 
+/** label 은 문자열이거나 { ko, en } 입니다 (site-config 의 Localized). 화면·콘솔은 한국어를 씁니다 */
+const koLabel = (v) => (v && typeof v === 'object' && !Array.isArray(v) ? (v.ko ?? v.en ?? '') : v);
+
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 const CONTENT_DIR = path.join(ROOT, 'src/content/products');
 const ASSET_DIR = path.join(ROOT, 'src/assets/products');
@@ -108,7 +111,7 @@ async function main() {
     console.log(`  ${field.padEnd(15)} ← "${headers[index]}"`);
   }
   if (specColumns.length) {
-    console.log(`  사양(specs)으로 처리 ← ${specColumns.map((c) => `"${c.label}"`).join(', ')}`);
+    console.log(`  사양(specs)으로 처리 ← ${specColumns.map((c) => `"${koLabel(c.label)}"`).join(', ')}`);
   }
   if (duplicates.length) {
     console.log(`  ⚠ 중복 매칭되어 무시한 열: ${duplicates.join(', ')}`);
@@ -147,7 +150,7 @@ async function main() {
     const specs = {};
     for (const col of specColumns) {
       const value = String(row[col.index] ?? '').trim();
-      if (value) specs[col.label] = value;
+      if (value) specs[koLabel(col.label)] = value;
     }
 
     const tags = parseTags(get('tags'));
@@ -181,7 +184,7 @@ async function main() {
     if (!category) {
       warnings.push(
         `${rowNo}행 "${title}": 카테고리 "${rawCategory || '(비어 있음)'}" 를 인식하지 못했습니다. ` +
-          `사용 가능: ${categories.map((c) => `${c.label}(${c.id})`).join(', ')}`
+          `사용 가능: ${categories.map((c) => `${koLabel(c.label)}(${c.id})`).join(', ')}`
       );
     }
 

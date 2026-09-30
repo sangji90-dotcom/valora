@@ -1,3 +1,5 @@
+import type { Localized } from './i18n';
+
 /**
  * ============================================================
  *  site.config.ts 의 타입 정의
@@ -30,7 +32,7 @@ export type BrandIconName =
 
 
 export interface NavItem {
-  label: string;
+  label: Localized<string>;
   href: string;
 }
 
@@ -38,9 +40,9 @@ export interface Category {
   /** 상품 md의 category 필드에 쓰는 값 + URL 경로에 쓰이는 값 */
   id: string;
   /** 화면에 표시되는 이름 */
-  label: string;
+  label: Localized<string>;
   /** 카테고리 페이지 상단 설명 (선택) */
-  description?: string;
+  description?: Localized<string>;
 }
 
 /**
@@ -124,12 +126,16 @@ export interface LayoutPreset {
 export interface SiteConfig {
   /** 배포 도메인. sitemap / canonical URL / OG URL 생성에 사용 */
   site: string;
-  /** 회사명 (헤더 로고 텍스트, 푸터, SEO title 접미사) */
-  company: string;
+  /**
+   * 회사명 (헤더 로고 텍스트, 푸터, SEO title 접미사).
+   * 영문판을 켜면 { ko, en } 으로 적습니다 — 법인명은 번역이 아니라
+   * 등기된 영문 표기를 써야 합니다. 임의로 옮겨 적지 마세요.
+   */
+  company: Localized<string>;
   /** 사이트 대표 문구 — 홈 히어로 제목 */
-  tagline: string;
+  tagline: Localized<string>;
   /** SEO description 기본값 */
-  description: string;
+  description: Localized<string>;
   /** 로고 이미지 경로. null이면 company 텍스트를 로고로 사용 */
   logo: string | null;
   /** OG 기본 이미지 (public/ 기준 절대경로) */
@@ -145,8 +151,8 @@ export interface SiteConfig {
    * homeSections 에 'message' 가 없으면 쓰이지 않습니다.
    */
   brandMessage?: {
-    title: string;
-    body: string;
+    title: Localized<string>;
+    body: Localized<string>;
   };
 
   nav: NavItem[];
@@ -239,11 +245,11 @@ export interface SiteConfig {
    */
   proof?: Array<{
     /** 위에 붙는 작은 라벨. 예: 특허 */
-    label: string;
+    label: Localized<string>;
     /** 굵게 표시될 본문 */
-    value: string;
+    value: Localized<string>;
     /** 아래 한 줄 보충 설명 */
-    note?: string;
+    note?: Localized<string>;
   }>;
 
   /**
@@ -277,17 +283,17 @@ export interface SiteConfig {
    * ⚠ 아직 개발 중인 제품이 섞여 있으면 disclaimer 로 반드시 밝히세요.
    */
   productSystem?: {
-    title: string;
-    lead?: string;
+    title: Localized<string>;
+    lead?: Localized<string>;
     items: Array<{
       icon: BrandIconName;
       /** 영문 키워드. 예: CAPSULE */
       key: string;
-      label: string;
+      label: Localized<string>;
       /** 개발 단계 표기 등 */
-      note?: string;
+      note?: Localized<string>;
     }>;
-    disclaimer?: string;
+    disclaimer?: Localized<string>;
   };
 
   /**
@@ -297,12 +303,12 @@ export interface SiteConfig {
    * ⚠ label 은 한 줄로 쓰세요. 길어지면 이 섹션을 만든 의미가 없습니다.
    */
   howItWorks?: {
-    title: string;
-    lead?: string;
+    title: Localized<string>;
+    lead?: Localized<string>;
     items: Array<{
       icon: BrandIconName;
       key: string;
-      label: string;
+      label: Localized<string>;
     }>;
   };
 
@@ -315,13 +321,13 @@ export interface SiteConfig {
    *   뒤 stats(ESG DATA)로 따로 내보냅니다.
    */
   sustainability?: {
-    title: string;
-    lead?: string;
+    title: Localized<string>;
+    lead?: Localized<string>;
     items: Array<{
       /** 영문 키워드. 예: LESS PACKAGING */
       key: string;
-      label: string;
-      body: string;
+      label: Localized<string>;
+      body: Localized<string>;
     }>;
   };
 
@@ -339,9 +345,9 @@ export interface SiteConfig {
    */
   productNotice?: {
     /** 탭 이름. 기본 '유의사항' */
-    label?: string;
+    label?: Localized<string>;
     /** 한 줄씩 표시됩니다 */
-    items: string[];
+    items: Array<Localized<string>>;
   };
 
   /**
@@ -354,7 +360,7 @@ export interface SiteConfig {
   contact: {
     email: string;
     phone: string;
-    address: string;
+    address: Localized<string>;
     /** 사업자등록번호 — 푸터 표기 (국내 사이트 관행) */
     businessNumber: string;
     /** 대표자명 */
@@ -462,6 +468,6 @@ export interface SiteConfig {
   demoBanner: {
     enabled: boolean;
     /** 배너에 띄울 문구 */
-    text?: string;
+    text?: Localized<string>;
   };
 }

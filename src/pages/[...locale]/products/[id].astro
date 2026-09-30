@@ -3,7 +3,7 @@ import type { GetStaticPaths } from 'astro';
 import { render } from 'astro:content';
 import siteConfig from '../../../../site.config';
 import { getTerms } from '../../../lib/terms';
-import { localeFromPath, localeParams, localePath } from '../../../lib/i18n';
+import { companyName, localeFromPath, localeParams, localePath, ps } from '../../../lib/i18n';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import ProductTabs from '../../../components/ProductTabs.astro';
 import StickyInquiry from '../../../components/StickyInquiry.astro';
@@ -15,12 +15,21 @@ import {
   getRelatedProducts,
   getCategoryLabel,
   getPriceView,
-  STATUS_LABEL,
+  statusLabel,
+  productTitle,
+  productSummary,
+  getProductBodyEntry,
+  productBadge,
+  productSpecs,
 } from '../../../lib/products';
 import { breadcrumbSchema } from '../../../lib/structured-data';
 
 /** 주소에서 언어를 읽어 화면 문구를 고릅니다 (i18n.ts 참고) */
 const T = getTerms(localeFromPath(Astro.url.pathname));
+
+const locale = localeFromPath(Astro.url.pathname);
+/** 설정 본문에서 현재 언어를 꺼냅니다 (i18n.ts 의 Localized 참고) */
+const S = (v: Parameters<typeof ps>[0]) => ps(v, locale);
 /** 내부 링크에 언어 접두어를 붙입니다 (i18n.ts 참고) */
 const L = (p: string) => localePath(p, localeFromPath(Astro.url.pathname));
 
@@ -40,11 +49,19 @@ export const getStaticPaths = (async () => {
 
 const { product } = Astro.props;
 const { data } = product;
-const { Content } = await render(product);
+const title = productTitle(product, locale);
+const summary = productSummary(product, locale);
+/**
+ * 본문은 <id>.en.md 가 있으면 그쪽을, 없으면 한국어를 씁니다.
+ * ⚠ 영문 본문이 없다는 사실이 화면에는 드러나지 않습니다.
+ *   공개 전에 무엇이 비어 있는지 확인하세요.
+ */
+const bodyEntry = await getProductBodyEntry(product, locale);
+const { Content } = await render(bodyEntry);
 const related = await getRelatedProducts(product);
-const specEntries = Object.entries(data.specs);
-const statusLabel = STATUS_LABEL[data.status];
-const price = getPriceView(data);
+const specEntries = productSpecs(data, locale);
+const status = statusLabel(data.status, locale);
+const price = getPriceView(data, locale);
 const ratio = siteConfig.layout.imageRatio;
 
 /**
@@ -52,13 +69,13 @@ const ratio = siteConfig.layout.imageRatio;
  * 내용이 없는 탭은 아예 만들지 않습니다 — 눌렀더니 빈 화면이 나오는 것보다
  * 탭이 없는 편이 낫습니다.
  */
-const notice = siteConfig.productNotice?.items ?? [];
+const notice = (siteConfig.productNotice?.items ?? []).map((n) => S(n));
 
 const tabs: Array<{ id: 'detail' | 'specs' | 'notice'; label: string }> = [
-  { id: 'detail' as const, label: '상세정보' },
+  { id: 'detail' as const, label: T.ui.detailTab },
   ...(specEntries.length > 0 ? [{ id: 'specs' as const, label: T.specTab }] : []),
   ...(notice.length > 0
-    ? [{ id: 'notice' as const, label: siteConfig.productNotice?.label ?? '유의사항' }]
+    ? [{ id: 'notice' as const, label: S(siteConfig.productNotice?.label) || T.ui.noticeTab }]
     : []),
 ];
 
@@ -66,22 +83,22 @@ const tabs: Array<{ id: 'detail' | 'specs' | 'notice'; label: string }> = [
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Product',
-  name: data.title,
-  description: data.summary,
-  category: getCategoryLabel(data.category),
-  brand: { '@type': 'Brand', name: siteConfig.company },
+  name: title,
+  description: summary,
+  category: getCategoryLabel(data.category, locale),
+  brand: { '@type': 'Brand', name: companyName(locale) },
 };
 
 // 검색결과에 "제품 > 산업용 > 프로쉴드 900" 경로가 표시될 수 있게 함
 const breadcrumb = breadcrumbSchema([
   { name: T.item, path: L('/products/') },
-  { name: getCategoryLabel(data.category), path: L(`/products/category/${data.category}/`) },
-  { name: data.title, path: L(`/products/${product.id}/`) },
+  { name: getCategoryLabel(data.category, locale), path: L(`/products/category/${data.category}/`) },
+  { name: title, path: L(`/products/${product.id}/`) },
 ]);
 
 ---
 
-<BaseLayout title={data.title} description={data.seoDescription ?? data.summary}>
+<BaseLayout title={title} description={(locale === 'ko' && data.seoDescription) || summary}>
   <script
     is:inline
     slot="head"
@@ -96,21 +113,21 @@ const breadcrumb = breadcrumbSchema([
   />
 
   <div class="container detail">
-    <nav class="crumb" aria-label="현재 위치">
+    <nav class="crumb" aria-label={T.ui.currentLocation}>
       <a href={L("/products/")}>{T.item}</a>
       <span aria-hidden="true">/</span>
       <a href={L(`/products/category/${data.category}/`)}>
-        {getCategoryLabel(data.category)}
+        {getCategoryLabel(data.category, locale)}
       </a>
       <span aria-hidden="true">/</span>
-      <span>{data.title}</span>
+      <span>{title}</span>
     </nav>
 
     <div class="detail__top">
       <div class="detail__media" data-ratio={ratio}>
         <ProductImage
           image={data.thumbnail}
-          alt={data.title}
+          alt={title}
           widths={[480, 760, 1040]}
           sizes="(max-width: 880px) 100vw, 560px"
           loading="eager"
@@ -122,7 +139,7 @@ const breadcrumb = breadcrumbSchema([
               {data.gallery.map((img, i) => (
                 <ProductImage
                   image={img}
-                  alt={`${data.title} 상세 이미지 ${i + 1}`}
+                  alt={T.ui.detailImageAlt(title, i + 1)}
                   widths={[160, 320]}
                   sizes="120px"
                   loading="lazy"
@@ -135,18 +152,18 @@ const breadcrumb = breadcrumbSchema([
       </div>
 
       <div class="detail__info">
-        <span class="badge">{getCategoryLabel(data.category)}</span>
-        {data.badge && <span class="badge badge--promo">{data.badge}</span>}
-        {statusLabel && <span class="badge badge--status">{statusLabel}</span>}
+        <span class="badge">{getCategoryLabel(data.category, locale)}</span>
+        {productBadge(data, locale) && <span class="badge badge--promo">{productBadge(data, locale)}</span>}
+        {status && <span class="badge badge--status">{status}</span>}
 
-        <h1 class="detail__title">{data.title}</h1>
-        <p class="detail__summary">{data.summary}</p>
+        <h1 class="detail__title">{title}</h1>
+        <p class="detail__summary">{summary}</p>
 
         <p class="detail__price">
           {
             price.listText && (
               <span class="detail__list-price">
-                <span class="visually-hidden">정가</span>
+                <span class="visually-hidden">{T.ui.listPrice}</span>
                 {price.listText}
               </span>
             )
@@ -168,7 +185,7 @@ const breadcrumb = breadcrumbSchema([
             고객사는 어느 제품 문의인지 알 수 없습니다.
           */}
           <a
-            href={L(`/contact/?product=${encodeURIComponent(data.title)}`)}
+            href={L(`/contact/?product=${encodeURIComponent(title)}`)}
             class="btn btn--primary"
           >
             {T.askThis}
@@ -181,7 +198,7 @@ const breadcrumb = breadcrumbSchema([
         {
           data.externalLinks.length > 0 && (
             <div class="buy">
-              <h2 class="buy__label">구매처</h2>
+              <h2 class="buy__label">{T.ui.buyLabel}</h2>
               <ul class="buy__list">
                 {data.externalLinks.map((link) => (
                   <li>
@@ -198,7 +215,7 @@ const breadcrumb = breadcrumbSchema([
                       rel="noopener noreferrer"
                     >
                       {link.label}
-                      <span class="visually-hidden">(새 창에서 열림)</span>
+                      <span class="visually-hidden">{T.ui.opensNewWindow}</span>
                       <span aria-hidden="true">↗</span>
                     </a>
                   </li>
@@ -222,7 +239,7 @@ const breadcrumb = breadcrumbSchema([
       {
         specEntries.length > 0 && (
           <table slot="specs" class="specs">
-            <caption class="visually-hidden">{T.specCaption(data.title)}</caption>
+            <caption class="visually-hidden">{T.specCaption(title)}</caption>
             <tbody>
               {specEntries.map(([key, value]) => (
                 <tr>
@@ -240,7 +257,7 @@ const breadcrumb = breadcrumbSchema([
     <ProseCalculator />
 
     {/* 좁은 화면에서만 나오는 하단 고정 문의 바 */}
-    <StickyInquiry productTitle={data.title} />
+    <StickyInquiry productTitle={title} />
 
     {
       related.length > 0 && (

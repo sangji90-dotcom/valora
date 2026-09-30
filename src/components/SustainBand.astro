@@ -1,5 +1,6 @@
 ---
 import siteConfig from '../../site.config';
+import { localeFromPath, ps } from '../lib/i18n';
 
 /**
  * ============================================================
@@ -21,23 +22,26 @@ import siteConfig from '../../site.config';
  */
 
 const s = siteConfig.sustainability;
+
+/** 설정 본문에서 현재 언어를 꺼냅니다 (i18n.ts 의 Localized 참고) */
+const S = (v: Parameters<typeof ps>[0]) => ps(v, localeFromPath(Astro.url.pathname));
 ---
 
 {
   s && s.items.length > 0 && (
-    <section class="sus" aria-label={s.title}>
+    <section class="sus" aria-label={S(s.title)}>
       <div class="container">
         <div class="sus__head" data-reveal>
-          <h2 class="sus__title">{s.title}</h2>
-          {s.lead && <p class="sus__lead">{s.lead}</p>}
+          <h2 class="sus__title">{S(s.title)}</h2>
+          {s.lead && <p class="sus__lead">{S(s.lead)}</p>}
         </div>
 
         <div class="sus__grid">
           {s.items.map((item) => (
             <article class="sus__item" data-reveal>
               <p class="sus__key">{item.key}</p>
-              <h3 class="sus__label">{item.label}</h3>
-              <p class="sus__body">{item.body}</p>
+              <h3 class="sus__label">{S(item.label)}</h3>
+              <p class="sus__body">{S(item.body)}</p>
             </article>
           ))}
         </div>

@@ -2,7 +2,7 @@
 import type { GetStaticPaths } from 'astro';
 import siteConfig from '../../../site.config';
 import { getTerms } from '../../lib/terms';
-import { localeFromPath, localeParams, localePath } from '../../lib/i18n';
+import { localeFromPath, localeParams, localePath, ps } from '../../lib/i18n';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Hero from '../../components/Hero.astro';
 import ProductGrid from '../../components/ProductGrid.astro';
@@ -21,6 +21,9 @@ import { organizationSchema } from '../../lib/structured-data';
 
 /** 주소에서 언어를 읽어 화면 문구를 고릅니다 (i18n.ts 참고) */
 const T = getTerms(localeFromPath(Astro.url.pathname));
+
+/** 주소에서 읽은 현재 언어 */
+const locale = localeFromPath(Astro.url.pathname);
 
 const featured = await getFeaturedProducts();
 const categories = await getCategoriesWithCount();
@@ -46,6 +49,9 @@ export const getStaticPaths = (() => localeParams()) satisfies GetStaticPaths;
  *   (빌드는 멀쩡히 통과합니다 — 눈으로만 잡히는 종류입니다)
  */
 const L = (p: string) => localePath(p, localeFromPath(Astro.url.pathname));
+
+/** 설정 본문에서 현재 언어를 꺼냅니다 (i18n.ts 의 Localized 참고) */
+const S = (v: Parameters<typeof ps>[0]) => ps(v, localeFromPath(Astro.url.pathname));
 ---
 
 <BaseLayout>
@@ -53,7 +59,7 @@ const L = (p: string) => localePath(p, localeFromPath(Astro.url.pathname));
     is:inline
     slot="head"
     type="application/ld+json"
-    set:html={JSON.stringify(organizationSchema())}
+    set:html={JSON.stringify(organizationSchema(locale))}
   />
 
   <Hero />
@@ -67,8 +73,8 @@ const L = (p: string) => localePath(p, localeFromPath(Astro.url.pathname));
         return (
           <section class="section section--subtle">
             <div class="container message">
-              <h2 class="message__title">{brandMessage.title}</h2>
-              <p class="message__body">{brandMessage.body}</p>
+              <h2 class="message__title">{S(brandMessage.title)}</h2>
+              <p class="message__body">{S(brandMessage.body)}</p>
             </div>
           </section>
         );
@@ -104,15 +110,15 @@ const L = (p: string) => localePath(p, localeFromPath(Astro.url.pathname));
           <section class="section section--subtle">
             <div class="container">
               <div class="section__head">
-                <h2 class="section__title">카테고리</h2>
+                <h2 class="section__title">{T.ui.categoriesTitle}</h2>
                 <p class="section__desc">{T.categoriesDesc}</p>
               </div>
               <div class="cats">
                 {categories.map((c) => (
                   <a href={L(`/products/category/${c.id}/`)} class="cat">
-                    <span class="cat__label">{c.label}</span>
+                    <span class="cat__label">{S(c.label)}</span>
                     <span class="cat__count">{T.countOf(c.count)}</span>
-                    {c.description && <span class="cat__desc">{c.description}</span>}
+                    {c.description && <span class="cat__desc">{S(c.description)}</span>}
                   </a>
                 ))}
               </div>
@@ -144,7 +150,7 @@ const L = (p: string) => localePath(p, localeFromPath(Astro.url.pathname));
               <h2 class="cta__title">{T.ctaTitle}</h2>
               <p class="cta__desc">{T.ctaDesc}</p>
               <a href={L("/contact/")} class="btn btn--primary">
-                문의하기
+                {T.ui.contactCta}
               </a>
             </div>
           </section>

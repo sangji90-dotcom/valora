@@ -1,5 +1,10 @@
 ---
 import siteConfig from '../../site.config';
+import { getTerms } from '../lib/terms';
+import { localeFromPath, ps } from '../lib/i18n';
+
+/** 주소에서 언어를 읽어 화면 문구를 고릅니다 (i18n.ts 참고) */
+const T = getTerms(localeFromPath(Astro.url.pathname));
 
 /**
  * ============================================================
@@ -21,17 +26,20 @@ import siteConfig from '../../site.config';
  */
 
 const items = siteConfig.proof ?? [];
+
+/** 설정 본문에서 현재 언어를 꺼냅니다 (i18n.ts 의 Localized 참고) */
+const S = (v: Parameters<typeof ps>[0]) => ps(v, localeFromPath(Astro.url.pathname));
 ---
 
 {
   items.length > 0 && (
-    <section class="proof" aria-label="회사 신뢰 근거">
+    <section class="proof" aria-label={T.ui.proofAria}>
       <div class="container proof__grid">
         {items.map((item) => (
           <div class="proof__item" data-reveal>
-            <p class="proof__label">{item.label}</p>
-            <p class="proof__value">{item.value}</p>
-            {item.note && <p class="proof__note">{item.note}</p>}
+            <p class="proof__label">{S(item.label)}</p>
+            <p class="proof__value">{S(item.value)}</p>
+            {item.note && <p class="proof__note">{S(item.note)}</p>}
           </div>
         ))}
       </div>

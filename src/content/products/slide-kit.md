@@ -1,6 +1,8 @@
 ---
 title: 휴대용 슬라이드 키트
 summary: 캡슐 2개가 들어가는 슬라이드형 소형 케이스입니다. 여행·야외용 배포에 맞습니다.
+titleEn: Portable Slide Kit
+summaryEn: A slim slide-open case holding two capsules — sized for travel and hand-outs.
 category: gift
 thumbnail: ../../assets/products/slide-kit.jpg
 specs:
@@ -11,8 +13,18 @@ specs:
   최소 주문 수량: 1,000개
   샘플 제작: 약 2주
   본 양산: 약 4~6주
+specsEn:
+  Contents: 2 capsules + slide case
+  Case colour: Red / black / ivory
+  Format: Slim, slide-open
+  Logo printing: Available on the case exterior
+  Minimum order: 1,000 units
+  Sampling: About 2 weeks
+  Production: About 4-6 weeks
 tags: [판촉물, ESG, 여행, 휴대용, 행사]
+tagsEn: [promotional, ESG, travel, portable, event]
 priceNote: 수량별 견적
+priceNoteEn: Quoted by volume
 featured: true
 order: 2
 status: active

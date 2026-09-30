@@ -1,6 +1,8 @@
 ---
 title: 회사소개
 description: 발로라가 무엇을 만들고 어떻게 공급하는지 소개합니다.
+titleEn: About
+descriptionEn: What VALORA makes, and how it is supplied.
 showHero: true
 ---
 

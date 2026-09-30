@@ -131,6 +131,13 @@ export function productsQuery(includeDrafts: boolean): string {
     draft,
     seoDescription,
     body,
+    titleEn,
+    summaryEn,
+    bodyEn,
+    "specsEn": specsEn[]{key, value},
+    tagsEn,
+    priceNoteEn,
+    badgeEn,
     _updatedAt
   } | order(order asc, title asc)`;
 }
@@ -153,6 +160,9 @@ export function pagesQuery(includeDrafts: boolean): string {
     showHero,
     draft,
     body,
+    titleEn,
+    descriptionEn,
+    bodyEn,
     _updatedAt
   }`;
 }

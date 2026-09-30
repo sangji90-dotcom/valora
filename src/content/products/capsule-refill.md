@@ -1,6 +1,8 @@
 ---
 title: 수용성 캡슐 비누 (리필)
 summary: 물에 닿으면 3~5초 만에 녹는 필름에 1회분 세정제를 담았습니다.
+titleEn: Water-Soluble Soap Capsule (Refill)
+summaryEn: A single dose of cleanser sealed in a film that dissolves in 3-5 seconds on contact with water.
 category: refill
 thumbnail: ../../assets/products/capsule-refill.jpg
 specs:
@@ -11,8 +13,18 @@ specs:
   사용량: 1회 1캡슐 정량
   포장: 10개입 기준
   색상: 용도별 구분 및 맞춤 제작 가능
+specsEn:
+  Types: Body wash / shampoo / face and hand soap
+  Film: Water-soluble film, leaves no residue
+  Dissolve time: 3-5 seconds after contact with water
+  pH: Neutral to mildly acidic, matched to skin
+  Dose: One capsule per use
+  Packing: 10 capsules per pack
+  Colour: Colour-coded by type; custom colours available
 tags: [리필, 캡슐, 수용성, 바디워시, 샴푸, 비누, 소모품]
+tagsEn: [refill, capsule, water-soluble, body wash, shampoo, soap, consumable]
 priceNote: 수량별 견적
+priceNoteEn: Quoted by volume
 featured: true
 order: 3
 status: active

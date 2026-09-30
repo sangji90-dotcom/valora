@@ -1,13 +1,19 @@
 ---
 import siteConfig from '../../site.config';
 import { getTerms } from '../lib/terms';
-import { localeFromPath, localePath } from '../lib/i18n';
+import { companyName, localeFromPath, localePath, ps } from '../lib/i18n';
 import ProductImage from './ProductImage.astro';
 import HeroCarousel from './HeroCarousel.astro';
-import { getFeaturedProducts } from '../lib/products';
+import { getFeaturedProducts, productTitle } from '../lib/products';
+
+/** 주소에서 읽은 현재 언어 */
+const locale = localeFromPath(Astro.url.pathname);
 
 /** 주소에서 언어를 읽어 화면 문구를 고릅니다 (i18n.ts 참고) */
 const T = getTerms(localeFromPath(Astro.url.pathname));
+
+/** 설정 본문에서 현재 언어를 꺼냅니다 (i18n.ts 의 Localized 참고) */
+const S = (v: Parameters<typeof ps>[0]) => ps(v, localeFromPath(Astro.url.pathname));
 
 /**
  * 홈 히어로. 구조는 site.config.ts의 layout.hero 가 정합니다.
@@ -30,12 +36,12 @@ const L = (p: string) => localePath(p, localeFromPath(Astro.url.pathname));
 <section class="hero" data-variant={effective}>
   <div class="container hero__inner">
     <div class="hero__body">
-      <p class="badge">{siteConfig.company}</p>
-      <h1 class="hero__title">{siteConfig.tagline}</h1>
-      <p class="hero__desc">{siteConfig.description}</p>
+      <p class="badge">{companyName(locale)}</p>
+      <h1 class="hero__title">{S(siteConfig.tagline)}</h1>
+      <p class="hero__desc">{S(siteConfig.description)}</p>
       <div class="hero__actions">
         <a href={L("/products/")} class="btn btn--primary">{T.viewItems}</a>
-        <a href={L("/contact/")} class="btn btn--ghost">문의하기</a>
+        <a href={L("/contact/")} class="btn btn--ghost">{T.ui.contactCta}</a>
       </div>
     </div>
 
@@ -44,7 +50,7 @@ const L = (p: string) => localePath(p, localeFromPath(Astro.url.pathname));
         <div class="hero__media">
           <ProductImage
             image={showcase.data.thumbnail}
-            alt={showcase.data.title}
+            alt={productTitle(showcase, locale)}
             widths={[480, 760, 1040]}
             sizes="(max-width: 880px) 100vw, 520px"
             loading="eager"

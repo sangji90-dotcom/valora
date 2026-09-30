@@ -1,13 +1,16 @@
 ---
 import siteConfig from '../../site.config';
 import { getTerms } from '../lib/terms';
-import { localeFromPath } from '../lib/i18n';
+import { localeFromPath, ps } from '../lib/i18n';
 import type { Product } from '../lib/products';
 import ProductCard from './ProductCard.astro';
-import { getCategoriesWithCount } from '../lib/products';
+import { getCategoriesWithCount, productKeywords } from '../lib/products';
 
 /** 주소에서 언어를 읽어 화면 문구를 고릅니다 (i18n.ts 참고) */
 const T = getTerms(localeFromPath(Astro.url.pathname));
+
+/** 주소에서 읽은 현재 언어 */
+const locale = localeFromPath(Astro.url.pathname);
 
 interface Props {
   products: Product[];
@@ -20,6 +23,9 @@ interface Props {
 const { products, showFilter = true, activeCategory } = Astro.props;
 const categories = await getCategoriesWithCount();
 const initial = siteConfig.productsPerPage;
+
+/** 설정 본문에서 현재 언어를 꺼냅니다 (i18n.ts 의 Localized 참고) */
+const S = (v: Parameters<typeof ps>[0]) => ps(v, localeFromPath(Astro.url.pathname));
 ---
 
 <div
@@ -34,13 +40,13 @@ const initial = siteConfig.productsPerPage;
     (showFilter || siteConfig.enableSearch) && (
       <div class="browser__bar">
         {showFilter && (
-          <div class="browser__filters" role="group" aria-label="카테고리 필터">
+          <div class="browser__filters" role="group" aria-label={T.ui.categoryFilter}>
             <button class="chip is-active" data-filter="all" type="button">
-              전체 <span class="chip__count">{products.length}</span>
+              {T.ui.allFilter} <span class="chip__count">{products.length}</span>
             </button>
             {categories.map((c) => (
               <button class="chip" data-filter={c.id} type="button">
-                {c.label} <span class="chip__count">{c.count}</span>
+                {S(c.label)} <span class="chip__count">{c.count}</span>
               </button>
             ))}
           </div>
@@ -80,13 +86,7 @@ const initial = siteConfig.productsPerPage;
           class="grid__item"
           data-item
           data-category={product.data.category}
-          data-keywords={[
-            product.data.title,
-            product.data.summary,
-            ...product.data.tags,
-          ]
-            .join(' ')
-            .toLowerCase()}
+          data-keywords={productKeywords(product, locale)}
           hidden={i >= initial}
         >
           <ProductCard product={product} eager={i < 4} />
@@ -100,7 +100,7 @@ const initial = siteConfig.productsPerPage;
   </p>
 
   <div class="browser__more">
-    <button class="btn btn--ghost" type="button" data-more hidden>더 보기</button>
+    <button class="btn btn--ghost" type="button" data-more hidden>{T.ui.moreButton}</button>
   </div>
 
   {/* JS 없을 때 전부 노출하고 필터 UI를 숨기는 규칙은 public/noscript.css 에 */}
@@ -145,10 +145,12 @@ const initial = siteConfig.productsPerPage;
       if (moreBtn) moreBtn.hidden = matched.length <= visible;
       if (countEl) {
         // 문구는 서버에서 data 속성으로 넘어옵니다 (고객사마다 "제품/도서/작품"이 다름)
+        // 문구는 서버가 언어에 맞춰 data 속성으로 넘깁니다.
+        // 아래 기본값은 속성이 통째로 빠졌을 때만 쓰이므로 언어 중립으로 둡니다.
         const template =
           matched.length === items.length
-            ? root.dataset.countAll || '전체 {n}개'
-            : root.dataset.countSome || '{n}개';
+            ? root.dataset.countAll || '{n}'
+            : root.dataset.countSome || '{n}';
         countEl.textContent = template.replace('{n}', String(matched.length));
       }
     };

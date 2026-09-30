@@ -1,6 +1,10 @@
 ---
 import siteConfig from '../../site.config';
 import { localeFromPath, localePath } from '../lib/i18n';
+import { getTerms } from '../lib/terms';
+
+/** 주소에서 언어를 읽어 화면 문구를 고릅니다 (i18n.ts 참고) */
+const T = getTerms(localeFromPath(Astro.url.pathname));
 
 /**
  * 기획전 배너 + 인기 검색어.
@@ -33,13 +37,13 @@ const L = (p: string) => localePath(p, localeFromPath(Astro.url.pathname));
           <div class="promo__body">
             <h2 class="promo__title">{promo.title}</h2>
             {promo.description && <p class="promo__desc">{promo.description}</p>}
-            <span class="promo__cta">{promo.cta ?? '보러 가기'}</span>
+            <span class="promo__cta">{promo.cta ?? T.ui.promoCta}</span>
           </div>
         </a>
 
         {promo.keywords && promo.keywords.length > 0 && (
           <div class="keywords">
-            <h3 class="keywords__label">인기 검색어</h3>
+            <h3 class="keywords__label">{T.ui.popularSearches}</h3>
             <ul class="keywords__list">
               {promo.keywords.map((word) => (
                 <li>
