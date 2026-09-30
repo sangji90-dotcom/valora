@@ -1,6 +1,17 @@
 ---
 import siteConfig from '../../site.config';
-import T from '../lib/terms';
+import { getTerms } from '../lib/terms';
+import {
+  localeFromPath,
+  localePath,
+  stripLocale,
+  publishedLocales,
+  hasMultipleLocales,
+  LOCALE_LABEL,
+} from '../lib/i18n';
+
+/** 주소에서 언어를 읽어 화면 문구를 고릅니다 (i18n.ts 참고) */
+const T = getTerms(localeFromPath(Astro.url.pathname));
 
 const path = Astro.url.pathname;
 const isActive = (href: string) =>
@@ -14,6 +25,29 @@ const hasUtility = Boolean(utility?.left?.length || utility?.right?.length);
  * 검색 자체는 목록 페이지에서 처리하므로 여기에는 로직이 없습니다.
  */
 const showSearch = siteConfig.enableSearch;
+
+/**
+ * 언어 전환 (요청서 3번 — 우측에 KR | EN).
+ * ⚠ 언어가 하나뿐이면 아예 내보내지 않습니다. 눌러도 갈 곳이 없는
+ *   버튼을 두면 404로 이어집니다.
+ */
+const here = localeFromPath(Astro.url.pathname);
+const bare = stripLocale(Astro.url.pathname);
+const langLinks = hasMultipleLocales()
+  ? publishedLocales().map((l) => ({
+      locale: l,
+      label: LOCALE_LABEL[l],
+      href: localePath(bare, l),
+      current: l === here,
+    }))
+  : [];
+
+/**
+ * 내부 링크에 언어 접두어를 붙입니다.
+ * ⚠ 이걸 빠뜨리면 /en/ 페이지의 링크가 한국어 쪽으로 돌아갑니다.
+ *   (빌드는 멀쩡히 통과합니다 — 눈으로만 잡히는 종류입니다)
+ */
+const L = (p: string) => localePath(p, localeFromPath(Astro.url.pathname));
 ---
 
 <header class="header">
@@ -23,17 +57,36 @@ const showSearch = siteConfig.enableSearch;
         <div class="container utility__inner">
           <nav class="utility__group" aria-label="보조 메뉴">
             {(utility?.left ?? []).map((item) => (
-              <a href={item.href} class="utility__link">
+              <a href={L(item.href)} class="utility__link">
                 {item.label}
               </a>
             ))}
           </nav>
           <nav class="utility__group" aria-label="고객 안내">
             {(utility?.right ?? []).map((item) => (
-              <a href={item.href} class="utility__link">
+              <a href={L(item.href)} class="utility__link">
                 {item.label}
               </a>
             ))}
+
+            {langLinks.length > 0 && (
+              <span class="lang" role="group" aria-label="언어 선택">
+                {langLinks.map((l, i) => (
+                  <>
+                    {i > 0 && <span class="lang__sep" aria-hidden="true">|</span>}
+                    <a
+                      href={l.href}
+                      class="utility__link lang__link"
+                      hreflang={l.locale}
+                      lang={l.locale}
+                      aria-current={l.current ? 'true' : undefined}
+                    >
+                      {l.label}
+                    </a>
+                  </>
+                ))}
+              </span>
+            )}
           </nav>
         </div>
       </div>
@@ -41,7 +94,7 @@ const showSearch = siteConfig.enableSearch;
   }
 
   <div class="container header__inner">
-    <a href="/" class="header__logo" aria-label={`${siteConfig.company} 홈`}>
+    <a href={L("/")} class="header__logo" aria-label={`${siteConfig.company} 홈`}>
       {
         siteConfig.logo ? (
           <img src={siteConfig.logo} alt={siteConfig.company} height="28" />
@@ -62,7 +115,7 @@ const showSearch = siteConfig.enableSearch;
       {
         siteConfig.nav.map((item) => (
           <a
-            href={item.href}
+            href={L(item.href)}
             class:list={['header__link', { 'is-active': isActive(item.href) }]}
             aria-current={isActive(item.href) ? 'page' : undefined}
           >
@@ -108,6 +161,23 @@ const showSearch = siteConfig.enableSearch;
 </header>
 
 <style>
+  /* 언어 전환 — 요청서 3번 */
+  .lang {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    margin-left: var(--space-2);
+  }
+
+  .lang__sep {
+    color: var(--color-border);
+  }
+
+  .lang__link[aria-current='true'] {
+    font-weight: 700;
+    color: var(--color-text);
+  }
+
   .header {
     position: sticky;
     top: 0;

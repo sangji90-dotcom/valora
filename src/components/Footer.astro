@@ -1,11 +1,22 @@
 ---
 import siteConfig from '../../site.config';
-import T from '../lib/terms';
+import { getTerms } from '../lib/terms';
+import { localeFromPath, localePath } from '../lib/i18n';
 import { getCategoriesWithCount } from '../lib/products';
+
+/** 주소에서 언어를 읽어 화면 문구를 고릅니다 (i18n.ts 참고) */
+const T = getTerms(localeFromPath(Astro.url.pathname));
 
 const categories = await getCategoriesWithCount();
 const year = new Date().getFullYear();
 const { contact } = siteConfig;
+
+/**
+ * 내부 링크에 언어 접두어를 붙입니다.
+ * ⚠ 이걸 빠뜨리면 /en/ 페이지의 링크가 한국어 쪽으로 돌아갑니다.
+ *   (빌드는 멀쩡히 통과합니다 — 눈으로만 잡히는 종류입니다)
+ */
+const L = (p: string) => localePath(p, localeFromPath(Astro.url.pathname));
 ---
 
 <footer class="footer">
@@ -19,7 +30,7 @@ const { contact } = siteConfig;
       <p class="footer__head">{T.item}</p>
       {
         categories.map((c) => (
-          <a href={`/products/category/${c.id}/`} class="footer__link">
+          <a href={L(`/products/category/${c.id}/`)} class="footer__link">
             {c.label}
           </a>
         ))
@@ -40,7 +51,7 @@ const { contact } = siteConfig;
     </p>
     <p class="footer__legal">
       © {year} {siteConfig.company}. All rights reserved.
-      <a href="/privacy/" class="footer__legal-link">개인정보처리방침</a>
+      <a href={L("/privacy/")} class="footer__legal-link">개인정보처리방침</a>
     </p>
 
     {/* 국내 사이트 관행 — 이메일 주소 자동 수집을 거부한다는 표시 */}

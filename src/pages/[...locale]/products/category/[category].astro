@@ -1,11 +1,17 @@
 ---
-import T from '../../../lib/terms';
+import { getTerms } from '../../../../lib/terms';
+import { localeFromPath, localeParams, localePath } from '../../../../lib/i18n';
 import type { GetStaticPaths } from 'astro';
-import siteConfig from '../../../../site.config';
-import BaseLayout from '../../../layouts/BaseLayout.astro';
-import ProductBrowser from '../../../components/ProductBrowser.astro';
-import { getProductsByCategory } from '../../../lib/products';
-import { breadcrumbSchema } from '../../../lib/structured-data';
+import siteConfig from '../../../../../site.config';
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+import ProductBrowser from '../../../../components/ProductBrowser.astro';
+import { getProductsByCategory } from '../../../../lib/products';
+import { breadcrumbSchema } from '../../../../lib/structured-data';
+
+/** 주소에서 언어를 읽어 화면 문구를 고릅니다 (i18n.ts 참고) */
+const T = getTerms(localeFromPath(Astro.url.pathname));
+/** 내부 링크에 언어 접두어를 붙입니다 (i18n.ts 참고) */
+const L = (p: string) => localePath(p, localeFromPath(Astro.url.pathname));
 
 /**
  * 카테고리별 URL을 정적으로 생성합니다.
@@ -13,18 +19,21 @@ import { breadcrumbSchema } from '../../../lib/structured-data';
  * SEO용 실제 URL을 별도로 만들어 둡니다.
  */
 export const getStaticPaths = (() => {
-  return siteConfig.categories.map((category) => ({
-    params: { category: category.id },
-    props: { category },
-  }));
+  /** 언어 × 카테고리 */
+  return localeParams().flatMap(({ params, props }) =>
+    siteConfig.categories.map((category) => ({
+      params: { ...params, category: category.id },
+      props: { ...props, category },
+    }))
+  );
 }) satisfies GetStaticPaths;
 
 const { category } = Astro.props;
 const products = await getProductsByCategory(category.id);
 
 const breadcrumb = breadcrumbSchema([
-  { name: T.item, path: '/products/' },
-  { name: category.label, path: `/products/category/${category.id}/` },
+  { name: T.item, path: L('/products/') },
+  { name: category.label, path: L(`/products/category/${category.id}/`) },
 ]);
 ---
 
@@ -41,7 +50,7 @@ const breadcrumb = breadcrumbSchema([
   <section class="section">
     <div class="container">
       <nav class="crumb" aria-label="현재 위치">
-        <a href="/products/">{T.item}</a>
+        <a href={L("/products/")}>{T.item}</a>
         <span aria-hidden="true">/</span>
         <span>{category.label}</span>
       </nav>

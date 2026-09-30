@@ -1,9 +1,25 @@
 ---
-import siteConfig from '../../site.config';
-import T from '../lib/terms';
-import BaseLayout from '../layouts/BaseLayout.astro';
+import type { GetStaticPaths } from 'astro';
+import siteConfig from '../../../site.config';
+import { getTerms } from '../../lib/terms';
+import { localeFromPath, localeParams, localePath } from '../../lib/i18n';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+/** 주소에서 언어를 읽어 화면 문구를 고릅니다 (i18n.ts 참고) */
+const T = getTerms(localeFromPath(Astro.url.pathname));
 
 const { contact, inquiry } = siteConfig;
+
+/**
+ * 이 한 파일이 언어별 페이지를 전부 내보냅니다.
+ * 기본 언어(ko)는 locale 이 undefined 라 접두어 없는 주소가 되고,
+ * site.config 의 i18n.published 에 'en' 을 넣으면 /en/ 판본이 함께 생깁니다.
+ */
+export const getStaticPaths = (() => localeParams()) satisfies GetStaticPaths;
+
+
+/** 내부 링크에 언어 접두어를 붙입니다 (i18n.ts 참고) */
+const L = (p: string) => localePath(p, localeFromPath(Astro.url.pathname));
 ---
 
 <BaseLayout
@@ -45,7 +61,7 @@ const { contact, inquiry } = siteConfig;
 
           <p class="contact__note">
             문의 시 수집되는 개인정보의 이용 목적과 보관 기간은
-            <a href="/privacy/">개인정보처리방침</a>에서 확인하실 수 있습니다.
+            <a href={L("/privacy/")}>개인정보처리방침</a>에서 확인하실 수 있습니다.
           </p>
         </div>
 
@@ -122,7 +138,7 @@ const { contact, inquiry } = siteConfig;
                   <input type="checkbox" name="consent" required />
                   <span>
                     개인정보 수집·이용에 동의합니다.
-                    (<a href="/privacy/">내용 보기</a>)
+                    (<a href={L("/privacy/")}>내용 보기</a>)
                   </span>
                 </label>
 

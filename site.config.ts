@@ -28,6 +28,15 @@ export const siteConfig: SiteConfig = {
   ogImage: '/og-default.png',
   lang: 'ko',
 
+  /**
+   * 다국어 (요청서 3번).
+   * 구조는 다 잡혀 있고, 아래 배열에 'en' 을 넣으면 영문 사이트가
+   * /en/ 아래에 통째로 생깁니다. 번역을 받기 전까지는 넣지 마세요.
+   */
+  i18n: {
+    published: ['ko'],
+  },
+
   layout: {
     // 제품 사진이 확실해서 좌측 문구 + 우측 대표 제품
     hero: 'split',

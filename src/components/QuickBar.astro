@@ -1,5 +1,6 @@
 ---
 import siteConfig from '../../site.config';
+import { localeFromPath, localePath } from '../lib/i18n';
 
 /**
  * 화면 우측에 고정되는 퀵 메뉴.
@@ -12,6 +13,13 @@ import siteConfig from '../../site.config';
  *  - 인쇄 시에는 나오지 않습니다.
  */
 const links = siteConfig.quickLinks ?? [];
+
+/**
+ * 내부 링크에 언어 접두어를 붙입니다.
+ * ⚠ 이걸 빠뜨리면 /en/ 페이지의 링크가 한국어 쪽으로 돌아갑니다.
+ *   (빌드는 멀쩡히 통과합니다 — 눈으로만 잡히는 종류입니다)
+ */
+const L = (p: string) => localePath(p, localeFromPath(Astro.url.pathname));
 ---
 
 {
@@ -20,7 +28,7 @@ const links = siteConfig.quickLinks ?? [];
       <ul class="quick__list">
         {links.map((item) => (
           <li>
-            <a href={item.href} class="quick__link">
+            <a href={L(item.href)} class="quick__link">
               {item.label}
             </a>
           </li>

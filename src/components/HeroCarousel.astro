@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import ProductImage from './ProductImage.astro';
+import { localeFromPath, localePath } from '../lib/i18n';
 
 /**
  * 풀블리드 슬라이드 배너.
@@ -19,6 +20,13 @@ const slides = all.sort((a, b) => a.data.order - b.data.order);
 
 /** 자동 넘김 간격(ms). 0이면 자동 넘김 없음 */
 const INTERVAL = 6000;
+
+/**
+ * 내부 링크에 언어 접두어를 붙입니다.
+ * ⚠ 이걸 빠뜨리면 /en/ 페이지의 링크가 한국어 쪽으로 돌아갑니다.
+ *   (빌드는 멀쩡히 통과합니다 — 눈으로만 잡히는 종류입니다)
+ */
+const L = (p: string) => localePath(p, localeFromPath(Astro.url.pathname));
 ---
 
 {
@@ -65,7 +73,7 @@ const INTERVAL = 6000;
                   <h2 class="slide__title">{d.title}</h2>
                   {d.subtitle && <p class="slide__subtitle">{d.subtitle}</p>}
                   {d.cta && (
-                    <a href={d.href} class="btn btn--primary slide__cta">
+                    <a href={L(d.href)} class="btn btn--primary slide__cta">
                       {d.cta}
                     </a>
                   )}

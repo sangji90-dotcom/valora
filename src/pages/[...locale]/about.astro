@@ -1,7 +1,9 @@
 ---
+import type { GetStaticPaths } from 'astro';
 import { getEntry, render } from 'astro:content';
-import BaseLayout from '../layouts/BaseLayout.astro';
-import ProseCalculator from '../components/ProseCalculator.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ProseCalculator from '../../components/ProseCalculator.astro';
+import { localeParams } from '../../lib/i18n';
 
 const entry = await getEntry('pages', 'about');
 if (!entry) {
@@ -10,6 +12,14 @@ if (!entry) {
   );
 }
 const { Content } = await render(entry);
+
+/**
+ * 이 한 파일이 언어별 페이지를 전부 내보냅니다.
+ * 기본 언어(ko)는 locale 이 undefined 라 접두어 없는 주소가 되고,
+ * site.config 의 i18n.published 에 'en' 을 넣으면 /en/ 판본이 함께 생깁니다.
+ */
+export const getStaticPaths = (() => localeParams()) satisfies GetStaticPaths;
+
 ---
 
 {/*

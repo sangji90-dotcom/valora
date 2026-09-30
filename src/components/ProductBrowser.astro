@@ -1,9 +1,13 @@
 ---
 import siteConfig from '../../site.config';
-import T from '../lib/terms';
+import { getTerms } from '../lib/terms';
+import { localeFromPath } from '../lib/i18n';
 import type { Product } from '../lib/products';
 import ProductCard from './ProductCard.astro';
 import { getCategoriesWithCount } from '../lib/products';
+
+/** 주소에서 언어를 읽어 화면 문구를 고릅니다 (i18n.ts 참고) */
+const T = getTerms(localeFromPath(Astro.url.pathname));
 
 interface Props {
   products: Product[];

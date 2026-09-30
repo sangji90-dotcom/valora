@@ -1,5 +1,6 @@
 ---
 import siteConfig from '../../site.config';
+import { localeFromPath, LOCALE_TAG } from '../lib/i18n';
 import SEO from '../components/SEO.astro';
 import DemoBanner from '../components/DemoBanner.astro';
 import Header from '../components/Header.astro';
@@ -18,10 +19,17 @@ const { title, description, image, noindex } = Astro.props;
 
 // 사이트 전체 설정이 켜져 있으면 페이지 설정과 무관하게 제외합니다
 const noindexFinal = siteConfig.noindex || noindex;
+
+/**
+ * ⚠ <html lang> 은 site.config.lang 고정이 아니라 주소에서 읽습니다.
+ *   /en/ 페이지가 lang="ko" 로 나가면 화면낭독기가 영문을 한국어
+ *   발음으로 읽고, 검색엔진도 언어를 잘못 잡습니다.
+ */
+const locale = localeFromPath(Astro.url.pathname);
 ---
 
 <!doctype html>
-<html lang={siteConfig.lang}>
+<html lang={LOCALE_TAG[locale]}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />

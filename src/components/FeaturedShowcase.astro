@@ -3,6 +3,7 @@ import siteConfig from '../../site.config';
 import ProductImage from './ProductImage.astro';
 import type { Product } from '../lib/products';
 import { getCategoryLabel, STATUS_LABEL } from '../lib/products';
+import { localeFromPath, localePath } from '../lib/i18n';
 
 /**
  * ============================================================
@@ -45,6 +46,13 @@ function firstSentence(text: string): string {
 
 const ratio = siteConfig.layout.imageRatio;
 const total = products.length;
+
+/**
+ * 내부 링크에 언어 접두어를 붙입니다.
+ * ⚠ 이걸 빠뜨리면 /en/ 페이지의 링크가 한국어 쪽으로 돌아갑니다.
+ *   (빌드는 멀쩡히 통과합니다 — 눈으로만 잡히는 종류입니다)
+ */
+const L = (p: string) => localePath(p, localeFromPath(Astro.url.pathname));
 ---
 
 <section
@@ -59,7 +67,7 @@ const total = products.length;
       products.map((product, index) => {
         const { data } = product;
         const statusLabel = STATUS_LABEL[data.status];
-        const href = `/products/${product.id}/`;
+        const href = L(`/products/${product.id}/`);
 
         return (
           <article

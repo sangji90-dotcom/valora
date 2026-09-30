@@ -1,29 +1,41 @@
 ---
 import type { GetStaticPaths } from 'astro';
 import { render } from 'astro:content';
-import siteConfig from '../../../site.config';
-import T from '../../lib/terms';
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import ProductTabs from '../../components/ProductTabs.astro';
-import StickyInquiry from '../../components/StickyInquiry.astro';
-import ProseCalculator from '../../components/ProseCalculator.astro';
-import ProductCard from '../../components/ProductCard.astro';
-import ProductImage from '../../components/ProductImage.astro';
+import siteConfig from '../../../../site.config';
+import { getTerms } from '../../../lib/terms';
+import { localeFromPath, localeParams, localePath } from '../../../lib/i18n';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import ProductTabs from '../../../components/ProductTabs.astro';
+import StickyInquiry from '../../../components/StickyInquiry.astro';
+import ProseCalculator from '../../../components/ProseCalculator.astro';
+import ProductCard from '../../../components/ProductCard.astro';
+import ProductImage from '../../../components/ProductImage.astro';
 import {
   getPublishedProducts,
   getRelatedProducts,
   getCategoryLabel,
   getPriceView,
   STATUS_LABEL,
-} from '../../lib/products';
-import { breadcrumbSchema } from '../../lib/structured-data';
+} from '../../../lib/products';
+import { breadcrumbSchema } from '../../../lib/structured-data';
+
+/** 주소에서 언어를 읽어 화면 문구를 고릅니다 (i18n.ts 참고) */
+const T = getTerms(localeFromPath(Astro.url.pathname));
+/** 내부 링크에 언어 접두어를 붙입니다 (i18n.ts 참고) */
+const L = (p: string) => localePath(p, localeFromPath(Astro.url.pathname));
 
 export const getStaticPaths = (async () => {
   const products = await getPublishedProducts();
-  return products.map((product) => ({
-    params: { id: product.id },
-    props: { product },
-  }));
+  /**
+   * 언어 × 제품. 언어가 ko 하나면 지금과 똑같은 주소만 나옵니다.
+   * 'en' 을 켜면 /en/products/<id>/ 가 함께 생깁니다.
+   */
+  return localeParams().flatMap(({ params, props }) =>
+    products.map((product) => ({
+      params: { ...params, id: product.id },
+      props: { ...props, product },
+    }))
+  );
 }) satisfies GetStaticPaths;
 
 const { product } = Astro.props;
@@ -62,10 +74,11 @@ const jsonLd = {
 
 // 검색결과에 "제품 > 산업용 > 프로쉴드 900" 경로가 표시될 수 있게 함
 const breadcrumb = breadcrumbSchema([
-  { name: T.item, path: '/products/' },
-  { name: getCategoryLabel(data.category), path: `/products/category/${data.category}/` },
-  { name: data.title, path: `/products/${product.id}/` },
+  { name: T.item, path: L('/products/') },
+  { name: getCategoryLabel(data.category), path: L(`/products/category/${data.category}/`) },
+  { name: data.title, path: L(`/products/${product.id}/`) },
 ]);
+
 ---
 
 <BaseLayout title={data.title} description={data.seoDescription ?? data.summary}>
@@ -84,9 +97,9 @@ const breadcrumb = breadcrumbSchema([
 
   <div class="container detail">
     <nav class="crumb" aria-label="현재 위치">
-      <a href="/products/">{T.item}</a>
+      <a href={L("/products/")}>{T.item}</a>
       <span aria-hidden="true">/</span>
-      <a href={`/products/category/${data.category}/`}>
+      <a href={L(`/products/category/${data.category}/`)}>
         {getCategoryLabel(data.category)}
       </a>
       <span aria-hidden="true">/</span>
@@ -155,7 +168,7 @@ const breadcrumb = breadcrumbSchema([
             고객사는 어느 제품 문의인지 알 수 없습니다.
           */}
           <a
-            href={`/contact/?product=${encodeURIComponent(data.title)}`}
+            href={L(`/contact/?product=${encodeURIComponent(data.title)}`)}
             class="btn btn--primary"
           >
             {T.askThis}

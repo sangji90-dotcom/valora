@@ -1,4 +1,5 @@
 import siteConfig from '../../site.config';
+import { DEFAULT_LOCALE, type Locale } from './i18n';
 
 /**
  * ============================================================
@@ -23,6 +24,12 @@ const item = t.item ?? '제품';
 const unit = t.unit ?? '개';
 
 /**
+ * 영문판에서 품목을 부르는 말.
+ * 한국어처럼 조사 계산이 필요 없어 훨씬 단순합니다.
+ */
+const itemEn = t.itemEn ?? 'product';
+
+/**
  * 한국어 조사 붙이기.
  *
  * "제품이 없습니다" / "도서가 없습니다" — 앞 글자의 받침 유무로 달라집니다.
@@ -44,7 +51,7 @@ export function withJosa(word: string, pair: '이/가' | '은/는' | '을/를' |
   return word + (hasFinal ? withFinal : withoutFinal);
 }
 
-export const T = {
+const KO = {
   item,
   unit,
 
@@ -94,4 +101,69 @@ export const T = {
   categoryDesc: (label: string) => `${label} ${item} 목록입니다.`,
 };
 
-export default T;
+/**
+ * 영문 문구.
+ *
+ * ⚠ 한국어를 기계적으로 옮기지 않았습니다. 존댓말 종결(~습니다)을
+ *   그대로 옮기면 영문에서는 장황해집니다. 영문 카탈로그의 관례대로
+ *   짧은 명사구·명령형으로 씁니다.
+ *
+ * ⚠ 키 이름과 모양(함수인지 문자열인지)은 KO 와 정확히 같아야 합니다.
+ *   어긋나면 영문 페이지에서 그 자리만 비어 버립니다.
+ *   아래 satisfies 가 빌드 때 잡습니다.
+ */
+const EN = {
+  item: itemEn,
+  unit: '',
+
+  itemList: 'Products',
+  viewItems: 'View products',
+  viewAll: 'View all products',
+
+  featuredTitle: 'Featured',
+  featuredDesc: 'The products we are asked about most.',
+
+  categoriesDesc: 'Browse by where it is used.',
+
+  ctaTitle: 'Looking for something else?',
+  ctaDesc: 'Tell us the use case and quantity and we will suggest a fit.',
+
+  listPageDesc:
+    'The full product list. Filter by category or search to find what you need.',
+  listPageLead: 'Filter by category or search to find what you need.',
+
+  searchLabel: 'Search products',
+  searchPlaceholder: 'Search by name or model',
+
+  countAllTemplate: 'All {n}',
+  countTemplate: '{n}',
+  countOf: (n: number) => String(n),
+
+  empty: 'No products match. Try another search term or category.',
+  emptyShort: 'Nothing to show.',
+
+  askThis: 'Ask about this product',
+  related: 'See also',
+  specCaption: (title: string) => `${title} specifications`,
+  specTab: 'Specifications',
+  inquiryOf: (title: string) => `Inquiry — ${title}`,
+
+  categoryDesc: (label: string) => `Products for ${label}.`,
+} satisfies typeof KO;
+
+const DICT: Record<Locale, typeof KO> = { ko: KO, en: EN };
+
+/**
+ * 화면 문구를 가져옵니다.
+ *
+ *   const T = getTerms(localeFromPath(Astro.url.pathname));
+ *
+ * 컴포넌트는 Astro.url 만 있으면 어느 깊이에서든 언어를 알 수 있어
+ * prop 으로 언어를 내려보낼 필요가 없습니다.
+ */
+export function getTerms(locale: Locale = DEFAULT_LOCALE) {
+  return DICT[locale] ?? KO;
+}
+
+export const T = KO;
+export default KO;

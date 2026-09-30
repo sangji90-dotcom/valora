@@ -1,5 +1,6 @@
 ---
 import siteConfig from '../../site.config';
+import { alternateLinks, localeFromPath, OG_LOCALE, LOCALE_TAG } from '../lib/i18n';
 
 interface Props {
   title?: string;
@@ -15,12 +16,36 @@ const pageTitle = title ? `${title} | ${siteConfig.company}` : `${siteConfig.com
 const pageDesc = description ?? siteConfig.description;
 const canonical = new URL(Astro.url.pathname, Astro.site ?? siteConfig.site);
 const ogImage = new URL(image ?? siteConfig.ogImage, Astro.site ?? siteConfig.site);
+
+const locale = localeFromPath(Astro.url.pathname);
+
+/**
+ * 같은 내용의 다른 언어 판본을 검색엔진에 알려줍니다.
+ * 언어가 하나뿐이면 빈 배열이라 태그가 나가지 않습니다 —
+ * 존재하지 않는 /en/ 을 가리키면 크롤러가 404를 계속 두드립니다.
+ */
+const alternates = alternateLinks(Astro.url.pathname).map((a) => ({
+  ...a,
+  href: new URL(a.path, Astro.site ?? siteConfig.site).href,
+}));
 ---
 
 <title>{pageTitle}</title>
 <meta name="description" content={pageDesc} />
 <link rel="canonical" href={canonical} />
 {noindex && <meta name="robots" content="noindex, nofollow" />}
+
+{
+  alternates.map((a) => (
+    <link rel="alternate" hreflang={LOCALE_TAG[a.locale]} href={a.href} />
+  ))
+}
+{
+  /* 어느 언어에도 해당하지 않는 방문자에게 보여줄 기본 판본 */
+  alternates.length > 0 && (
+    <link rel="alternate" hreflang="x-default" href={alternates[0].href} />
+  )
+}
 
 {/* 검색엔진 사이트 소유확인 — 값이 없으면 출력하지 않습니다 */}
 {
@@ -40,7 +65,7 @@ const ogImage = new URL(image ?? siteConfig.ogImage, Astro.site ?? siteConfig.si
 <meta property="og:description" content={pageDesc} />
 <meta property="og:url" content={canonical} />
 <meta property="og:image" content={ogImage} />
-<meta property="og:locale" content="ko_KR" />
+<meta property="og:locale" content={OG_LOCALE[locale]} />
 
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content={pageTitle} />

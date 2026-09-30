@@ -3,6 +3,7 @@ import siteConfig from '../../site.config';
 import ProductImage from './ProductImage.astro';
 import type { Product } from '../lib/products';
 import { getCategoryLabel, getPriceView, STATUS_LABEL } from '../lib/products';
+import { localeFromPath, localePath } from '../lib/i18n';
 
 interface Props {
   products: Product[];
@@ -23,6 +24,13 @@ const { products } = Astro.props;
 const SPEC_LIMIT = 3;
 
 const ratio = siteConfig.layout.imageRatio;
+
+/**
+ * 내부 링크에 언어 접두어를 붙입니다.
+ * ⚠ 이걸 빠뜨리면 /en/ 페이지의 링크가 한국어 쪽으로 돌아갑니다.
+ *   (빌드는 멀쩡히 통과합니다 — 눈으로만 잡히는 종류입니다)
+ */
+const L = (p: string) => localePath(p, localeFromPath(Astro.url.pathname));
 ---
 
 <div class="rows">
@@ -35,7 +43,7 @@ const ratio = siteConfig.layout.imageRatio;
 
       return (
         <article class="row" data-flip={index % 2 === 1 ? 'true' : 'false'}>
-          <a href={`/products/${product.id}/`} class="row__media" data-ratio={ratio} tabindex="-1" aria-hidden="true">
+          <a href={L(`/products/${product.id}/`)} class="row__media" data-ratio={ratio} tabindex="-1" aria-hidden="true">
             <ProductImage
               image={data.thumbnail}
               alt={data.title}
@@ -55,7 +63,7 @@ const ratio = siteConfig.layout.imageRatio;
 
             <h3 class="row__title">
               {/* 링크는 제목에 걸어 스크린리더가 한 번만 읽도록 합니다 */}
-              <a href={`/products/${product.id}/`}>{data.title}</a>
+              <a href={L(`/products/${product.id}/`)}>{data.title}</a>
             </h3>
 
             <p class="row__summary">{data.summary}</p>
@@ -86,7 +94,7 @@ const ratio = siteConfig.layout.imageRatio;
               </span>
             </p>
 
-            <a href={`/products/${product.id}/`} class="btn btn--ghost row__more">
+            <a href={L(`/products/${product.id}/`)} class="btn btn--ghost row__more">
               자세히 보기
             </a>
           </div>

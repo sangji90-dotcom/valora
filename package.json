@@ -19,7 +19,8 @@
     "make-template": "node scripts/make-product-template.mjs",
     "gen:og": "node scripts/gen-og.mjs",
     "studio:sync": "node scripts/sync-studio.mjs",
-    "export:sanity": "node scripts/export-to-sanity.mjs"
+    "export:sanity": "node scripts/export-to-sanity.mjs",
+    "test:i18n": "node scripts/test-i18n.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.4",

@@ -1,6 +1,10 @@
 ---
 import siteConfig from '../../site.config';
-import T from '../lib/terms';
+import { getTerms } from '../lib/terms';
+import { localeFromPath, localePath } from '../lib/i18n';
+
+/** 주소에서 언어를 읽어 화면 문구를 고릅니다 (i18n.ts 참고) */
+const T = getTerms(localeFromPath(Astro.url.pathname));
 
 /**
  * ============================================================
@@ -28,6 +32,13 @@ interface Props {
 
 const { productTitle } = Astro.props;
 const phone = siteConfig.contact.phone;
+
+/**
+ * 내부 링크에 언어 접두어를 붙입니다.
+ * ⚠ 이걸 빠뜨리면 /en/ 페이지의 링크가 한국어 쪽으로 돌아갑니다.
+ *   (빌드는 멀쩡히 통과합니다 — 눈으로만 잡히는 종류입니다)
+ */
+const L = (p: string) => localePath(p, localeFromPath(Astro.url.pathname));
 ---
 
 <div class="sticky-cta">
@@ -40,7 +51,7 @@ const phone = siteConfig.contact.phone;
       전화
     </a>
     <a
-      href={`/contact/?product=${encodeURIComponent(productTitle)}`}
+      href={L(`/contact/?product=${encodeURIComponent(productTitle)}`)}
       class="sticky-cta__main"
     >
       {T.askThis}

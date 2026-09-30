@@ -1,9 +1,13 @@
 ---
 import siteConfig from '../../site.config';
-import T from '../lib/terms';
+import { getTerms } from '../lib/terms';
+import { localeFromPath, localePath } from '../lib/i18n';
 import ProductImage from './ProductImage.astro';
 import HeroCarousel from './HeroCarousel.astro';
 import { getFeaturedProducts } from '../lib/products';
+
+/** 주소에서 언어를 읽어 화면 문구를 고릅니다 (i18n.ts 참고) */
+const T = getTerms(localeFromPath(Astro.url.pathname));
 
 /**
  * 홈 히어로. 구조는 site.config.ts의 layout.hero 가 정합니다.
@@ -15,6 +19,9 @@ const variant = siteConfig.layout.hero;
 const featured = variant === 'split' ? await getFeaturedProducts(1) : [];
 const showcase = featured[0];
 const effective = variant === 'split' && !showcase ? 'stacked' : variant;
+
+/** 내부 링크에 언어 접두어를 붙입니다 (i18n.ts 참고) */
+const L = (p: string) => localePath(p, localeFromPath(Astro.url.pathname));
 ---
 
 {variant === 'carousel' && <HeroCarousel />}
@@ -27,8 +34,8 @@ const effective = variant === 'split' && !showcase ? 'stacked' : variant;
       <h1 class="hero__title">{siteConfig.tagline}</h1>
       <p class="hero__desc">{siteConfig.description}</p>
       <div class="hero__actions">
-        <a href="/products/" class="btn btn--primary">{T.viewItems}</a>
-        <a href="/contact/" class="btn btn--ghost">문의하기</a>
+        <a href={L("/products/")} class="btn btn--primary">{T.viewItems}</a>
+        <a href={L("/contact/")} class="btn btn--ghost">문의하기</a>
       </div>
     </div>
 

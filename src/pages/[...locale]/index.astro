@@ -1,21 +1,26 @@
 ---
-import siteConfig from '../../site.config';
-import T from '../lib/terms';
-import BaseLayout from '../layouts/BaseLayout.astro';
-import Hero from '../components/Hero.astro';
-import ProductGrid from '../components/ProductGrid.astro';
+import type { GetStaticPaths } from 'astro';
+import siteConfig from '../../../site.config';
+import { getTerms } from '../../lib/terms';
+import { localeFromPath, localeParams, localePath } from '../../lib/i18n';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Hero from '../../components/Hero.astro';
+import ProductGrid from '../../components/ProductGrid.astro';
 // 발로라는 지그재그 나열(FeaturedRows) 대신 한 화면에 하나씩 보여줍니다.
 // FeaturedRows.astro 는 템플릿과 공유하므로 건드리지 않고 그대로 둡니다.
-import FeaturedShowcase from '../components/FeaturedShowcase.astro';
-import PromoBanner from '../components/PromoBanner.astro';
-import ProofStrip from '../components/ProofStrip.astro';
+import FeaturedShowcase from '../../components/FeaturedShowcase.astro';
+import PromoBanner from '../../components/PromoBanner.astro';
+import ProofStrip from '../../components/ProofStrip.astro';
 // StatBand 는 메인에서 내렸습니다 (요청서 11번) — ESG DATA 영역이 생기면 다시 씁니다
-import SustainBand from '../components/SustainBand.astro';
-import ValoraSystem from '../components/ValoraSystem.astro';
-import HowItWorks from '../components/HowItWorks.astro';
-import Reveal from '../components/Reveal.astro';
-import { getFeaturedProducts, getCategoriesWithCount } from '../lib/products';
-import { organizationSchema } from '../lib/structured-data';
+import SustainBand from '../../components/SustainBand.astro';
+import ValoraSystem from '../../components/ValoraSystem.astro';
+import HowItWorks from '../../components/HowItWorks.astro';
+import Reveal from '../../components/Reveal.astro';
+import { getFeaturedProducts, getCategoriesWithCount } from '../../lib/products';
+import { organizationSchema } from '../../lib/structured-data';
+
+/** 주소에서 언어를 읽어 화면 문구를 고릅니다 (i18n.ts 참고) */
+const T = getTerms(localeFromPath(Astro.url.pathname));
 
 const featured = await getFeaturedProducts();
 const categories = await getCategoriesWithCount();
@@ -26,6 +31,21 @@ const categories = await getCategoriesWithCount();
  */
 const sections = siteConfig.layout.homeSections;
 const { brandMessage } = siteConfig;
+
+/**
+ * 이 한 파일이 언어별 페이지를 전부 내보냅니다.
+ * 기본 언어(ko)는 locale 이 undefined 라 접두어 없는 주소가 되고,
+ * site.config 의 i18n.published 에 'en' 을 넣으면 /en/ 판본이 함께 생깁니다.
+ */
+export const getStaticPaths = (() => localeParams()) satisfies GetStaticPaths;
+
+
+/**
+ * 내부 링크에 언어 접두어를 붙입니다.
+ * ⚠ 이걸 빠뜨리면 /en/ 페이지의 링크가 한국어 쪽으로 돌아갑니다.
+ *   (빌드는 멀쩡히 통과합니다 — 눈으로만 잡히는 종류입니다)
+ */
+const L = (p: string) => localePath(p, localeFromPath(Astro.url.pathname));
 ---
 
 <BaseLayout>
@@ -70,7 +90,7 @@ const { brandMessage } = siteConfig;
               )}
 
               <div class="more">
-                <a href="/products/" class="btn btn--ghost">
+                <a href={L("/products/")} class="btn btn--ghost">
                   {T.viewAll}
                 </a>
               </div>
@@ -89,7 +109,7 @@ const { brandMessage } = siteConfig;
               </div>
               <div class="cats">
                 {categories.map((c) => (
-                  <a href={`/products/category/${c.id}/`} class="cat">
+                  <a href={L(`/products/category/${c.id}/`)} class="cat">
                     <span class="cat__label">{c.label}</span>
                     <span class="cat__count">{T.countOf(c.count)}</span>
                     {c.description && <span class="cat__desc">{c.description}</span>}
@@ -123,7 +143,7 @@ const { brandMessage } = siteConfig;
             <div class="container cta">
               <h2 class="cta__title">{T.ctaTitle}</h2>
               <p class="cta__desc">{T.ctaDesc}</p>
-              <a href="/contact/" class="btn btn--primary">
+              <a href={L("/contact/")} class="btn btn--primary">
                 문의하기
               </a>
             </div>
