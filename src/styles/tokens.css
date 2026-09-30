@@ -23,21 +23,24 @@
    * 같은 색상환에 머물면서 채도를 내리면 브랜드 계보는 유지하면서
    * 화장품 매대의 질감이 납니다.
    */
-  --brand-50: #fbf2ec;
-  --brand-100: #f2ddcf;
-  /* 흰 글자를 얹었을 때 대비 4.76 — WCAG AA(4.5) 를 넘기는 가장 밝은 값 */
-  --brand-500: #b25a38;
-  --brand-600: #9e4f30;
-  --brand-700: #7d3e26;
+  --brand-50: #e9efea;
+  --brand-100: #cfdcd4;
+  /* Deep Forest — 요청서 2번. 흰 글자를 얹으면 대비 12.43 */
+  --brand-500: #26382f;
+  --brand-600: #1e2d26;
+  --brand-700: #16211c;
   --brand-contrast: #ffffff;
 
   /**
-   * 캡슐 색에서 가져온 보조 색.
-   * 배지·태그처럼 작은 면적에만 씁니다.
+   * 제품 컬러에서 가져온 보조 색 (요청서 2번 — 연핑크·세이지·투명 소재).
+   * 카테고리 구분선처럼 작은 면적에만 씁니다.
+   *
+   * ⚠ 요청서의 '오프화이트/투명'은 띠로 쓰면 아이보리 배경에 묻혀
+   *   보이지 않습니다. 세 번째는 같은 계열의 따뜻한 모래색으로 잡았습니다.
    */
-  --accent-rose: #e6a3ad;
-  --accent-mint: #9cc6a8;
-  --accent-sky: #9dbfd8;
+  --accent-pink: #e8c8c8;
+  --accent-sage: #bbc5b6;
+  --accent-sand: #cdbba6;
 
   /* ---------- Neutral ---------- */
   /**
@@ -46,11 +49,11 @@
    * 흰 배경과 경계가 사라집니다. 아이보리를 깔고 카드만 흰색으로
    * 띄우면 같은 콘텐츠도 정돈되어 보입니다.
    */
-  --gray-0: #ffffff;
-  --gray-50: #faf7f2;
-  --gray-100: #f3eee6;
-  --gray-200: #e6ddd2;
-  --gray-300: #cdc1b3;
+  --gray-0: #ffffff;   /* White — 제품 강조 */
+  --gray-50: #f4f1eb;  /* Warm Ivory — 메인 배경 */
+  --gray-100: #ebe6dd; /* Ivory 와 Beige 사이 — 섹션 교차 */
+  --gray-200: #ded7cd; /* Soft Beige — 섹션 구분·테두리 */
+  --gray-300: #bdb4a6;
   /**
    * 본문 보조색(--color-text-muted).
    * ⚠ 가장 **어두운** 배경을 기준으로 잡아야 합니다.
@@ -58,11 +61,11 @@
    *   실제로는 --color-bg-subtle(푸터·섹션)과 --color-bg-muted(상태 배지)
    *   위에도 올라갑니다. 거기서는 4.45 / 3.93 으로 AA 미달이었습니다.
    *   페이지 전체를 훑어 보니 74곳이 걸렸습니다.
-   * 현재 대비 — bg 5.93 / bg-subtle 5.49 / bg-muted 4.72 (모두 AA 통과)
+   * 현재 대비 — Ivory 5.93 / 중간 5.38 / Soft Beige 4.68 (모두 AA 통과)
    */
-  --gray-500: #675e56;
-  --gray-700: #453e38;
-  --gray-900: #241f1b;
+  --gray-500: #5a5d58;
+  --gray-700: #3a3d38;
+  --gray-900: #191919; /* Charcoal — 본문 및 주요 텍스트 */
 
   /* ---------- Semantic (컴포넌트는 이 계층만 참조) ---------- */
   /* 본문 배경은 아이보리, 카드·패널은 흰색(--color-surface) */
@@ -149,17 +152,21 @@
  */
 @media (prefers-color-scheme: dark) {
   :root {
-    --color-bg: #16120f;
-    --color-surface: #1e1915;
-    --color-bg-subtle: #221c18;
-    --color-bg-muted: #2c241e;
-    --color-text: #f0ebe5;
-    --color-text-muted: #a99f95;
-    --color-border: #3b322b;
-    --color-accent: #d98a64;
-    --color-accent-hover: #e8a082;
-    --color-accent-text: #16120f;
-    --color-accent-subtle: #34221a;
+    --color-bg: #141815;
+    --color-surface: #1b211d;
+    --color-bg-subtle: #1f2621;
+    --color-bg-muted: #2a322c;
+    --color-text: #eceee9;
+    --color-text-muted: #a8ada4;
+    --color-border: #39423b;
+    /**
+     * ⚠ Deep Forest(#26382F)를 다크 모드에서 그대로 쓰면 배경과 붙어
+     *   버튼이 사라집니다. 같은 색상환의 밝은 쪽을 씁니다.
+     */
+    --color-accent: #9dbba8;
+    --color-accent-hover: #b4cdbd;
+    --color-accent-text: #141815;
+    --color-accent-subtle: #22302a;
     --color-sale: #ff8078;
 
     --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);

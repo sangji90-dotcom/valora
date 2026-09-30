@@ -9,7 +9,8 @@ import ProductGrid from '../components/ProductGrid.astro';
 import FeaturedShowcase from '../components/FeaturedShowcase.astro';
 import PromoBanner from '../components/PromoBanner.astro';
 import ProofStrip from '../components/ProofStrip.astro';
-import StatBand from '../components/StatBand.astro';
+// StatBand 는 메인에서 내렸습니다 (요청서 11번) — ESG DATA 영역이 생기면 다시 씁니다
+import SustainBand from '../components/SustainBand.astro';
 import Reveal from '../components/Reveal.astro';
 import { getFeaturedProducts, getCategoriesWithCount } from '../lib/products';
 import { organizationSchema } from '../lib/structured-data';
@@ -102,8 +103,8 @@ const { brandMessage } = siteConfig;
         return <PromoBanner />;
       }
 
-      if (section === 'stats') {
-        return <StatBand />;
+      if (section === 'sustainability') {
+        return <SustainBand />;
       }
 
       if (section === 'cta') {

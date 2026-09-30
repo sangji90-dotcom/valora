@@ -35,7 +35,7 @@ export const siteConfig: SiteConfig = {
     imageRatio: '4:3',
     // 품목이 4종뿐이라 하나씩 설명하는 rows 가 맞습니다
     featured: 'rows',
-    homeSections: ['message', 'featured', 'stats', 'categories', 'cta'],
+    homeSections: ['message', 'featured', 'sustainability', 'categories', 'cta'],
   },
 
   /**
@@ -70,6 +70,12 @@ export const siteConfig: SiteConfig = {
    * ⚠ 기준(basis)과 면책(disclaimer)을 비우지 마세요 —
    *   수치만 크게 써두면 근거 없는 환경 주장이 됩니다.
    */
+  /**
+   * ⚠ 메인에서 내렸습니다 (요청서 11번).
+   *   검증자료를 확보한 뒤 산정근거와 함께 별도 ESG DATA 영역에 씁니다.
+   *   homeSections 에 'stats' 를 다시 넣으면 그대로 살아납니다.
+   *   환경 수치는 근거 없이 크게 쓰면 부당 표시가 됩니다.
+   */
   stats: {
     title: '도입하면 얼마나 줄어드나',
     basis: '캡슐 1만 개를 도입했을 때를 기준으로 한 추정치입니다.',
@@ -97,11 +103,42 @@ export const siteConfig: SiteConfig = {
       '도입 수량에 비례한 추정치입니다. 실제 산출 근거가 필요하시면 문의 시 요청해 주세요. UN 지속가능발전목표 12번·13번에 해당하는 항목이라 ESG 보고서에 수치로 적을 수 있습니다.',
   },
 
+  /**
+   * ⚠ '용기를 없앴습니다' 라고 쓰면 안 됩니다.
+   *   케이스·디스펜서처럼 반복해서 쓰는 용기를 같이 파는 이상 모순입니다.
+   *   (요청서 5번) 줄이는 대상은 '매번 버리는 일회용 용기' 입니다.
+   */
   brandMessage: {
-    title: '용기를 없앴습니다',
-    body: `세정제를 담기 위해 매번 플라스틱 용기를 만들 필요는 없습니다.
-물에 닿으면 3~5초 만에 녹는 필름에 1회분만 담으면, 쓰고 나서 남는 것이 없습니다.
-한 번에 한 캡슐만 쓰이니 과다 사용과 교차 오염도 함께 사라집니다.`,
+    title: 'SMALL CAPSULE, BIG CHANGE.',
+    body: `발로라는 필요한 만큼의 세정 성분을 수용성 필름 한 알에 담습니다.
+물과 만나면 필름은 녹고, 필요한 양만 쓰입니다.
+매번 버리는 일회용 용기를 줄입니다.`,
+  },
+
+  /**
+   * 지속가능성 3원칙 (요청서 11번).
+   * 숫자는 여기 두지 않습니다 — 아래 stats 주석을 보세요.
+   */
+  sustainability: {
+    title: '구조가 만드는 지속가능성',
+    lead: '캠페인 문구가 아니라 제품이 생긴 방식에서 나옵니다.',
+    items: [
+      {
+        key: 'LESS PACKAGING',
+        label: '불필요한 일회용 포장을 줄입니다',
+        body: '1회분이 필름 한 알에 들어갑니다. 용량마다 따로 용기를 만들 필요가 없습니다.',
+      },
+      {
+        key: 'EXACT DOSE',
+        label: '필요한 만큼 사용합니다',
+        body: '한 번에 한 캡슐만 쓰입니다. 펌프처럼 눌린 만큼 나와 남는 일이 없습니다.',
+      },
+      {
+        key: 'REFILL SYSTEM',
+        label: '케이스와 디스펜서는 반복해 사용합니다',
+        body: '본체는 그대로 두고 캡슐만 채웁니다. 쓰는 동안 버려지는 것은 필름뿐입니다.',
+      },
+    ],
   },
 
   nav: [

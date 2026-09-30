@@ -72,28 +72,32 @@
    */
   .reveal-ready [data-reveal] {
     opacity: 0;
-    transform: translateY(14px);
+    transform: translateY(22px);
   }
 
   /* 같은 줄의 항목이 계단식으로 들어오게 살짝씩 늦춥니다 */
   .reveal-ready [data-reveal]:nth-child(2) {
-    --reveal-delay: 70ms;
+    --reveal-delay: 110ms;
   }
 
   .reveal-ready [data-reveal]:nth-child(3) {
-    --reveal-delay: 140ms;
+    --reveal-delay: 220ms;
   }
 
   .reveal-ready [data-reveal]:nth-child(4) {
-    --reveal-delay: 210ms;
+    --reveal-delay: 330ms;
   }
 
   .reveal-ready [data-reveal].is-revealed {
     opacity: 1;
     transform: none;
+    /**
+     * 요청서 17번: "빠르고 화려한 효과보다 천천히 움직이는 분위기".
+     * 620ms 에서 900ms 로 늦추고 이동 거리도 조금 늘렸습니다.
+     */
     transition:
-      opacity 620ms var(--ease) var(--reveal-delay, 0ms),
-      transform 620ms var(--ease) var(--reveal-delay, 0ms);
+      opacity 900ms var(--ease) var(--reveal-delay, 0ms),
+      transform 900ms var(--ease) var(--reveal-delay, 0ms);
   }
 
   @media (prefers-reduced-motion: reduce) {

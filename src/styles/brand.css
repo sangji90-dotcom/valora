@@ -42,12 +42,16 @@
  *    밝고 어두운 값이 달라야 하는 것은 전부 이 블록을 거칩니다.
  * ------------------------------------------------------------------ */
 :root {
-  /* 바탕에 얹는 아주 옅은 온기 — 캡슐 색에서 따왔습니다 */
-  --brand-glow-a: rgba(230, 163, 173, 0.16);
-  --brand-glow-b: rgba(156, 198, 168, 0.14);
+  /**
+   * 바탕에 얹는 아주 옅은 온기 — 제품 컬러(세이지·모래)에서 따왔습니다.
+   * ⚠ 요청서 2번: "페이지 전체를 핑크톤으로 구성하지 않습니다."
+   *   핑크는 개별 제품 쪽에만 두고, 바탕에는 쓰지 않습니다.
+   */
+  --brand-glow-a: rgba(187, 197, 182, 0.22);
+  --brand-glow-b: rgba(205, 187, 166, 0.18);
 
-  /* 반투명 헤더 바탕 (--color-bg 와 같은 색의 88%) */
-  --brand-header-bg: rgba(250, 247, 242, 0.88);
+  /* 반투명 헤더 바탕 (Warm Ivory #F4F1EB 의 88%) */
+  --brand-header-bg: rgba(244, 241, 235, 0.88);
 
   /* 배지 글자 — 배경은 --color-accent-subtle */
   --brand-badge-text: var(--brand-700);
@@ -56,19 +60,19 @@
   --brand-cta-from: var(--brand-50);
 
   /* 주 버튼 그림자 — 브랜드 색을 머금은 그림자라 다크에서는 죽입니다 */
-  --brand-btn-shadow: 0 6px 18px rgba(185, 96, 60, 0.28);
-  --brand-btn-shadow-hover: 0 10px 24px rgba(185, 96, 60, 0.34);
+  --brand-btn-shadow: 0 6px 18px rgba(38, 56, 47, 0.22);
+  --brand-btn-shadow-hover: 0 10px 24px rgba(38, 56, 47, 0.28);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     /* 어두운 바탕에서는 같은 세기로 얹으면 얼룩처럼 보입니다 */
-    --brand-glow-a: rgba(230, 163, 173, 0.07);
-    --brand-glow-b: rgba(156, 198, 168, 0.06);
+    --brand-glow-a: rgba(187, 197, 182, 0.08);
+    --brand-glow-b: rgba(205, 187, 166, 0.06);
 
-    --brand-header-bg: rgba(22, 18, 15, 0.88);
+    --brand-header-bg: rgba(20, 24, 21, 0.88);
 
-    /* #7d3e26 을 어두운 배경에 그대로 쓰면 대비 1.6:1 — 안 읽힙니다 */
+    /* 어두운 brand-700 을 어두운 배경에 쓰면 안 읽힙니다 */
     --brand-badge-text: var(--brand-100);
 
     --brand-cta-from: var(--color-bg-muted);
@@ -324,15 +328,15 @@
   position: absolute;
   inset: 0 0 auto 0;
   height: 4px;
-  background: var(--accent-rose);
+  background: var(--accent-pink);
 }
 
 :root body .cats > .cat:nth-child(2)::before {
-  background: var(--accent-sky);
+  background: var(--accent-sand);
 }
 
 :root body .cats > .cat:nth-child(3)::before {
-  background: var(--accent-mint);
+  background: var(--accent-sage);
 }
 
 :root body .cat:hover {
@@ -578,5 +582,83 @@
   :root body .prose h3 {
     font-size: var(--text-lg);
     margin-top: var(--space-8);
+  }
+}
+
+/* ================================================================== *
+ *  스크롤 모션 — 요청서 17번
+ * ================================================================== *
+ *  Fade-in / Slow Slide-up 은 Reveal.astro 가 맡습니다.
+ *  여기서는 큰 사진에만 Image Zoom 과 Parallax 를 얹습니다.
+ *
+ *  ⚠ 스크롤 값을 JS로 읽어 el.style 에 넣는 방식은 쓰면 안 됩니다.
+ *    style **속성**이 생기고, 해시 기반 CSP가 조용히 막습니다.
+ *    (이 함정에 이미 네 번 걸렸습니다 — npm run test:csp 가 감시합니다)
+ *
+ *  대신 CSS 스크롤 기반 애니메이션(animation-timeline: view())을 씁니다.
+ *  JS가 한 줄도 없고, 지원하지 않는 브라우저는 그냥 아무 일도
+ *  일어나지 않습니다 — 사진은 정상으로 보입니다.
+ *
+ *  ⚠ 카드(.card)에는 걸지 마세요. hover 확대와 transform 이 충돌합니다.
+ * ================================================================== */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    /* 화면에 들어오는 동안 아주 천천히 제자리로 — "들어앉는" 느낌 */
+    @keyframes brand-settle {
+      from {
+        transform: scale(1.06);
+      }
+
+      to {
+        transform: scale(1);
+      }
+    }
+
+    /* 틀 안에서만 움직이는 패럴랙스. 1.08배로 깔아둬서 가장자리가 안 보입니다 */
+    @keyframes brand-parallax {
+      from {
+        transform: scale(1.08) translateY(-2.2%);
+      }
+
+      to {
+        transform: scale(1.08) translateY(2.2%);
+      }
+    }
+
+    /* ⚠ :global() 금지 — 평범한 .css 에서는 잘못된 선택자라 규칙 전체가 버려집니다 */
+    /**
+     * ⚠ 쇼케이스(.show__img)에는 걸면 안 됩니다.
+     *   그 사진은 가로 스크롤 트랙(.show__track) 안에 있는데,
+     *   overflow-x: auto 를 주면 overflow-y 도 auto 가 되어 그 트랙이
+     *   세로 방향으로도 스크롤 컨테이너가 됩니다. view() 는 가장 가까운
+     *   스크롤 컨테이너를 기준으로 진행도를 계산하므로, 페이지가 아니라
+     *   그 트랙을 봅니다. 트랙 안에서 사진은 세로로 움직이지 않으니
+     *   진행도가 한 값에 멈추고, 운이 나쁘면 scale(1.06) 인 채로
+     *   영원히 확대되어 있습니다. 실측으로 확인했습니다.
+     */
+    :root body .detail__media .detail__img {
+      animation-name: brand-settle;
+      /* 진행도는 타임라인이 정합니다 — 이 값은 애니메이션을 켜는 용도뿐 */
+      animation-duration: 1ms;
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 45%;
+    }
+
+    /* 히어로는 틀을 씌우고 그 안에서 움직입니다 */
+    :root body .hero__media {
+      overflow: hidden;
+      border-radius: var(--radius-xl);
+    }
+
+    :root body .hero__media img {
+      animation-name: brand-parallax;
+      animation-duration: 1ms;
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-timeline: view();
+      animation-range: cover 0% cover 100%;
+    }
   }
 }

@@ -60,4 +60,30 @@ if (missing.length) {
   process.exit(1);
 }
 
-console.log(`CSS 변수 참조 이상 없음 (선언 ${declared.size}개 / 파일 ${files.length}개)`);
+/**
+ * :global() 은 .astro 의 <style> 안에서만 쓰는 Astro 문법입니다.
+ * 평범한 .css 파일에서는 **잘못된 선택자**이고, CSS는 선택자 목록에
+ * 하나라도 잘못된 게 섞이면 규칙 전체를 버립니다. 그래서 같이 적힌
+ * 멀쩡한 선택자까지 조용히 날아갑니다.
+ *
+ * 빌드는 통과하고 콘솔에도 아무 말이 없습니다. 두 번 당했습니다.
+ */
+const globals = [];
+for (const [f, text] of contents) {
+  if (!f.endsWith('.css')) continue;
+  // 주석 안에 적힌 경고문은 제외합니다
+  const stripped = text.replace(/\/\*[\s\S]*?\*\//g, (m) => ' '.repeat(m.length));
+  for (const m of stripped.matchAll(/:global\(/g)) {
+    const line = text.slice(0, m.index).split('\n').length;
+    globals.push(`${path.relative(ROOT, f)}:${line}`);
+  }
+}
+
+if (globals.length) {
+  console.log(`.css 파일에 :global() 이 ${globals.length}곳 있습니다. 규칙 전체가 버려집니다:`);
+  for (const g of globals) console.log(`  ✗ ${g}`);
+  console.log('\n:global(.x) → .x 로 고치세요. (.astro 의 <style> 안에서만 쓰는 문법입니다)');
+  process.exit(1);
+}
+
+console.log(`CSS 변수 참조 이상 없음, :global() 없음 (선언 ${declared.size}개 / 파일 ${files.length}개)`);

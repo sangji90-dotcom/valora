@@ -93,7 +93,7 @@ export interface LayoutPreset {
    * 히어로는 항상 맨 위에 옵니다.
    */
   homeSections: Array<
-    'message' | 'featured' | 'categories' | 'promo' | 'stats' | 'cta'
+    'message' | 'featured' | 'categories' | 'promo' | 'stats' | 'sustainability' | 'cta'
   >;
 }
 
@@ -227,6 +227,25 @@ export interface SiteConfig {
     }>;
     /** 아래 작게 붙는 면책 문구 */
     disclaimer?: string;
+  };
+
+  /**
+   * 지속가능성 3원칙 (발로라 전용 확장).
+   * homeSections 에 'sustainability' 를 넣어야 나옵니다.
+   *
+   * ⚠ 여기에는 숫자를 쓰지 않습니다. 제품 구조가 만드는 지속가능성을
+   *   말로만 설명하는 자리입니다. 절감량 같은 수치는 검증자료를 확보한
+   *   뒤 stats(ESG DATA)로 따로 내보냅니다.
+   */
+  sustainability?: {
+    title: string;
+    lead?: string;
+    items: Array<{
+      /** 영문 키워드. 예: LESS PACKAGING */
+      key: string;
+      label: string;
+      body: string;
+    }>;
   };
 
   /**
