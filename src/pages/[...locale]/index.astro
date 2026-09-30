@@ -15,6 +15,10 @@ import ProofStrip from '../../components/ProofStrip.astro';
 import SustainBand from '../../components/SustainBand.astro';
 import ValoraSystem from '../../components/ValoraSystem.astro';
 import HowItWorks from '../../components/HowItWorks.astro';
+import BrandStory from '../../components/BrandStory.astro';
+import Technology from '../../components/Technology.astro';
+import B2BProcess from '../../components/B2BProcess.astro';
+import MobileJump from '../../components/MobileJump.astro';
 import Reveal from '../../components/Reveal.astro';
 import { getFeaturedProducts, getCategoriesWithCount } from '../../lib/products';
 import { organizationSchema } from '../../lib/structured-data';
@@ -34,6 +38,26 @@ const categories = await getCategoriesWithCount();
  */
 const sections = siteConfig.layout.homeSections;
 const { brandMessage } = siteConfig;
+
+/*
+ * 실제로 화면에 나오는 섹션만 추립니다.
+ * 바로가기가 "없는 곳"으로 보내지 않게 하려는 것입니다 —
+ * homeSections 에 적혀 있어도 내용(brandMessage, technology 등)이
+ * 비면 그 섹션은 렌더되지 않습니다.
+ */
+const rendered = sections.filter((section) => {
+  if (section === 'message') return Boolean(brandMessage);
+  if (section === 'story') return Boolean(siteConfig.brandStory);
+  if (section === 'featured') return featured.length > 0;
+  if (section === 'categories') return categories.length > 0;
+  if (section === 'promo') return Boolean(siteConfig.promo);
+  if (section === 'system') return Boolean(siteConfig.productSystem);
+  if (section === 'howItWorks') return Boolean(siteConfig.howItWorks);
+  if (section === 'technology') return Boolean(siteConfig.technology);
+  if (section === 'sustainability') return Boolean(siteConfig.sustainability);
+  if (section === 'b2b') return Boolean(siteConfig.b2b);
+  return section === 'cta';
+});
 
 /**
  * 이 한 파일이 언어별 페이지를 전부 내보냅니다.
@@ -64,6 +88,15 @@ const S = (v: Parameters<typeof ps>[0]) => ps(v, localeFromPath(Astro.url.pathna
 
   <Hero />
 
+  {/*
+    좁은 화면 전용 바로가기 (요청서 16번).
+    ⚠ 신뢰 근거 띠(ProofStrip) 위에 둡니다. 아래에 두었더니 모바일에서
+      네 칸이 세로로 쌓여 한 화면을 다 먹고, 바로가기는 그 아래라
+      스크롤해야 보였습니다 — 스크롤을 줄이려고 만든 것이 스크롤
+      뒤에 숨어 있었습니다.
+  */}
+  <MobileJump available={rendered} />
+
   {/* 히어로 직후 — "이 회사 믿을 만한가"에 먼저 답합니다 */}
   <ProofStrip />
 
@@ -71,7 +104,7 @@ const S = (v: Parameters<typeof ps>[0]) => ps(v, localeFromPath(Astro.url.pathna
     sections.map((section) => {
       if (section === 'message' && brandMessage) {
         return (
-          <section class="section section--subtle">
+          <section class="section section--subtle" id="message">
             <div class="container message">
               <h2 class="message__title">{S(brandMessage.title)}</h2>
               <p class="message__body">{S(brandMessage.body)}</p>
@@ -80,9 +113,13 @@ const S = (v: Parameters<typeof ps>[0]) => ps(v, localeFromPath(Astro.url.pathna
         );
       }
 
+      if (section === 'story') {
+        return <BrandStory />;
+      }
+
       if (section === 'featured' && featured.length > 0) {
         return (
-          <section class="section">
+          <section class="section" id="featured">
             <div class="container">
               <div class="section__head">
                 <h2 class="section__title">{T.featuredTitle}</h2>
@@ -107,7 +144,7 @@ const S = (v: Parameters<typeof ps>[0]) => ps(v, localeFromPath(Astro.url.pathna
 
       if (section === 'categories' && categories.length > 0) {
         return (
-          <section class="section section--subtle">
+          <section class="section section--subtle" id="categories">
             <div class="container">
               <div class="section__head">
                 <h2 class="section__title">{T.ui.categoriesTitle}</h2>
@@ -139,13 +176,21 @@ const S = (v: Parameters<typeof ps>[0]) => ps(v, localeFromPath(Astro.url.pathna
         return <HowItWorks />;
       }
 
+      if (section === 'technology') {
+        return <Technology />;
+      }
+
       if (section === 'sustainability') {
         return <SustainBand />;
       }
 
+      if (section === 'b2b') {
+        return <B2BProcess />;
+      }
+
       if (section === 'cta') {
         return (
-          <section class="section">
+          <section class="section" id="cta">
             <div class="container cta">
               <h2 class="cta__title">{T.ctaTitle}</h2>
               <p class="cta__desc">{T.ctaDesc}</p>

@@ -74,13 +74,36 @@ const S = (v: Parameters<typeof ps>[0]) => ps(v, localeFromPath(Astro.url.pathna
 <style>
   .quick {
     position: fixed;
-    right: var(--space-4);
+    /*
+     * 본문 오른쪽 **바깥**에 붙입니다.
+     *
+     * ⚠ right: var(--space-4) 로 두었더니, 1280px 화면에서 본문
+     *   컨테이너(1180px)와 화면 가장자리 사이가 50px 밖에 안 남아
+     *   신뢰 근거 띠의 마지막 칸 글자를 덮었습니다. 화면 폭에
+     *   상관없이 본문 가장자리를 기준으로 잡습니다.
+     *
+     * 자리가 모자라면 (아래 미디어쿼리) 아예 숨기고, 더 좁아지면
+     * 하단 가로 막대로 바뀝니다.
+     */
+    left: calc(50% + var(--container-max) / 2 + var(--space-4));
     /*
      * 화면 중앙이 아니라 오른쪽 아래에 둡니다.
      * 중앙에 두면 캐러셀의 다음 화살표와 정확히 겹칩니다.
      */
     bottom: var(--space-8);
     z-index: 40;
+  }
+
+  /*
+   * 본문 바깥에 퀵 메뉴가 들어갈 자리가 없는 폭 —
+   * 1180(본문) + 2 × (100 퀵메뉴 + 16 여백) ≈ 1412px
+   * 여기부터 좁아지면 겹치므로 숨깁니다. 하단 막대가 나오는
+   * 880px 까지는 헤더의 "문의" 링크가 같은 일을 합니다.
+   */
+  @media (max-width: 1412px) and (min-width: 881px) {
+    .quick {
+      display: none;
+    }
   }
 
   .quick__list {

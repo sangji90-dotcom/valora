@@ -229,9 +229,9 @@ const S = (v: Parameters<typeof ps>[0]) => ps(v, localeFromPath(Astro.url.pathna
   }
 
   .chip__count {
-    opacity: 0.65;
     font-size: var(--text-xs);
     margin-left: 2px;
+    /* ⚠ opacity 로 흐리게 하면 AA 미달이 됩니다 (2.82:1 이었습니다) */
   }
 
   .browser__search input {

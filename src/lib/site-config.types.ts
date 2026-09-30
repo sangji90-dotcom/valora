@@ -112,15 +112,19 @@ export interface LayoutPreset {
    */
   homeSections: Array<
     | 'message'
+    | 'story'
     | 'featured'
     | 'categories'
     | 'promo'
     | 'stats'
     | 'system'
     | 'howItWorks'
+    | 'technology'
     | 'sustainability'
+    | 'b2b'
     | 'cta'
   >;
+
 }
 
 export interface SiteConfig {
@@ -136,6 +140,14 @@ export interface SiteConfig {
   tagline: Localized<string>;
   /** SEO description 기본값 */
   description: Localized<string>;
+  /**
+   * 히어로 제목 아래 한두 줄 (요청서 4번).
+   *
+   * ⚠ description 을 그대로 쓰지 마세요. 그쪽은 검색결과용이라
+   *   키워드를 눌러 담은 긴 문장입니다. 첫 화면에서 그걸 읽는
+   *   사람은 없습니다. 비우면 description 으로 떨어집니다.
+   */
+  heroLead?: Localized<string>;
   /** 로고 이미지 경로. null이면 company 텍스트를 로고로 사용 */
   logo: string | null;
   /** OG 기본 이미지 (public/ 기준 절대경로) */
@@ -329,6 +341,81 @@ export interface SiteConfig {
       label: Localized<string>;
       body: Localized<string>;
     }>;
+  };
+
+  /**
+   * 좁은 화면에서 히어로 바로 아래 놓을 바로가기.
+   *
+   * ⚠ 섹션 순서를 화면 크기별로 뒤집지 않는 이유 —
+   *   CSS order 로 눈에 보이는 순서만 바꾸면 DOM 순서와 어긋나
+   *   키보드 tab 순서·스크린리더 읽는 순서가 화면과 달라집니다
+   *   (WCAG 2.4.3 Focus Order). 순서는 하나로 두고, 모바일에서는
+   *   멀리 있는 섹션으로 **건너뛸 수단**을 줍니다.
+   *
+   * 값은 홈 섹션 id 입니다. 없는 id 를 적으면 그 칩은 나오지 않습니다.
+   */
+  mobileJump?: Array<{ section: string; label: Localized<string> }>;
+
+  /**
+   * BRAND STORY — 왜 이 제품이 생겼는지 (발로라 전용 확장).
+   * homeSections 에 'story' 를 넣어야 나옵니다.
+   *
+   * ⚠ 창업자 서사를 지어내지 마세요. 확인된 사실과 제품이 생긴
+   *   이유만 씁니다. 인물 사진·수상 이력은 넣지 않습니다.
+   */
+  brandStory?: {
+    title: Localized<string>;
+    /** 왼쪽에 크게 놓을 한 문장 */
+    pull: Localized<string>;
+    /** 본문 문단. 배열 하나가 한 문단입니다 */
+    body: Array<Localized<string>>;
+  };
+
+  /**
+   * TECHNOLOGY — 무엇이 이 제품을 가능하게 하는가 (발로라 전용 확장).
+   * homeSections 에 'technology' 를 넣어야 나옵니다.
+   *
+   * ⚠ ProofStrip 과 역할이 다릅니다.
+   *   ProofStrip = "이 회사 믿을 만한가" (자격)
+   *   TECHNOLOGY = "무엇이 그걸 가능하게 하나" (원리)
+   *   여기에 자격을 또 크게 쓰면 같은 말을 두 번 하게 됩니다.
+   *
+   * ⚠ 특허는 **출원**이며 등록이 아닙니다. '특허 획득/취득' 으로
+   *   바꿔 적으면 허위표시가 됩니다. credentials 와 disclaimer 를
+   *   비우지 마세요.
+   */
+  technology?: {
+    title: Localized<string>;
+    lead?: Localized<string>;
+    items: Array<{
+      key: string;
+      label: Localized<string>;
+      body: Localized<string>;
+    }>;
+    /** 하단 한 줄 근거 (특허 출원번호·인증 진행 상태 등) */
+    credentials?: Array<Localized<string>>;
+    disclaimer?: Localized<string>;
+  };
+
+  /**
+   * B2B — 도입 절차와 거래 조건 (발로라 전용 확장).
+   * homeSections 에 'b2b' 를 넣어야 나옵니다.
+   *
+   * ⚠ 결제·장바구니가 없는 카탈로그입니다. 여기에 가격표를 넣지 마세요.
+   *   수량·납기 조건까지만 적고 나머지는 문의로 넘깁니다.
+   */
+  b2b?: {
+    title: Localized<string>;
+    lead?: Localized<string>;
+    steps: Array<{
+      label: Localized<string>;
+      body: Localized<string>;
+      /** 걸리는 시간. 확정할 수 없으면 비웁니다 */
+      duration?: Localized<string>;
+    }>;
+    /** 거래 조건 — 최소 수량·인쇄 원본·맞춤 제작 가능 범위 등 */
+    terms?: Array<{ label: Localized<string>; value: Localized<string> }>;
+    ctaLabel?: Localized<string>;
   };
 
   /**

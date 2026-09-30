@@ -30,7 +30,7 @@ const S = (v: Parameters<typeof ps>[0]) => ps(v, localeFromPath(Astro.url.pathna
 
 {
   how && how.items.length > 0 && (
-    <section class="how section section--subtle" aria-label={S(how.title)}>
+    <section class="how section section--subtle" id="howItWorks" aria-label={S(how.title)}>
       <div class="container">
         <div class="section__head" data-reveal>
           <h2 class="section__title">{S(how.title)}</h2>

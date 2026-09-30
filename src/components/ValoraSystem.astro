@@ -28,7 +28,7 @@ const S = (v: Parameters<typeof ps>[0]) => ps(v, localeFromPath(Astro.url.pathna
 
 {
   sys && sys.items.length > 0 && (
-    <section class="sys section" aria-label={S(sys.title)}>
+    <section class="sys section" id="system" aria-label={S(sys.title)}>
       <div class="container">
         <div class="section__head" data-reveal>
           <h2 class="section__title">{S(sys.title)}</h2>

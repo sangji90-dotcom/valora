@@ -1,0 +1,114 @@
+---
+import siteConfig from '../../site.config';
+import { getTerms } from '../lib/terms';
+import { localeFromPath, ps } from '../lib/i18n';
+
+/**
+ * ============================================================
+ *  좁은 화면 전용 바로가기 (요청서 16번)
+ * ============================================================
+ *  ⚠ 이 컴포넌트는 발로라에만 있습니다. 템플릿에는 넣지 마세요.
+ *
+ *  왜 "순서를 바꾸지 않고" 바로가기를 두는가 —
+ *
+ *  화면 크기별로 섹션 순서를 뒤집으려면 CSS order 를 써야 하는데,
+ *  그러면 눈에 보이는 순서와 DOM 순서가 어긋납니다. 키보드 Tab 순서와
+ *  스크린리더가 읽는 순서는 DOM 을 따르므로, 보는 사람과 듣는 사람이
+ *  서로 다른 사이트를 쓰게 됩니다 (WCAG 2.4.3 Focus Order 위반).
+ *
+ *  홈이 길어서 생긴 문제이니, 순서는 하나로 두고 **건너뛸 수단**을
+ *  줍니다. 앵커 링크라 JS 없이도 동작하고, CSP에도 걸리지 않습니다.
+ *
+ *  ⚠ 넓은 화면에는 나오지 않습니다. 거기서는 한 화면에 들어오는
+ *    분량이라 바로가기가 오히려 방해가 됩니다.
+ * ============================================================
+ */
+
+interface Props {
+  /** 실제로 렌더된 섹션 id 목록. 없는 곳으로 보내지 않기 위함입니다 */
+  available: string[];
+}
+
+const { available } = Astro.props;
+const T = getTerms(localeFromPath(Astro.url.pathname));
+
+/** 설정 본문에서 현재 언어를 꺼냅니다 (i18n.ts 의 Localized 참고) */
+const S = (v: Parameters<typeof ps>[0]) => ps(v, localeFromPath(Astro.url.pathname));
+
+/*
+ * 설정에 적힌 것 중 **실제로 화면에 있는 섹션만** 남깁니다.
+ * 섹션을 homeSections 에서 빼면 바로가기도 같이 사라집니다 —
+ * 아무 데도 가지 않는 링크가 남는 것이 가장 나쁜 결과입니다.
+ */
+const items = (siteConfig.mobileJump ?? []).filter((j) => available.includes(j.section));
+---
+
+{
+  items.length > 0 && (
+    <nav class="jump" aria-label={T.ui.jumpNav}>
+      <ul class="jump__list">
+        {items.map((j) => (
+          <li>
+            <a class="jump__chip" href={`#${j.section}`}>
+              {S(j.label)}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  )
+}
+
+<style>
+  /* 좁은 화면 전용 — 기본은 숨김 */
+  .jump {
+    display: none;
+  }
+
+  @media (max-width: 880px) {
+    .jump {
+      display: block;
+      padding: var(--space-4) 0;
+      border-bottom: 1px solid var(--color-border);
+      background: var(--color-bg);
+    }
+
+    .jump__list {
+      display: flex;
+      gap: var(--space-2);
+      margin: 0;
+      padding: 0 var(--space-4);
+      list-style: none;
+      /* 칩이 많아지면 가로로 밀어서 봅니다 */
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .jump__list::-webkit-scrollbar {
+      display: none;
+    }
+
+    .jump__chip {
+      display: block;
+      white-space: nowrap;
+      font-size: var(--text-sm);
+      padding: var(--space-2) var(--space-4);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-full);
+      color: var(--color-text-muted);
+      background: var(--color-surface);
+    }
+
+    .jump__chip:hover,
+    .jump__chip:focus-visible {
+      border-color: var(--color-accent);
+      color: var(--color-text);
+    }
+  }
+
+  @media print {
+    .jump {
+      display: none;
+    }
+  }
+</style>

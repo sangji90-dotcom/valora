@@ -33,6 +33,10 @@ export const siteConfig: SiteConfig = {
     ko: '발로라는 물에 녹는 수용성 필름으로 만든 캡슐 세정제와 전용 디스펜서를 공급합니다. 기업 ESG 판촉물과 숙박업소 어메니티에 맞는 구성을 안내해 드립니다.',
     en: 'VALORA supplies capsule cleansers made with water-soluble film, and the dispensers built for them. We put together configurations for corporate ESG gifting and for hospitality amenities.',
   },
+  heroLead: {
+    ko: '물에 닿으면 녹는 캡슐 하나가 용기와 과다 사용을 함께 없앱니다.',
+    en: 'One capsule that dissolves in water removes the bottle and the overuse together.',
+  },
   logo: null,
   ogImage: '/og-default.png',
   lang: 'ko',
@@ -58,16 +62,49 @@ export const siteConfig: SiteConfig = {
      * HERO → BRAND MESSAGE → VALORA SYSTEM → PRODUCT → HOW IT WORKS
      *   → SUSTAINABILITY → CATEGORY → CONTACT
      */
+    /**
+     * 요청서 20번 — 11단 구성.
+     *
+     *   1 HERO (+ PROOF)   6 HOW IT WORKS
+     *   2 BRAND MESSAGE    7 TECHNOLOGY
+     *   3 BRAND STORY      8 SUSTAINABILITY
+     *   4 VALORA SYSTEM    9 B2B
+     *   5 PRODUCT         10 CATEGORY
+     *                     11 CONTACT
+     *
+     * 순서에 있는 논리 — 무엇을 믿을 수 있는지(PROOF) → 무엇을
+     * 말하는 회사인지(MESSAGE·STORY) → 무엇을 만드는지(SYSTEM·PRODUCT)
+     * → 어떻게 쓰는지(HOW) → 왜 되는지(TECHNOLOGY) → 무엇이 남는지
+     * (SUSTAINABILITY) → 어떻게 사는지(B2B) → 문의.
+     *
+     * ⚠ 화면 크기별로 이 순서를 뒤집지 마세요. CSS order 로 보이는
+     *   순서만 바꾸면 Tab 순서·스크린리더 순서와 어긋납니다.
+     *   좁은 화면 대응은 mobileJump 바로가기로 합니다.
+     */
     homeSections: [
       'message',
+      'story',
       'system',
       'featured',
       'howItWorks',
+      'technology',
       'sustainability',
+      'b2b',
       'categories',
       'cta',
     ],
   },
+
+  /**
+   * 좁은 화면에서 히어로 아래 놓을 바로가기 (요청서 16번).
+   * homeSections 에 없는 섹션을 적으면 그 칩은 나오지 않습니다.
+   */
+  mobileJump: [
+    { section: 'featured', label: { ko: '제품', en: 'Products' } },
+    { section: 'technology', label: { ko: '기술', en: 'Technology' } },
+    { section: 'b2b', label: { ko: '도입 절차', en: 'How to order' } },
+    { section: 'cta', label: { ko: '문의', en: 'Contact' } },
+  ],
 
   /**
    * 히어로 아래 신뢰 근거 띠.
@@ -255,6 +292,165 @@ Fewer single-use bottles thrown away, every time.`,
         },
       },
     ],
+  },
+
+  /**
+   * BRAND STORY (요청서 14번).
+   *
+   * ⚠ 창업자 서사를 지어내지 않았습니다. 제품이 생긴 이유와
+   *   확인된 사실만 씁니다. 인물 사진·수상 이력은 넣지 않습니다.
+   */
+  brandStory: {
+    title: { ko: '왜 캡슐인가', en: 'WHY A CAPSULE' },
+    pull: {
+      ko: '세정제를 담으려고\n매번 플라스틱 용기를 만들 이유는 없었습니다.',
+      en: 'Holding cleanser never required\nmanufacturing a new plastic bottle.',
+    },
+    body: [
+      {
+        ko: '지금까지는 둘 중 하나를 골라야 했습니다. 일회용 어메니티를 줄이면 여러 사람이 같은 용기를 만지게 되어 위생이 나빠지고, 위생을 챙기면 객실마다 작은 용기가 쌓여 폐기물이 늘었습니다.',
+        en: 'Until now it was one or the other. Cut single-use amenities and people end up sharing one container, so hygiene suffers. Protect hygiene and every room fills with small bottles, so waste grows.',
+      },
+      {
+        ko: '캡슐은 그 둘을 나누지 않습니다. 필름이 곧 포장이라 담을 용기가 없고, 한 번에 한 알만 쓰이므로 다음 사람은 언제나 새 캡슐을 받습니다. 물에 닿으면 3~5초 만에 녹아 버릴 것이 남지 않습니다.',
+        en: 'The capsule does not force that trade-off. The film is the packaging, so there is no container, and one capsule is used at a time, so the next person always gets a fresh one. It dissolves in three to five seconds and leaves nothing to throw away.',
+      },
+      {
+        ko: '캡슐을 만들고 나니 담을 것이, 담고 나니 보관할 것이, 보관하고 나니 꺼낼 것이 필요했습니다. 제품이 늘어난 것이 아니라 하나의 체계가 이어진 것입니다.',
+        en: 'Once there was a capsule, it needed something to hold it; once held, somewhere to keep it; once kept, a way to take one out. The line-up did not grow — one system extended.',
+      },
+    ],
+  },
+
+  /**
+   * TECHNOLOGY (요청서 10번).
+   *
+   * ⚠ 위의 proof 와 역할이 다릅니다.
+   *   proof      = "이 회사 믿을 만한가" (자격)
+   *   technology = "무엇이 그걸 가능하게 하나" (원리)
+   *
+   * ⚠ 특허는 **출원**입니다. 등록이 아닙니다.
+   *   '특허 획득/취득' 으로 바꾸면 허위표시가 됩니다.
+   */
+  technology: {
+    title: { ko: 'TECHNOLOGY', en: 'TECHNOLOGY' },
+    lead: {
+      ko: '용기를 없애고도 위생과 사용량을 지킬 수 있게 만드는 것들입니다.',
+      en: 'What lets the container disappear without giving up hygiene or dose control.',
+    },
+    items: [
+      {
+        key: 'FILM',
+        label: { ko: '수용성 필름', en: 'Water-soluble film' },
+        body: {
+          ko: '물에 닿은 뒤 3~5초 만에 녹습니다. 필름이 곧 포장이라 다 쓰고 남는 것이 없습니다.',
+          en: 'Dissolves three to five seconds after contact with water. The film is the packaging, so nothing is left over.',
+        },
+      },
+      {
+        key: 'DOSE',
+        label: { ko: '정량 토출', en: 'Measured dose' },
+        body: {
+          ko: '버튼 1회에 캡슐 1알. 펌프처럼 눈대중으로 조절할 일이 없어 남아서 버려지는 세정제가 생기지 않습니다.',
+          en: 'One press, one capsule. There is no pump to judge by eye, so no cleanser is left over to discard.',
+        },
+      },
+      {
+        key: 'FORMULA',
+        label: { ko: '조성물', en: 'Formulation' },
+        body: {
+          ko: '남부대학교 산학협력으로 이전받은 식물추출물 유효성분 포함 조성물을 씁니다.',
+          en: 'Built on a plant-extract active compound formulation transferred from Nambu University.',
+        },
+      },
+      {
+        key: 'pH',
+        label: { ko: '피부 기준', en: 'Skin-matched pH' },
+        body: {
+          ko: '중성~약산성으로 맞췄습니다. 얼굴·손·두피에 같은 방식으로 씁니다.',
+          en: 'Neutral to mildly acidic, used the same way on face, hands and scalp.',
+        },
+      },
+    ],
+    credentials: [
+      {
+        ko: '특허 출원 — 캡슐형 비누 및 그 토출장치 (10-2025-0122876)',
+        en: 'Patent application — Capsule soap and dispensing device (KR 10-2025-0122876)',
+      },
+      {
+        ko: '기술이전 — 남부대학교 산학협력',
+        en: 'Technology transfer — Nambu University industry-academia cooperation',
+      },
+      {
+        ko: '인증 — 화장품법 기반 절차 진행 중',
+        en: 'Certification — in progress under the Korean Cosmetics Act',
+      },
+    ],
+    disclaimer: {
+      ko: '특허는 출원 상태이며 등록이 확정된 것은 아닙니다. 인증은 진행 중입니다.',
+      en: 'The patent is filed, not granted. Certification is still in progress.',
+    },
+  },
+
+  /**
+   * B2B 도입 안내 (요청서 12·13번).
+   *
+   * ⚠ 가격표를 넣지 마세요. 결제가 없는 카탈로그입니다.
+   *   수량·납기 조건까지만 적고 나머지는 문의로 넘깁니다.
+   */
+  b2b: {
+    title: { ko: '도입 절차', en: 'HOW TO ORDER' },
+    lead: {
+      ko: '용도와 수량을 알려주시면 구성과 견적을 안내해 드립니다. 샘플을 먼저 받아보고 결정하셔도 됩니다.',
+      en: 'Tell us the use case and the volume, and we come back with a configuration and a quote. You are welcome to see a sample first.',
+    },
+    steps: [
+      {
+        label: { ko: '상담', en: 'Consultation' },
+        body: { ko: '용도와 수량을 확인하고 구성을 제안합니다.', en: 'We confirm the use case and volume, and propose a configuration.' },
+      },
+      {
+        label: { ko: '샘플', en: 'Sampling' },
+        body: { ko: '샘플을 만들어 실제로 써보고 결정합니다.', en: 'We make samples so you can try them before deciding.' },
+        duration: { ko: '약 2주', en: 'About 2 weeks' },
+      },
+      {
+        label: { ko: '발주', en: 'Order' },
+        body: { ko: '수량과 납기를 확정합니다.', en: 'Quantity and delivery date are confirmed.' },
+      },
+      {
+        label: { ko: '생산', en: 'Production' },
+        body: { ko: '생산 후 품질 검수를 거칩니다.', en: 'Manufacturing, followed by quality inspection.' },
+        duration: { ko: '약 4~6주', en: 'About 4-6 weeks' },
+      },
+      {
+        label: { ko: '납품', en: 'Delivery' },
+        body: { ko: '디스펜서는 설치와 사용 교육까지 함께 진행합니다.', en: 'For dispensers, installation and user training are included.' },
+      },
+      {
+        label: { ko: '리필', en: 'Refills' },
+        body: { ko: '이후에는 캡슐만 정기적으로 채웁니다.', en: 'After that you top up capsules on a regular cycle.' },
+      },
+    ],
+    terms: [
+      {
+        label: { ko: '최소 주문 수량', en: 'Minimum order' },
+        value: { ko: '케이스 제품 1,000개부터 (제품별로 다릅니다)', en: 'From 1,000 units for case products; varies by product' },
+      },
+      {
+        label: { ko: '로고 인쇄', en: 'Logo printing' },
+        value: { ko: '케이스 외관에 가능. 인쇄용 원본 파일(AI·PDF) 필요', en: 'Available on the case exterior; print-ready artwork (AI or PDF) required' },
+      },
+      {
+        label: { ko: '색상 맞춤', en: 'Custom colour' },
+        value: { ko: '기업 CI 색으로 제작 가능. 발주 수량에 따라 달라집니다', en: 'Matched to corporate CI; depends on the order quantity' },
+      },
+      {
+        label: { ko: '결제', en: 'Payment' },
+        value: { ko: '이 사이트에서는 이루어지지 않습니다. 견적·계약은 별도로 진행합니다', en: 'Not taken on this site. Quotations and contracts are handled separately' },
+      },
+    ],
+    ctaLabel: { ko: '도입 문의하기', en: 'Start an enquiry' },
   },
 
   nav: [

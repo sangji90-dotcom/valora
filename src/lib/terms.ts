@@ -151,6 +151,8 @@ const KO = {
     ceoLine: (ceo: string, biz: string) => `대표 ${ceo} · 사업자등록번호 ${biz}`,
     /** 문의 폼을 쓰지 않는 설정일 때의 대체 안내 */
     fallbackLead: '전화 또는 이메일로 문의해 주세요.',
+    /** 좁은 화면 바로가기 (요청서 16번) */
+    jumpNav: '바로가기',
     sendEmail: '이메일 보내기',
     emailNotice:
       '본 사이트에 게시된 이메일 주소가 전자우편 수집 프로그램이나 그 밖의 기술적 장치를 이용하여 무단으로 수집되는 것을 거부하며, 이를 위반 시 정보통신망법에 의해 형사처벌됨을 유념하시기 바랍니다.',
@@ -281,6 +283,7 @@ const EN = {
     ceoLine: (ceo: string, biz: string) =>
       `CEO ${ceo} · Business registration ${biz}`,
     fallbackLead: 'Please reach us by phone or email.',
+    jumpNav: 'Jump to a section',
     sendEmail: 'Send an email',
     emailNotice:
       'Email addresses published on this site may not be collected by automated means. Unauthorised collection is subject to penalty under the Korean Information and Communications Network Act.',

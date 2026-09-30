@@ -4,7 +4,7 @@ import { getTerms } from '../lib/terms';
 import { companyName, localeFromPath, localePath, ps } from '../lib/i18n';
 import ProductImage from './ProductImage.astro';
 import HeroCarousel from './HeroCarousel.astro';
-import { getFeaturedProducts, productTitle } from '../lib/products';
+import { getCategoriesWithCount, getFeaturedProducts, productTitle } from '../lib/products';
 
 /** 주소에서 읽은 현재 언어 */
 const locale = localeFromPath(Astro.url.pathname);
@@ -26,6 +26,21 @@ const featured = variant === 'split' ? await getFeaturedProducts(1) : [];
 const showcase = featured[0];
 const effective = variant === 'split' && !showcase ? 'stacked' : variant;
 
+/**
+ * 히어로에서 바로 "누구를 위한 것인지" 를 보여줍니다 (요청서 4번).
+ * 카테고리를 그대로 씁니다 — 따로 적어두면 카테고리를 고칠 때
+ * 여기만 옛날 값으로 남습니다.
+ * 상품이 없는 카테고리는 getCategoriesWithCount 가 이미 걸러냅니다.
+ */
+const audiences = await getCategoriesWithCount();
+
+/**
+ * 첫 화면 문구. heroLead 가 비어 있으면 SEO description 으로 떨어집니다.
+ * ⚠ description 은 검색결과용 긴 문장이라, 첫 화면에서 그대로 읽히면
+ *   아무도 끝까지 안 읽습니다. heroLead 를 채우는 쪽이 낫습니다.
+ */
+const lead = S(siteConfig.heroLead) || S(siteConfig.description);
+
 /** 내부 링크에 언어 접두어를 붙입니다 (i18n.ts 참고) */
 const L = (p: string) => localePath(p, localeFromPath(Astro.url.pathname));
 ---
@@ -38,11 +53,25 @@ const L = (p: string) => localePath(p, localeFromPath(Astro.url.pathname));
     <div class="hero__body">
       <p class="badge">{companyName(locale)}</p>
       <h1 class="hero__title">{S(siteConfig.tagline)}</h1>
-      <p class="hero__desc">{S(siteConfig.description)}</p>
+      <p class="hero__desc">{lead}</p>
       <div class="hero__actions">
         <a href={L("/products/")} class="btn btn--primary">{T.viewItems}</a>
         <a href={L("/contact/")} class="btn btn--ghost">{T.ui.contactCta}</a>
       </div>
+
+      {
+        audiences.length > 0 && (
+          <ul class="hero__for" aria-label={T.ui.categoriesTitle}>
+            {audiences.map((c) => (
+              <li>
+                <a class="hero__forItem" href={L(`/products/category/${c.id}/`)}>
+                  {S(c.label)}
+                </a>
+              </li>
+            ))}
+          </ul>
+        )
+      }
     </div>
 
     {
@@ -83,6 +112,37 @@ const L = (p: string) => localePath(p, localeFromPath(Astro.url.pathname));
     display: flex;
     gap: var(--space-3);
     flex-wrap: wrap;
+  }
+
+  /* ---------- 누구를 위한 것인가 ---------- */
+
+  .hero__for {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-3);
+    margin: var(--space-8) 0 0;
+    padding: var(--space-5) 0 0;
+    list-style: none;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .hero__forItem {
+    display: block;
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    padding: var(--space-1) 0;
+  }
+
+  /* 항목 사이 구분점 — 칩으로 만들면 위의 버튼과 경쟁합니다 */
+  .hero__for li + li .hero__forItem::before {
+    content: '·';
+    margin-right: var(--space-3);
+    opacity: 0.5;
+  }
+
+  .hero__forItem:hover,
+  .hero__forItem:focus-visible {
+    color: var(--color-text);
   }
 
   /* ---------- stacked : 문구 위주 + 그라데이션 ---------- */

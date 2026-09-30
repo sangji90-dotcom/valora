@@ -69,9 +69,8 @@ const S = (v: Parameters<typeof ps>[0]) => ps(v, localeFromPath(Astro.url.pathna
 
             {langLinks.length > 0 && (
               <span class="lang" role="group" aria-label={T.ui.languageSelect}>
-                {langLinks.map((l, i) => (
+                {langLinks.map((l) => (
                   <>
-                    {i > 0 && <span class="lang__sep" aria-hidden="true">|</span>}
                     <a
                       href={l.href}
                       class="utility__link lang__link"
@@ -167,8 +166,18 @@ const S = (v: Parameters<typeof ps>[0]) => ps(v, localeFromPath(Astro.url.pathna
     margin-left: var(--space-2);
   }
 
-  .lang__sep {
-    color: var(--color-border);
+  /*
+   * 언어 링크 사이 구분선.
+   *
+   * 전에는 "|" 글자를 넣었는데, 색이 --color-border 라 대비가
+   * 1.15:1 이었습니다. 장식이라 aria-hidden 을 걸어두긴 했지만
+   * 그건 "안 읽히게" 할 뿐이고, 눈으로도 거의 안 보이는 상태였습니다.
+   * 글자를 지우고 경계선으로 그립니다 — 대비 검사 대상에서 빠지고
+   * 실제로는 더 잘 보입니다.
+   */
+  .lang__link + .lang__link {
+    padding-left: var(--space-2);
+    border-left: 1px solid var(--color-border);
   }
 
   .lang__link[aria-current='true'] {

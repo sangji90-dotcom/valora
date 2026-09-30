@@ -29,7 +29,7 @@ const S = (v: Parameters<typeof ps>[0]) => ps(v, localeFromPath(Astro.url.pathna
 
 {
   s && s.items.length > 0 && (
-    <section class="sus" aria-label={S(s.title)}>
+    <section class="sus" id="sustainability" aria-label={S(s.title)}>
       <div class="container">
         <div class="sus__head" data-reveal>
           <h2 class="sus__title">{S(s.title)}</h2>
