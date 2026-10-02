@@ -52,8 +52,16 @@ const L = (p: string) => localePath(p, localeFromPath(Astro.url.pathname));
       <div class="contact">
         <div class="contact__info">
           <dl class="info">
-            <dt>{T.contact.phone}</dt>
-            <dd><a href={`tel:${contact.phone.replace(/-/g, '')}`}>{contact.phone}</a></dd>
+            {
+              /* 전화번호가 없으면 항목을 통째로 뺍니다. 빈 칸만 남으면
+                 "연락처를 안 적어놨네" 로 읽힙니다 */
+              contact.phone && (
+                <Fragment>
+                  <dt>{T.contact.phone}</dt>
+                  <dd><a href={`tel:${contact.phone.replace(/-/g, '')}`}>{contact.phone}</a></dd>
+                </Fragment>
+              )
+            }
 
             <dt>{T.contact.email}</dt>
             <dd><a href={`mailto:${contact.email}`}>{contact.email}</a></dd>

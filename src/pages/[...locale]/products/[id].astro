@@ -190,9 +190,13 @@ const breadcrumb = breadcrumbSchema([
           >
             {T.askThis}
           </a>
-          <a href={`tel:${siteConfig.contact.phone.replace(/-/g, '')}`} class="btn btn--ghost">
-            {siteConfig.contact.phone}
-          </a>
+          {
+            siteConfig.contact.phone && (
+              <a href={`tel:${siteConfig.contact.phone.replace(/-/g, '')}`} class="btn btn--ghost">
+                {siteConfig.contact.phone}
+              </a>
+            )
+          }
         </div>
 
         {

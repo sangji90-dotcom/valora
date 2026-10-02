@@ -96,6 +96,24 @@ console.log(`내부 링크 전부 언어 접두어 처리됨 (.astro ${files.len
 const DIST = path.join(ROOT, 'dist', 'en');
 const HANGUL = /[가-힣]/;
 
+/*
+ * 영문 페이지에 남아도 되는 한국어.
+ *
+ * 사람 이름과 법인명은 고유명사라 번역 대상이 아닙니다. 로마자 표기는
+ * 본인이 쓰는 철자가 따로 있어서(전소은 → Jeon / Jun / Chun …) 저희가
+ * 지어내면 계약서나 명함과 달라집니다. 받기 전까지는 한글 그대로 둡니다.
+ *
+ * 표기를 받으면 site.config.ts 의 해당 값을 { ko, en } 으로 바꾸고
+ * 여기서 이름을 지우세요. 목록이 길어지면 검사가 의미를 잃습니다.
+ */
+const ALLOW = await (async () => {
+  // site.config.ts 는 타입스크립트라 이 스크립트에서 바로 못 읽습니다.
+  // 값 하나만 필요하므로 글자로 찾습니다.
+  const cfg = await readFile(path.join(ROOT, 'site.config.ts'), 'utf8');
+  const ceo = cfg.match(/ceo:\s*'([^']*)'/)?.[1];
+  return [ceo].filter((v) => v && HANGUL.test(v));
+})();
+
 async function walkHtml(dir) {
   const out = [];
   for (const e of await readdir(dir, { withFileTypes: true })) {
@@ -115,6 +133,12 @@ if (existsSync(DIST)) {
     // 태그 바깥(본문)과 태그 안(속성) 을 모두 훑습니다
     for (const chunk of html.match(/[^<>]+/g) ?? []) {
       if (!HANGUL.test(chunk)) continue;
+
+      // 고유명사만 들어 있는 조각은 넘어갑니다
+      let rest = chunk;
+      for (const w of ALLOW) rest = rest.split(w).join('');
+      if (!HANGUL.test(rest)) continue;
+
       const at = chunk.search(HANGUL);
       leaks.push(
         `${path.relative(ROOT, f)}  …${chunk.slice(Math.max(0, at - 40), at + 40).trim()}…`

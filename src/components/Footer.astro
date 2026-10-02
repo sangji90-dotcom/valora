@@ -45,7 +45,12 @@ const S = (v: Parameters<typeof ps>[0]) => ps(v, localeFromPath(Astro.url.pathna
 
     <div class="footer__col">
       <p class="footer__head">{T.ui.contactLabel}</p>
-      <a href={`tel:${contact.phone.replace(/-/g, '')}`} class="footer__link">{contact.phone}</a>
+      {
+        /* 전화번호를 안 받았거나 공개하지 않기로 한 경우 줄 자체를 뺍니다 */
+        contact.phone && (
+          <a href={`tel:${contact.phone.replace(/-/g, '')}`} class="footer__link">{contact.phone}</a>
+        )
+      }
       <a href={`mailto:${contact.email}`} class="footer__link">{contact.email}</a>
       <p class="footer__muted footer__address">{companyAddress(locale)}</p>
     </div>

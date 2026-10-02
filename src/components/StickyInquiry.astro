@@ -43,13 +43,18 @@ const L = (p: string) => localePath(p, localeFromPath(Astro.url.pathname));
 
 <div class="sticky-cta">
   <div class="sticky-cta__inner">
-    <a
-      href={`tel:${phone.replace(/-/g, '')}`}
-      class="sticky-cta__tel"
-      aria-label={T.ui.callTo(phone)}
-    >
-      {T.ui.call}
-    </a>
+    {
+      /* 번호가 없으면 전화 버튼을 빼고 문의 버튼만 남깁니다 */
+      phone && (
+        <a
+          href={`tel:${phone.replace(/-/g, '')}`}
+          class="sticky-cta__tel"
+          aria-label={T.ui.callTo(phone)}
+        >
+          {T.ui.call}
+        </a>
+      )
+    }
     <a
       href={L(`/contact/?product=${encodeURIComponent(productTitle)}`)}
       class="sticky-cta__main"
