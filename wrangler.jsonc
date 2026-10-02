@@ -10,7 +10,9 @@
   //
   //  name 은 Cloudflare 프로젝트명과 같아야 합니다.
   // ============================================================
-  "name": "valora",
+  // 시연용입니다. 주소에 demo 가 보여야 고객사가 공식 사이트로 오해하지 않습니다.
+  // 정식 계약되면 고객사 Cloudflare 계정에 "valora" 로 따로 만듭니다.
+  "name": "valora-demo",
   "compatibility_date": "2026-09-18",
 
   // Cloudflare 대시보드의 "Build command" 가 비어 있으면

@@ -19,7 +19,9 @@ import type {
 export type { NavItem, Category, LayoutPreset, SiteConfig };
 
 export const siteConfig: SiteConfig = {
-  site: 'https://example.com',
+  // 시연용 임시 주소입니다. 정식 도메인이 정해지면 바꿉니다.
+  // 이 값은 각 페이지의 대표 주소(canonical)와 공유 미리보기에 쓰입니다.
+  site: 'https://valora-demo.sangji90.workers.dev',
   company: {
     ko: '주식회사 발로라',
     // ⚠ 등기된 영문 법인명을 확인해 바꿔야 합니다. 아래는 잠정 표기입니다.

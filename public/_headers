@@ -8,6 +8,10 @@
 # X-Frame-Options 로 여기서 처리합니다.
 
 /*
+  # 시연용 페이지입니다. 각 페이지에 noindex 메타가 들어가지만, 메타를 못 읽는
+  # 수집기와 HTML 이 아닌 파일까지 막으려면 헤더가 필요합니다.
+  # 정식 공개할 때 site.config.ts 의 noindex 와 함께 지웁니다.
+  X-Robots-Tag: noindex, nofollow
   X-Frame-Options: DENY
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
