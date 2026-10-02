@@ -545,8 +545,23 @@ Fewer single-use bottles thrown away, every time.`,
 
   inquiry: {
     mode: 'external',
-    // Google Forms → 보내기 → <> 탭의 iframe src 주소를 그대로 붙여넣습니다.
-    embedUrl: 'https://docs.google.com/forms/d/e/FORM_ID/viewform?embedded=true',
+
+    /*
+     * 문의 양식 주소입니다.
+     *
+     * 국내 서비스(네이버 폼 등)를 권합니다. 구글 폼은 서버가 국외에 있어
+     * 개인정보 국외 이전에 해당하고(개인정보 보호법 제28조의8), 처리방침에
+     * 이전 국가·이전받는 자·이용 목적·보유 기간을 따로 공개해야 합니다.
+     * 국내 폼을 쓰면 그 항목이 통째로 빠집니다.
+     *
+     *   네이버 폼 : 폼 편집 → 공유 → 링크 주소
+     *   구글 폼   : 보내기 → <> 탭의 iframe src 주소
+     *
+     * ⚠ 어느 쪽이든 문의를 받기 시작하면 고객사가 개인정보처리자가 됩니다.
+     *   처리방침 공개(제30조)와 보호책임자 기재(제31조)가 따라옵니다.
+     *   src/content/pages/privacy.md 의 괄호 자리를 반드시 채우세요.
+     */
+    embedUrl: 'https://form.naver.com/response/FORM_ID',
   },
 
   productsPerPage: 12,
