@@ -3,6 +3,7 @@
  * 모바일 가로 스크롤 / 콘솔 에러를 검사합니다.
  */
 import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { chromium } from 'playwright';
 import { serveDist } from './lib/serve.mjs';
@@ -71,7 +72,7 @@ try {
       continue;
     }
 
-    const srv = await serveDist(new URL('../dist', import.meta.url).pathname);
+    const srv = await serveDist(fileURLToPath(new URL('../dist', import.meta.url)));
     try {
       const browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
       const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });

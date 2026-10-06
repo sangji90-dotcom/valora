@@ -13,9 +13,10 @@
  * 컴포넌트 안에서 선언하고 쓰는 지역 변수와, 폴백이 있는 참조는 통과입니다.
  */
 import { readFile, readdir } from 'node:fs/promises';
+import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
-const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SRC = path.join(ROOT, 'src');
 
 /** 브라우저가 기본 제공하거나 외부에서 주입되는 변수는 검사 대상이 아닙니다 */

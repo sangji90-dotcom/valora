@@ -8,13 +8,14 @@
  * 이 양식을 먼저 보내는 편이 빠릅니다.
  */
 import ExcelJS from 'exceljs';
+import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 /** label 은 문자열이거나 { ko, en } 입니다 (site-config 의 Localized). 화면·콘솔은 한국어를 씁니다 */
 const koLabel = (v) => (v && typeof v === 'object' && !Array.isArray(v) ? (v.ko ?? v.en ?? '') : v);
 
-const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const outPath = process.argv[2] ?? path.join(ROOT, '상품등록_양식.xlsx');
 
 const { default: siteConfig } = await import(pathToFileURL(path.join(ROOT, 'site.config.ts')).href);

@@ -8,6 +8,7 @@
  * 실제로 들어오는 형태를 만들어 두고 매번 확인합니다.
  */
 import { mkdtemp, writeFile, rm, readFile, readdir } from 'node:fs/promises';
+import { fileURLToPath } from 'node:url';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
@@ -25,7 +26,7 @@ import {
   yamlString,
 } from './lib/normalize.mjs';
 
-const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const CONTENT_DIR = path.join(ROOT, 'src/content/products');
 const ASSET_DIR = path.join(ROOT, 'src/assets/products');
 

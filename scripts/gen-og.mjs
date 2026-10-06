@@ -3,6 +3,7 @@
  * 실제 납품 시에는 고객사 디자이너가 만든 이미지로 교체합니다.
  */
 import sharp from 'sharp';
+import { fileURLToPath } from 'node:url';
 
 const og = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630">
   <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
@@ -20,6 +21,6 @@ const og = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630">
 
 await sharp(Buffer.from(og))
   .png()
-  .toFile(new URL('../public/og-default.png', import.meta.url).pathname);
+  .toFile(fileURLToPath(new URL('../public/og-default.png', import.meta.url)));
 
 console.log('OG 이미지를 생성했습니다.');

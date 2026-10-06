@@ -22,6 +22,7 @@
  * ============================================================
  */
 import { writeFile, mkdir, access } from 'node:fs/promises';
+import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import process from 'node:process';
 import { pathToFileURL } from 'node:url';
@@ -43,7 +44,7 @@ import { indexImageDir, resolveImages, optimizeInto, makePlaceholder } from './l
 /** label 은 문자열이거나 { ko, en } 입니다 (site-config 의 Localized). 화면·콘솔은 한국어를 씁니다 */
 const koLabel = (v) => (v && typeof v === 'object' && !Array.isArray(v) ? (v.ko ?? v.en ?? '') : v);
 
-const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const CONTENT_DIR = path.join(ROOT, 'src/content/products');
 const ASSET_DIR = path.join(ROOT, 'src/assets/products');
 
