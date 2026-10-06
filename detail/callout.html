@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>제품 콜아웃</title>
+<style>
+  /*
+   * 제품을 크게 두고 지시선으로 특징을 가리키는 형식.
+   *
+   * ⚠ 라벨이 잘리지 않게 폭을 먼저 나눕니다.
+   *   740 = 좌측 라벨 150 | 제품 440 | 우측 라벨 150
+   *   24px 글자는 한 글자가 약 24px 이므로 라벨은 **여섯 글자까지**.
+   *   처음에 "돌려서 선택", "3~5초에 녹음" 으로 썼다가 양쪽이 화면
+   *   밖으로 잘렸습니다. 글자 수를 세고 쓰세요.
+   *
+   * ⚠ 지시선 끝점은 가리키는 부위에 닿아야 합니다. 엉뚱한 데를
+   *   가리키면 설명이 아니라 장식이 됩니다. 제품 도형의 좌표와 같이
+   *   보세요 (원판 중심 370,548 / 반지름 140).
+   *
+   * ⚠ 끝점이 원판 안 영문 라벨(SHAMPOO 등)과 겹치지 않게 두세요.
+   *   선이 글자를 가로지르면 둘 다 읽기 어려워집니다. 좌상은 라벨
+   *   위쪽, 우상은 테두리 쪽을 가리킵니다.
+   *
+   * ⚠ 효능을 쓰지 않습니다. 화장품법 인증이 진행 중이라 실증자료가
+   *   필요한 표현은 못 씁니다. 구조와 쓰는 법만 가리킵니다.
+   */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Pretendard Variable', 'Noto Sans CJK KR', sans-serif; background:#fff; }
+  .shot { width: 740px; }
+  .shot svg { display: block; width: 100%; height: auto; }
+</style>
+</head>
+<body>
+
+<div class="shot" id="dispenser-callout">
+<svg viewBox="0 0 740 900" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f2f9f5"/>
+      <stop offset="0.5" stop-color="#e2f0e8"/>
+      <stop offset="1" stop-color="#d0e7da"/>
+    </linearGradient>
+  </defs>
+  <rect width="740" height="900" fill="url(#bg)"/>
+
+  <!-- ===== 카피 ===== -->
+  <text x="370" y="68" font-size="20" font-weight="700" fill="#2f6a4e" text-anchor="middle">한 대로 네 가지를</text>
+  <text x="370" y="118" font-size="40" font-weight="800" fill="#13201a" text-anchor="middle" letter-spacing="-1.2">객실 어메니티를</text>
+  <text x="370" y="166" font-size="40" font-weight="800" fill="#13201a" text-anchor="middle" letter-spacing="-1.2">한 자리에</text>
+  <text x="370" y="206" font-size="16" fill="#49554e" text-anchor="middle">원판을 돌려 칸을 고르고, 버튼을 누르면 캡슐이 한 알 떨어집니다.</text>
+  <text x="370" y="230" font-size="16" fill="#49554e" text-anchor="middle">객실마다 작은 용기를 채워 넣을 일이 없습니다.</text>
+  <text x="370" y="262" font-size="12" fill="#7d8a83" text-anchor="middle">· 시안 단계이며 실물 사진이 아닙니다</text>
+
+  <!-- ===== 제품 (중심 370,548 / 반지름 150) ===== -->
+  <circle cx="370" cy="548" r="155" fill="#ffffff" stroke="#13201a" stroke-width="9"/>
+  <path d="M370 548 L370 408 A140 140 0 0 1 510 548 Z" fill="#d7e8de"/>
+  <path d="M370 548 L510 548 A140 140 0 0 1 370 688 Z" fill="#f3dfe3"/>
+  <path d="M370 548 L370 688 A140 140 0 0 1 230 548 Z" fill="#dce9f5"/>
+  <path d="M370 548 L230 548 A140 140 0 0 1 370 408 Z" fill="#f6eedb"/>
+  <circle cx="370" cy="548" r="140" fill="none" stroke="#13201a" stroke-width="3"/>
+  <line x1="370" y1="408" x2="370" y2="688" stroke="#13201a" stroke-width="2.6"/>
+  <line x1="230" y1="548" x2="510" y2="548" stroke="#13201a" stroke-width="2.6"/>
+
+  <text x="440" y="476" font-size="13.5" font-weight="700" fill="#13201a" text-anchor="middle">SHAMPOO</text>
+  <text x="440" y="630" font-size="13.5" font-weight="700" fill="#13201a" text-anchor="middle">CONDITIONER</text>
+  <text x="300" y="630" font-size="13.5" font-weight="700" fill="#13201a" text-anchor="middle">BODY WASH</text>
+  <text x="300" y="476" font-size="13.5" font-weight="700" fill="#13201a" text-anchor="middle">HAND WASH</text>
+
+  <g fill="#13201a" opacity="0.16">
+    <circle cx="424" cy="506" r="7"/><circle cx="452" cy="526" r="7"/><circle cx="434" cy="542" r="7"/>
+    <circle cx="424" cy="590" r="7"/><circle cx="452" cy="570" r="7"/><circle cx="434" cy="554" r="7"/>
+    <circle cx="316" cy="590" r="7"/><circle cx="288" cy="570" r="7"/><circle cx="306" cy="554" r="7"/>
+    <circle cx="316" cy="506" r="7"/><circle cx="288" cy="526" r="7"/><circle cx="306" cy="542" r="7"/>
+  </g>
+
+  <circle cx="370" cy="548" r="42" fill="#13201a"/>
+  <text x="370" y="543" font-size="13" font-weight="700" fill="#fff" text-anchor="middle">1회</text>
+  <text x="370" y="562" font-size="13" font-weight="700" fill="#fff" text-anchor="middle">1캡슐</text>
+
+  <rect x="272" y="716" width="196" height="50" rx="14" fill="#13201a"/>
+  <rect x="297" y="733" width="56" height="14" rx="7" fill="#49584f"/>
+  <circle cx="428" cy="741" r="18" fill="#fff"/>
+  <text x="428" y="746" font-size="10" font-weight="800" fill="#13201a" text-anchor="middle">PUSH</text>
+  <circle cx="320" cy="800" r="10" fill="#1b4a35"/>
+  <line x1="320" y1="772" x2="320" y2="786" stroke="#1b4a35" stroke-width="3" stroke-dasharray="4 4"/>
+
+  <!-- ===== 지시선 ===== -->
+  <g fill="none" stroke="#13201a" stroke-width="2.2" stroke-linecap="round">
+    <path d="M150 416 Q222 420 296 444"/>
+    <path d="M556 430 Q524 448 498 496"/>
+    <path d="M556 716 Q508 724 450 740"/>
+    <path d="M160 786 Q232 792 310 800"/>
+  </g>
+  <g fill="#13201a">
+    <circle cx="296" cy="444" r="5"/>
+    <circle cx="498" cy="496" r="5"/>
+    <circle cx="450" cy="740" r="5"/>
+    <circle cx="310" cy="800" r="5"/>
+  </g>
+
+  <!-- ===== 라벨 (좌 24~150 / 우 566~716) ===== -->
+  <text x="24" y="392" font-size="16" font-weight="700" fill="#2f6a4e">용도별</text>
+  <text x="24" y="424" font-size="24" font-weight="800" fill="#13201a">4칸 구분</text>
+
+  <text x="566" y="392" font-size="16" font-weight="700" fill="#2f6a4e">원판을</text>
+  <text x="566" y="424" font-size="24" font-weight="800" fill="#13201a">돌려 선택</text>
+
+  <text x="566" y="690" font-size="16" font-weight="700" fill="#2f6a4e">버튼 1회</text>
+  <text x="566" y="722" font-size="24" font-weight="800" fill="#13201a">캡슐 1알</text>
+
+  <text x="24" y="760" font-size="16" font-weight="700" fill="#2f6a4e">물에 닿으면</text>
+  <text x="24" y="792" font-size="24" font-weight="800" fill="#13201a">3~5초</text>
+
+  <text x="370" y="862" font-size="16" font-weight="700" fill="#13201a" text-anchor="middle">벽면 고정 · 세면대 거치 모두 가능</text>
+</svg>
+</div>
+
+</body>
+</html>

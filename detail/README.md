@@ -10,7 +10,23 @@
 node detail/shoot.mjs             # 상세 이미지 → detail/out/
 node detail/shoot-products.mjs    # 제품 대표 이미지 → detail/out/
 node detail/shoot-sections.mjs    # 상세정보 본문 삽화 → src/assets/products/detail/
+node detail/shoot-callout.mjs     # 제품 콜아웃 → src/assets/products/detail/
 ```
+
+### 제품 콜아웃 (callout.html)
+
+제품을 크게 두고 지시선으로 특징을 가리키는 한 장입니다. **상세정보
+탭 맨 위**에 놓습니다 — 들어가자마자 제품 전체가 보입니다.
+
+- 폭 740 을 **좌측 라벨 150 / 제품 440 / 우측 라벨 150** 으로 나눕니다.
+  24px 글자는 한 글자가 약 24px 이므로 라벨은 여섯 글자까지입니다.
+  처음에 "돌려서 선택", "3~5초에 녹음" 으로 썼다가 양쪽이 화면 밖으로
+  잘렸습니다. 글자 수를 세고 쓰세요.
+- **지시선 끝점은 가리키는 부위에 닿아야 합니다.** 엉뚱한 데를 가리키면
+  설명이 아니라 장식입니다. 원판 안 영문 라벨(SHAMPOO 등)과 겹치지
+  않게도 두세요 — 선이 글자를 가로지르면 둘 다 읽기 어려워집니다.
+- 가리킬 자리가 네 곳쯤 되어야 이 형식이 성립합니다. 캡슐·박스·슬라이드
+  키트는 두세 곳뿐이라 같은 틀을 쓰면 허전합니다.
 
 ### 상세정보 본문 삽화 (sections.html)
 
