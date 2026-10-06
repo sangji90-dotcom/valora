@@ -21,7 +21,9 @@
     "studio:sync": "node scripts/sync-studio.mjs",
     "export:sanity": "node scripts/export-to-sanity.mjs",
     "test:i18n": "node scripts/test-i18n.mjs",
-    "test:contrast": "node scripts/test-contrast.mjs"
+    "test:contrast": "node scripts/test-contrast.mjs",
+    "go-live": "node scripts/go-live.mjs",
+    "test:leak": "node scripts/test-leak.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.4",

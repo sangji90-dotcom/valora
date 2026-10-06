@@ -587,11 +587,22 @@ Fewer single-use bottles thrown away, every time.`,
     // cloudflareToken: '0123456789abcdef...',
   },
 
+  /**
+   * 공개 전 검토용 띠.
+   *
+   * ⚠ 문구에 "의뢰 없이 만들었다" 류를 쓰지 마세요. 고객사가 자료를
+   *   보내준 뒤에는 사실과 다르고, 그 화면을 고객사가 읽습니다.
+   *   띠가 해야 할 일은 두 가지뿐입니다 — 보는 사람이 정식 사이트로
+   *   오인하지 않게 하는 것, 지금 보는 주소가 임시라는 것.
+   *
+   * 공개할 때 enabled 를 false 로 바꿉니다. noindex 와 contact 도
+   * 같이 바꿔야 합니다 — scripts/go-live.mjs 가 세 개를 함께 봅니다.
+   */
   demoBanner: {
     enabled: true,
     text: {
-      ko: '이 사이트는 템플릿 시연용으로 제작한 샘플입니다. 주식회사 발로라의 공식 사이트가 아니며, 회사의 의뢰 없이 공개 자료만으로 구성했습니다.',
-      en: 'This is a template demonstration built from public information only. It is not an official site of VALORA and was not commissioned by the company.',
+      ko: '공개 전 검토용 화면입니다. 임시 주소에서 작업 중이며, 내용과 주소는 정식 공개 시점에 확정됩니다.',
+      en: 'Review copy, not yet published. This is a working address; the content and the URL are finalised at launch.',
     },
   },
 };
