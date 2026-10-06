@@ -3,7 +3,7 @@
 title: 4-Capsule Premium Box
 summary: Four capsules in a hard case — built for employee gifts and VIP campaign kits.
 category: gift
-thumbnail: ../../assets/products/box-4capsule.jpg
+thumbnail: ../../assets/products/box-4capsule-concept.png
 order: 1
 status: active
 draft: false

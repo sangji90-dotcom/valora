@@ -4,7 +4,7 @@ summary: 캡슐 2개가 들어가는 슬라이드형 소형 케이스입니다. 
 titleEn: Portable Slide Kit
 summaryEn: A slim slide-open case holding two capsules — sized for travel and hand-outs.
 category: gift
-thumbnail: ../../assets/products/slide-kit.jpg
+thumbnail: ../../assets/products/slide-kit-concept.png
 specs:
   구성: 캡슐 2개 + 슬라이드 케이스
   케이스: 레드 / 블랙 / 아이보리

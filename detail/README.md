@@ -7,14 +7,36 @@
 ## 만들기
 
 ```
-node detail/shoot.mjs            # detail/out/ 에 PNG 가 생깁니다
-node detail/shoot.mjs ./out capsule.html   # 다른 제품
+node detail/shoot.mjs             # 상세 이미지 → detail/out/
+node detail/shoot-products.mjs    # 제품 대표 이미지 → detail/out/
 ```
+
+### 상세 이미지 (dispenser.html)
 
 - `dispenser-full.png` — 전체 한 장 (사이트 상세 탭, PDF 용)
 - `dispenser-01.png` ~ — 섹션별 조각 (스마트스토어 등은 여러 장으로 올립니다)
 
 폭 860px, 2배 해상도로 찍습니다. 국내 커머스 상세의 관행입니다.
+
+### 제품 대표 이미지 (products.html)
+
+실물 촬영본이 오기 전까지 쓰는 임시 도식입니다. 생산과 디자인이
+확정된 뒤에 찍은 사진으로 교체합니다.
+
+- `<제품>.png` — 설명 글자가 있는 판본. 상세·히어로처럼 크게 보이는 자리
+- `<제품>-thumb.png` — 글자를 뺀 판본. **제품 목록 카드용**
+
+두 판본을 두는 이유 — 카드는 폭이 280px 안팎까지 줄어듭니다. 30px 로
+그린 설명 글자가 9px 이 되어 읽히지 않고, 읽히지 않는 글자는 얼룩으로만
+보입니다.
+
+비율은 4:3 (`site.config` 의 `layout.imageRatio`) 입니다.
+
+**사진처럼 보이게 만들지 않습니다.** 그림자·반사·질감을 넣어 실물처럼
+만들면 받아보는 쪽이 "이런 제품이 이미 있다" 고 읽습니다. 선과 평면
+색만 씁니다. 형태는 `src/content/products/*.md` 의 사양에 적힌 것만
+따릅니다 — 캡슐 개수, 케이스 형태, 색상 선택지. 타사 제품 사진을 보고
+그리지 않습니다.
 
 ## 쓰면 안 되는 것
 

@@ -4,7 +4,7 @@ summary: 물에 닿으면 3~5초 만에 녹는 필름에 1회분 세정제를 �
 titleEn: Water-Soluble Soap Capsule (Refill)
 summaryEn: A single dose of cleanser sealed in a film that dissolves in 3-5 seconds on contact with water.
 category: refill
-thumbnail: ../../assets/products/capsule-refill.jpg
+thumbnail: ../../assets/products/capsule-refill-concept.png
 specs:
   유형: 바디워시 / 샴푸 / 세안·비누
   필름: 수용성 필름 (사용 후 잔여물 없음)

@@ -3,7 +3,7 @@
 title: Portable Slide Kit
 summary: A slim slide-open case holding two capsules — sized for travel and hand-outs.
 category: gift
-thumbnail: ../../assets/products/slide-kit.jpg
+thumbnail: ../../assets/products/slide-kit-concept.png
 order: 2
 status: active
 draft: false

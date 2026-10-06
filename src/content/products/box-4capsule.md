@@ -4,7 +4,7 @@ summary: 하드케이스에 캡슐 4개를 담은 구성입니다. 임직원 선
 titleEn: 4-Capsule Premium Box
 summaryEn: Four capsules in a hard case — built for employee gifts and VIP campaign kits.
 category: gift
-thumbnail: ../../assets/products/box-4capsule.jpg
+thumbnail: ../../assets/products/box-4capsule-concept.png
 specs:
   구성: 캡슐 4개 + 하드케이스
   케이스: 핑크 / 블랙 매트

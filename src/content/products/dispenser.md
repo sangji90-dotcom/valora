@@ -4,7 +4,7 @@ summary: 원판을 4칸으로 나눠 버튼 한 번에 캡슐 한 알이 떨어�
 titleEn: Zero-Waste Dispenser (4-Bay)
 summaryEn: A rotating four-bay dispenser that releases exactly one capsule per press.
 category: amenity
-thumbnail: ../../assets/products/dispenser-4.jpg
+thumbnail: ../../assets/products/dispenser-concept.png
 specs:
   구성: 원형 4구 (샴푸 / 컨디셔너 / 바디워시 / 핸드워시)
   토출: 버튼 1회 = 캡슐 1알

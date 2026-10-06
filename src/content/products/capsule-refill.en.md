@@ -3,7 +3,7 @@
 title: Water-Soluble Soap Capsule (Refill)
 summary: A single dose of cleanser sealed in a film that dissolves in 3-5 seconds on contact with water.
 category: refill
-thumbnail: ../../assets/products/capsule-refill.jpg
+thumbnail: ../../assets/products/capsule-refill-concept.png
 order: 3
 status: active
 draft: false

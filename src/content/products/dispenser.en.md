@@ -5,7 +5,7 @@
 title: Zero-Waste Dispenser (4-Bay)
 summary: A rotating four-bay dispenser that releases exactly one capsule per press.
 category: amenity
-thumbnail: ../../assets/products/dispenser-4.jpg
+thumbnail: ../../assets/products/dispenser-concept.png
 order: 4
 status: coming-soon
 draft: false

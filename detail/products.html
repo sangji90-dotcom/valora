@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>발로라 제품 임시 도식</title>
+<style>
+  /*
+   * 제품 대표 이미지 — 임시 도식.
+   *
+   * 실물 촬영본이 오기 전까지 쓰는 그림입니다. 생산과 디자인이
+   * 확정된 뒤에 찍은 사진으로 교체합니다.
+   *
+   * ⚠ 사진처럼 보이게 만들지 않습니다.
+   *   그림자·반사·질감을 넣어 실물처럼 만들면, 받아보는 쪽이
+   *   "이런 제품이 이미 있다" 고 읽습니다. 선과 평면 색만 씁니다.
+   *
+   * ⚠ 타사 제품 사진을 보고 그리지 않습니다.
+   *   형태는 제품 사양(src/content/products/*.md)에 적힌 것만
+   *   따릅니다 — 캡슐 개수, 케이스 형태, 색상 선택지.
+   *
+   * 비율은 4:3 (site.config 의 layout.imageRatio) 입니다.
+   */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #fff; font-family: 'Pretendard Variable', 'Noto Sans CJK KR', sans-serif; }
+
+  .shot {
+    width: 960px;
+    height: 720px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f4f8f6;
+  }
+  .shot svg { width: 100%; height: 100%; display: block; }
+
+  .tag {
+    position: absolute;
+    left: 26px; top: 26px;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: #1b4a35;
+    background: #d7e8de;
+    border-radius: 999px;
+    padding: 8px 16px;
+  }
+
+  /* 썸네일 판본 — 설명 글자를 뺍니다 (shoot 스크립트가 켭니다) */
+  body.plain .cap { display: none; }
+
+  /*
+   * 썸네일에서는 배지를 크게 키웁니다.
+   *
+   * 카드 폭이 260px 안팎까지 줄어듭니다. 원본 960px 에서 20px 로 두면
+   * 화면에서 5px 이 되어 읽히지 않고, 읽히지 않는 글자는 얼룩으로만
+   * 보입니다. 그 상태로는 도식을 실물 사진으로 오인하게 됩니다.
+   */
+  body.plain .tag {
+    font-size: 27px;
+    padding: 12px 24px;
+    left: 28px;
+    top: 28px;
+    letter-spacing: 0.03em;
+    background: rgba(215, 232, 222, 0.92);
+  }
+</style>
+</head>
+<body>
+
+<!-- ======================= 1. 리필 캡슐 ======================= -->
+<div class="shot" id="capsule-refill">
+  <span class="tag">시안 · 실물 사진 아님</span>
+  <svg viewBox="0 0 960 720">
+    <rect width="960" height="720" fill="#f4f8f6"/>
+
+    <!-- 바닥선 -->
+    <line x1="150" y1="448" x2="810" y2="448" stroke="#c9ddd3" stroke-width="2"/>
+
+    <!-- 캡슐 3알: 용도별 색 구분 -->
+    <g>
+      <!-- 뒤 왼쪽 -->
+      <ellipse cx="330" cy="374" rx="96" ry="76" fill="#dce9f5" stroke="#17241d" stroke-width="5"/>
+      <path d="M262 344 q30 -26 66 -26" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round" opacity="0.85"/>
+      <text x="330" y="382" font-size="21" font-weight="700" fill="#17241d" text-anchor="middle">BODY</text>
+      <!-- 뒤 오른쪽 -->
+      <ellipse cx="630" cy="374" rx="96" ry="76" fill="#f3dfe3" stroke="#17241d" stroke-width="5"/>
+      <path d="M562 344 q30 -26 66 -26" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round" opacity="0.85"/>
+      <text x="630" y="382" font-size="21" font-weight="700" fill="#17241d" text-anchor="middle">SOAP</text>
+      <!-- 앞 가운데 -->
+      <ellipse cx="480" cy="290" rx="112" ry="88" fill="#d9ece2" stroke="#17241d" stroke-width="6"/>
+      <path d="M402 256 q34 -30 76 -30" fill="none" stroke="#fff" stroke-width="11" stroke-linecap="round" opacity="0.9"/>
+      <text x="480" y="299" font-size="25" font-weight="700" fill="#17241d" text-anchor="middle">SHAMPOO</text>
+    </g>
+
+    <!-- 설명 -->
+    <text x="480" y="610" class="cap" font-size="30" font-weight="800" fill="#17241d" text-anchor="middle">수용성 필름 · 1회 1캡슐</text>
+    <text x="480" y="650" class="cap" font-size="22" fill="#49554e" text-anchor="middle">물에 닿으면 3~5초 만에 녹습니다</text>
+  </svg>
+</div>
+
+<!-- ======================= 2. 4캡슐 박스 ======================= -->
+<div class="shot" id="box-4capsule">
+  <span class="tag">시안 · 실물 사진 아님</span>
+  <svg viewBox="0 0 960 720">
+    <rect width="960" height="720" fill="#f4f8f6"/>
+
+    <!-- 열린 하드케이스: 뚜껑 + 본체 -->
+    <!-- 뚜껑 (뒤로 젖힘) -->
+    <rect x="236" y="110" width="300" height="196" rx="14" fill="#1d1d1d" stroke="#17241d" stroke-width="5"/>
+    <rect x="258" y="132" width="256" height="152" rx="8" fill="#2c2c2c"/>
+    <text x="386" y="216" font-size="26" font-weight="800" fill="#6f6f6f" text-anchor="middle" letter-spacing="4">LOGO</text>
+
+    <!-- 본체 -->
+    <rect x="424" y="262" width="330" height="250" rx="16" fill="#eccdd4" stroke="#17241d" stroke-width="5"/>
+    <!-- 4칸 -->
+    <g stroke="#17241d" stroke-width="3.5" fill="#f6e4e8">
+      <rect x="452" y="290" width="134" height="92" rx="9"/>
+      <rect x="594" y="290" width="134" height="92" rx="9"/>
+      <rect x="452" y="390" width="134" height="92" rx="9"/>
+      <rect x="594" y="390" width="134" height="92" rx="9"/>
+    </g>
+    <!-- 캡슐 4알 -->
+    <g stroke="#17241d" stroke-width="3.5">
+      <ellipse cx="519" cy="336" rx="42" ry="33" fill="#d9ece2"/>
+      <ellipse cx="661" cy="336" rx="42" ry="33" fill="#dce9f5"/>
+      <ellipse cx="519" cy="436" rx="42" ry="33" fill="#f3dfe3"/>
+      <ellipse cx="661" cy="436" rx="42" ry="33" fill="#f6eedb"/>
+    </g>
+
+    <text x="480" y="616" class="cap" font-size="30" font-weight="800" fill="#17241d" text-anchor="middle">캡슐 4개 + 하드케이스</text>
+    <text x="480" y="656" class="cap" font-size="22" fill="#49554e" text-anchor="middle">핑크 / 블랙 매트 · 외관 로고 인쇄 가능</text>
+  </svg>
+</div>
+
+<!-- ======================= 3. 슬라이드 키트 ======================= -->
+<div class="shot" id="slide-kit">
+  <span class="tag">시안 · 실물 사진 아님</span>
+  <svg viewBox="0 0 960 720">
+    <rect width="960" height="720" fill="#f4f8f6"/>
+
+    <!-- 슬라이드 케이스: 바깥 슬리브 + 밀려 나온 속통 -->
+    <!-- 속통 (오른쪽으로 밀려 나옴) -->
+    <rect x="452" y="206" width="268" height="168" rx="14" fill="#f2efe6" stroke="#17241d" stroke-width="5"/>
+    <g stroke="#17241d" stroke-width="3.5">
+      <ellipse cx="548" cy="290" rx="44" ry="35" fill="#d9ece2"/>
+      <ellipse cx="652" cy="290" rx="44" ry="35" fill="#f3dfe3"/>
+    </g>
+
+    <!-- 바깥 슬리브 -->
+    <rect x="232" y="192" width="268" height="196" rx="18" fill="#b8352f" stroke="#17241d" stroke-width="5"/>
+    <rect x="258" y="218" width="216" height="144" rx="10" fill="#c7453f"/>
+    <text x="366" y="300" font-size="24" font-weight="800" fill="#f0cfcd" text-anchor="middle" letter-spacing="4">LOGO</text>
+
+    <!-- 미는 방향 -->
+    <g stroke="#1b4a35" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="548" y1="430" x2="672" y2="430"/>
+      <polyline points="652,416 672,430 652,444"/>
+    </g>
+    <text x="490" y="436" font-size="19" fill="#1b4a35" text-anchor="end" font-weight="700">밀어서 열기</text>
+
+    <text x="480" y="616" class="cap" font-size="30" font-weight="800" fill="#17241d" text-anchor="middle">캡슐 2개 + 슬라이드 케이스</text>
+    <text x="480" y="656" class="cap" font-size="22" fill="#49554e" text-anchor="middle">레드 / 블랙 / 아이보리 · 슬림형</text>
+  </svg>
+</div>
+
+<!-- ======================= 4. 디스펜서 ======================= -->
+<div class="shot" id="dispenser">
+  <span class="tag">시안 · 실물 사진 아님</span>
+  <svg viewBox="0 0 960 720">
+    <rect width="960" height="720" fill="#f4f8f6"/>
+
+    <circle cx="480" cy="316" r="188" fill="#fff" stroke="#17241d" stroke-width="11"/>
+    <path d="M480 316 L480 140 A176 176 0 0 1 656 316 Z" fill="#d9ece2"/>
+    <path d="M480 316 L656 316 A176 176 0 0 1 480 492 Z" fill="#f3dfe3"/>
+    <path d="M480 316 L480 492 A176 176 0 0 1 304 316 Z" fill="#dce9f5"/>
+    <path d="M480 316 L304 316 A176 176 0 0 1 480 140 Z" fill="#f6eedb"/>
+    <circle cx="480" cy="316" r="176" fill="none" stroke="#17241d" stroke-width="4"/>
+    <line x1="480" y1="140" x2="480" y2="492" stroke="#17241d" stroke-width="3.5"/>
+    <line x1="304" y1="316" x2="656" y2="316" stroke="#17241d" stroke-width="3.5"/>
+
+    <text x="568" y="228" font-size="18" font-weight="700" fill="#17241d" text-anchor="middle">SHAMPOO</text>
+    <text x="568" y="404" font-size="18" font-weight="700" fill="#17241d" text-anchor="middle">CONDITIONER</text>
+    <text x="392" y="404" font-size="18" font-weight="700" fill="#17241d" text-anchor="middle">BODY WASH</text>
+    <text x="392" y="228" font-size="18" font-weight="700" fill="#17241d" text-anchor="middle">HAND WASH</text>
+
+    <g fill="#17241d" opacity="0.2">
+      <circle cx="548" cy="258" r="9"/><circle cx="584" cy="282" r="9"/><circle cx="562" cy="302" r="9"/>
+      <circle cx="548" cy="374" r="9"/><circle cx="584" cy="350" r="9"/><circle cx="562" cy="330" r="9"/>
+      <circle cx="412" cy="374" r="9"/><circle cx="376" cy="350" r="9"/><circle cx="398" cy="330" r="9"/>
+      <circle cx="412" cy="258" r="9"/><circle cx="376" cy="282" r="9"/><circle cx="398" cy="302" r="9"/>
+    </g>
+
+    <circle cx="480" cy="316" r="52" fill="#17241d"/>
+    <text x="480" y="311" font-size="16" font-weight="700" fill="#fff" text-anchor="middle">1회</text>
+    <text x="480" y="333" font-size="16" font-weight="700" fill="#fff" text-anchor="middle">1캡슐</text>
+
+    <rect x="344" y="514" width="272" height="60" rx="16" fill="#17241d"/>
+    <rect x="378" y="534" width="72" height="17" rx="8" fill="#4a5a52"/>
+    <circle cx="566" cy="544" r="22" fill="#fff"/>
+    <text x="566" y="550" font-size="13" font-weight="800" fill="#17241d" text-anchor="middle">PUSH</text>
+    <circle cx="414" cy="594" r="12" fill="#1b4a35"/>
+    <line x1="414" y1="560" x2="414" y2="578" stroke="#1b4a35" stroke-width="3" stroke-dasharray="4 4"/>
+
+    <text x="480" y="664" class="cap" class="cap" font-size="30" font-weight="800" fill="#17241d" text-anchor="middle">원형 4구 · 버튼 한 번에 한 알</text>
+  </svg>
+</div>
+
+</body>
+</html>
