@@ -86,10 +86,10 @@ showHero: false
 
 | 기관 | 전화 | 주소 |
 | --- | --- | --- |
-| 개인정보분쟁조정위원회 | 1833-6972 | www.kopico.go.kr |
-| 개인정보침해신고센터 | 118 | privacy.kisa.or.kr |
-| 대검찰청 사이버수사과 | 1301 | www.spo.go.kr |
-| 경찰청 사이버수사국 | 182 | ecrm.police.go.kr |
+| 개인정보분쟁조정위원회 | 1833-6972 | [www.kopico.go.kr](https://www.kopico.go.kr) |
+| 개인정보침해신고센터 | 118 | [privacy.kisa.or.kr](https://privacy.kisa.or.kr) |
+| 대검찰청 사이버수사과 | 1301 | [www.spo.go.kr](https://www.spo.go.kr) |
+| 경찰청 사이버수사국 | 182 | [ecrm.police.go.kr](https://ecrm.police.go.kr) |
 
 ## 12. 방침의 변경
 

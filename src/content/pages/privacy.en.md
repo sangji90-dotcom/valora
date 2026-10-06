@@ -77,14 +77,15 @@ below are acted on without delay. Requests for access are received at the same a
 
 A data subject seeking redress for harm caused by the handling of personal data may
 apply to the following bodies for dispute resolution or advice. These are Korean
-authorities and operate in Korean.
+authorities and operate in Korean. The numbers below are short codes that work only
+when dialled inside Korea; from abroad, use the websites.
 
-| Body | Phone | Address |
+| Body | Phone (in Korea) | Address |
 | --- | --- | --- |
-| Personal Information Dispute Mediation Committee | +82-1833-6972 | www.kopico.go.kr |
-| Privacy Infringement Report Centre | +82-118 | privacy.kisa.or.kr |
-| Supreme Prosecutors' Office, Cyber Investigation Division | +82-1301 | www.spo.go.kr |
-| National Police Agency, Cyber Bureau | +82-182 | ecrm.police.go.kr |
+| Personal Information Dispute Mediation Committee | 1833-6972 | [www.kopico.go.kr](https://www.kopico.go.kr) |
+| Privacy Infringement Report Centre | 118 | [privacy.kisa.or.kr](https://privacy.kisa.or.kr) |
+| Supreme Prosecutors' Office, Cyber Investigation Division | 1301 | [www.spo.go.kr](https://www.spo.go.kr) |
+| National Police Agency, Cyber Bureau | 182 | [ecrm.police.go.kr](https://ecrm.police.go.kr) |
 
 ## 12. Changes to this policy
 
