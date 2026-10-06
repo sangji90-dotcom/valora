@@ -74,6 +74,7 @@ const LIVE = config.match(/^\s*noindex:\s*(true|false)/m)?.[1] === 'false';
 let bad = 0;
 let warned = 0;
 const fail = (m) => { console.log(`  ✗ ${m}`); bad += 1; };
+const ok = (m) => console.log(`  ✓ ${m}`);
 
 /** 보이는 글자만 남깁니다 — script·style·태그·주석을 떼고 엔티티를 풉니다 */
 function visibleText(html) {
@@ -95,6 +96,53 @@ async function htmlFiles(dir) {
     else if (e.name.endsWith('.html')) out.push(p);
   }
   return out;
+}
+
+/*
+ * 빌드가 정말 마크다운을 썼는가.
+ *
+ * CONTENT_SOURCE=sanity 면 본문이 src/content/pages/*.md 가 아니라
+ * Sanity CMS 에서 옵니다. 그러면 md 를 아무리 고쳐도 화면은 그대로입니다.
+ *
+ * 실제로 이렇게 됐습니다 — 처리방침을 12항목으로 보강했는데 배포된
+ * 사이트는 8항목이었습니다. site.config.ts 에서 오는 데모 띠만 최신이라
+ * "배포가 됐다" 고 믿었고, 이 검사는 local 모드로 돌아 통과했습니다.
+ * **법으로 공개해야 하는 문서가 옛 버전으로 떠 있었습니다.**
+ *
+ * 그래서 소스의 항목 수와 화면의 항목 수를 맞춰 봅니다. 어긋나면
+ * 내용이 다른 데서 오고 있다는 뜻입니다.
+ */
+const SOURCE = (process.env.CONTENT_SOURCE ?? 'local').trim().toLowerCase();
+
+const PAIRS = [
+  ['src/content/pages/privacy.md', 'privacy/index.html'],
+  ['src/content/pages/privacy.en.md', 'en/privacy/index.html'],
+];
+
+console.log(`콘텐츠 소스: ${SOURCE}`);
+for (const [md, out] of PAIRS) {
+  const mdPath = path.join(ROOT, md);
+  const outPath = path.join(DIST, out);
+  let srcText;
+  let outHtml;
+  try {
+    srcText = await readFile(mdPath, 'utf8');
+    outHtml = await readFile(outPath, 'utf8');
+  } catch {
+    continue; // 그 판본을 안 내보내는 설정이면 넘어갑니다
+  }
+  const inMd = (srcText.match(/^## \d+\./gm) ?? []).length;
+  const inHtml = (outHtml.match(/<h2[^>]*>\s*\d+\./g) ?? []).length;
+  if (!inMd) continue;
+  if (inMd !== inHtml) {
+    fail(
+      `${out} 의 항목이 ${inHtml}개인데 ${md} 에는 ${inMd}개입니다 — ` +
+        `빌드가 이 마크다운을 쓰지 않았습니다` +
+        (SOURCE === 'sanity' ? ' (CONTENT_SOURCE=sanity 라 CMS 본문이 들어갔습니다)' : '')
+    );
+  } else {
+    ok(`${out} 항목 ${inHtml}개가 마크다운과 일치`);
+  }
 }
 
 const files = await htmlFiles(DIST);
