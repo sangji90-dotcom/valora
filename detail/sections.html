@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>상세정보 본문 삽화</title>
+<style>
+  /*
+   * 제품 상세정보 탭 본문에 들어가는 삽화.
+   *
+   * ⚠ 제목을 넣지 마세요. 마크다운의 ## 제목 바로 아래에 놓이므로
+   *   그림 안에 또 제목이 있으면 같은 말이 두 번 나옵니다.
+   *
+   * ⚠ 글자는 최소로. 그림 안 글자는 번역되지 않습니다. 영문 페이지에서
+   *   같은 그림을 쓰려면 숫자·아이콘·영문 라벨 위주여야 합니다.
+   *   한국어가 꼭 필요하면 body.en 을 만들어 영문 판본을 따로 굽습니다.
+   *
+   * 폭 740px, 2배 해상도.
+   *
+   * ⚠ 처음에 1200px 로 잡았더니 본문(약 630px)에서 절반으로 줄어
+   *   16px 글자가 8px 이 되어 읽히지 않았습니다. 원본 폭을 본문에
+   *   가깝게 두면 축소율이 0.85 정도라 글자가 살아남습니다.
+   */
+  :root {
+    --ink: #13201a;
+    --ink-soft: #49554e;
+    --line: #b5d0c1;
+    --green: #1b4a35;
+    --pale: #eef6f1;
+    --band: #d7e8de;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Pretendard Variable', 'Noto Sans CJK KR', sans-serif; background: #fff; }
+
+  .fig { width: 740px; padding: 34px 28px; background: var(--pale); }
+
+  .row4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .row3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+  .cell { text-align: center; }
+  .cell svg { display: block; margin: 0 auto 12px; }
+  .cell__n {
+    display: inline-block;
+    font-size: 13px; font-weight: 800; letter-spacing: 0.08em;
+    color: var(--green);
+  }
+  .cell__t { margin-top: 6px; font-size: 17px; font-weight: 800; color: var(--ink); word-break: keep-all; }
+  .cell__d { margin-top: 6px; font-size: 14px; line-height: 1.6; color: var(--ink-soft); word-break: keep-all; }
+
+  .card {
+    background: #fff; border: 1px solid var(--line); border-radius: 16px;
+    padding: 20px 14px; text-align: center;
+  }
+  .card svg { display: block; margin: 0 auto 12px; }
+
+  .box { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 22px 20px; }
+  .box--now { background: #f3f4f3; border-color: #dcdfdd; }
+  .box__k { font-size: 12.5px; font-weight: 800; letter-spacing: 0.1em; color: #8d968f; margin-bottom: 14px; }
+  .box--new .box__k { color: var(--green); }
+  .box__t { font-size: 19px; font-weight: 800; color: var(--ink); line-height: 1.4; word-break: keep-all; }
+  .box__d { margin-top: 9px; font-size: 14px; line-height: 1.65; color: var(--ink-soft); word-break: keep-all; }
+  .box svg { display: block; margin: 0 auto 14px; }
+
+  .list { display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+  .item { background: #fff; padding: 18px 20px; display: grid; grid-template-columns: 44px 1fr; gap: 14px; align-items: center; }
+  .item__n { font-size: 22px; font-weight: 800; color: var(--green); }
+  .item__t { font-size: 17px; font-weight: 800; color: var(--ink); word-break: keep-all; }
+  .item__d { margin-top: 5px; font-size: 14px; line-height: 1.6; color: var(--ink-soft); word-break: keep-all; }
+</style>
+</head>
+<body>
+
+<!-- ============ 작동 4단계 ============ -->
+<div class="fig" id="dispenser-steps">
+  <div class="row4">
+    <div class="cell">
+      <svg width="76" height="76" viewBox="0 0 104 104">
+        <circle cx="52" cy="52" r="51" fill="#fff" stroke="#b5d0c1" stroke-width="2"/>
+        <rect x="26" y="34" width="52" height="20" rx="8" fill="#13201a"/>
+        <circle cx="68" cy="44" r="7" fill="#fff"/>
+        <circle cx="38" cy="72" r="10" fill="#1b4a35"/>
+        <line x1="38" y1="56" x2="38" y2="62" stroke="#1b4a35" stroke-width="3" stroke-dasharray="3 3"/>
+      </svg>
+      <span class="cell__n">STEP 1</span>
+      <p class="cell__t">꺼냅니다</p>
+      <p class="cell__d">버튼을 누르면<br>한 알이 떨어집니다</p>
+    </div>
+    <div class="cell">
+      <svg width="76" height="76" viewBox="0 0 104 104">
+        <circle cx="52" cy="52" r="51" fill="#fff" stroke="#b5d0c1" stroke-width="2"/>
+        <path d="M52 24 C38 44 33 52 33 60 a19 19 0 0 0 38 0 c0-8-5-16-19-36z" fill="#1b4a35"/>
+      </svg>
+      <span class="cell__n">STEP 2</span>
+      <p class="cell__t">물에 댑니다</p>
+      <p class="cell__d">손에 받아<br>물을 묻힙니다</p>
+    </div>
+    <div class="cell">
+      <svg width="76" height="76" viewBox="0 0 104 104">
+        <circle cx="52" cy="52" r="51" fill="#fff" stroke="#b5d0c1" stroke-width="2"/>
+        <circle cx="52" cy="52" r="15" fill="#1b4a35" opacity="0.9"/>
+        <circle cx="32" cy="36" r="6" fill="#1b4a35" opacity="0.5"/>
+        <circle cx="72" cy="39" r="5" fill="#1b4a35" opacity="0.45"/>
+        <circle cx="30" cy="68" r="5" fill="#1b4a35" opacity="0.4"/>
+        <circle cx="71" cy="69" r="6.5" fill="#1b4a35" opacity="0.5"/>
+      </svg>
+      <span class="cell__n">STEP 3</span>
+      <p class="cell__t">녹습니다</p>
+      <p class="cell__d">3~5초면<br>필름이 사라집니다</p>
+    </div>
+    <div class="cell">
+      <svg width="76" height="76" viewBox="0 0 104 104">
+        <circle cx="52" cy="52" r="51" fill="#fff" stroke="#b5d0c1" stroke-width="2"/>
+        <path d="M34 53 l13 13 l24 -27" fill="none" stroke="#1b4a35" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span class="cell__n">STEP 4</span>
+      <p class="cell__t">정량만</p>
+      <p class="cell__d">남아서 버려지는<br>세정제가 없습니다</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 쓰는 자리 ============ -->
+<div class="fig" id="dispenser-places">
+  <div class="row3">
+    <div class="card">
+      <svg width="58" height="58" viewBox="0 0 64 64">
+        <rect x="10" y="16" width="44" height="36" rx="4" fill="none" stroke="#1b4a35" stroke-width="3"/>
+        <rect x="10" y="16" width="44" height="9" rx="4" fill="#1b4a35"/>
+        <rect x="19" y="33" width="12" height="12" rx="2" fill="#d7e8de"/>
+        <rect x="35" y="33" width="10" height="12" rx="2" fill="#d7e8de"/>
+      </svg>
+      <p class="cell__t">호텔·리조트 객실 욕실</p>
+      <p class="cell__d">벽면 고정 또는 세면대 거치</p>
+    </div>
+    <div class="card">
+      <svg width="58" height="58" viewBox="0 0 64 64">
+        <path d="M32 10 v12" stroke="#1b4a35" stroke-width="3" stroke-linecap="round"/>
+        <path d="M20 22 h24 a3 3 0 0 1 3 3 v3 H17 v-3 a3 3 0 0 1 3 -3z" fill="#1b4a35"/>
+        <g stroke="#1b4a35" stroke-width="2.5" stroke-linecap="round">
+          <path d="M24 36 v6"/><path d="M32 36 v10"/><path d="M40 36 v6"/>
+          <path d="M28 44 v5"/><path d="M36 44 v5"/>
+        </g>
+      </svg>
+      <p class="cell__t">숙박업소 공용 샤워장</p>
+      <p class="cell__d">한 대로 여러 칸을 감당</p>
+    </div>
+    <div class="card">
+      <svg width="58" height="58" viewBox="0 0 64 64">
+        <rect x="8" y="27" width="8" height="10" rx="2" fill="#1b4a35"/>
+        <rect x="48" y="27" width="8" height="10" rx="2" fill="#1b4a35"/>
+        <rect x="18" y="23" width="9" height="18" rx="2.5" fill="#1b4a35"/>
+        <rect x="37" y="23" width="9" height="18" rx="2.5" fill="#1b4a35"/>
+        <rect x="27" y="30" width="10" height="4" fill="#1b4a35"/>
+      </svg>
+      <p class="cell__t">피트니스·수영장 샤워실</p>
+      <p class="cell__d">회원이 많아도 캡슐만 채우면 됩니다</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 3구 세로형 대비 ============ -->
+<div class="fig" id="dispenser-compare">
+  <div class="row2">
+    <div class="box box--now">
+      <svg width="112" height="112" viewBox="0 0 150 150">
+        <rect x="52" y="14" width="46" height="118" rx="10" fill="#fff" stroke="#6d7570" stroke-width="4"/>
+        <g stroke="#6d7570" stroke-width="3" fill="#e8eae9">
+          <rect x="62" y="26" width="26" height="30" rx="5"/>
+          <rect x="62" y="60" width="26" height="30" rx="5"/>
+          <rect x="62" y="94" width="26" height="26" rx="5"/>
+        </g>
+        <g stroke="#6d7570" stroke-width="2.5" stroke-linecap="round">
+          <line x1="30" y1="140" x2="120" y2="140"/>
+          <line x1="30" y1="134" x2="30" y2="146"/>
+          <line x1="120" y1="134" x2="120" y2="146"/>
+        </g>
+      </svg>
+      <p class="box__k">기존 벽걸이 3구</p>
+      <p class="box__t">세로로 선 관</p>
+      <p class="box__d">관이 세로로 서 있어 벽면 폭을 많이 차지했습니다.</p>
+    </div>
+    <div class="box box--new">
+      <svg width="112" height="112" viewBox="0 0 150 150">
+        <circle cx="75" cy="62" r="50" fill="#fff" stroke="#13201a" stroke-width="4"/>
+        <path d="M75 62 L75 16 A46 46 0 0 1 121 62 Z" fill="#d7e8de"/>
+        <path d="M75 62 L121 62 A46 46 0 0 1 75 108 Z" fill="#f3dfe3"/>
+        <path d="M75 62 L75 108 A46 46 0 0 1 29 62 Z" fill="#dce9f5"/>
+        <path d="M75 62 L29 62 A46 46 0 0 1 75 16 Z" fill="#f6eedb"/>
+        <circle cx="75" cy="62" r="46" fill="none" stroke="#13201a" stroke-width="2.5"/>
+        <line x1="75" y1="16" x2="75" y2="108" stroke="#13201a" stroke-width="2"/>
+        <line x1="29" y1="62" x2="121" y2="62" stroke="#13201a" stroke-width="2"/>
+        <circle cx="75" cy="62" r="14" fill="#13201a"/>
+        <rect x="52" y="116" width="46" height="16" rx="6" fill="#13201a"/>
+        <g stroke="#1b4a35" stroke-width="2.5" stroke-linecap="round">
+          <line x1="25" y1="140" x2="125" y2="140"/>
+          <line x1="25" y1="134" x2="25" y2="146"/>
+          <line x1="125" y1="134" x2="125" y2="146"/>
+        </g>
+      </svg>
+      <p class="box__k">원형 4구</p>
+      <p class="box__t">같은 자리에 한 칸 더</p>
+      <p class="box__d">세면대 위에 올려두는 형태로도 쓸 수 있습니다.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 달라지는 것 ============ -->
+<div class="fig" id="dispenser-changes">
+  <div class="list">
+    <div class="item">
+      <div class="item__n">01</div>
+      <div>
+        <p class="item__t">일회용 용기가 사라집니다</p>
+        <p class="item__d">객실당 용기 수만큼 폐기물과 처리 비용이 줄어듭니다.</p>
+      </div>
+    </div>
+    <div class="item">
+      <div class="item__n">02</div>
+      <div>
+        <p class="item__t">정량만 나옵니다</p>
+        <p class="item__d">펌프형과 달리 한 번에 한 캡슐이라, 남아서 버려지는 세정제가 없습니다.</p>
+      </div>
+    </div>
+    <div class="item">
+      <div class="item__n">03</div>
+      <div>
+        <p class="item__t">보관이 가볍습니다</p>
+        <p class="item__d">대용량 말통을 쌓아 둘 공간이 필요 없습니다.</p>
+      </div>
+    </div>
+    <div class="item">
+      <div class="item__n">04</div>
+      <div>
+        <p class="item__t">매번 새 캡슐입니다</p>
+        <p class="item__d">여러 사람이 같은 노즐을 반복해 누르는 구조가 아닙니다.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

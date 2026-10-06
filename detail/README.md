@@ -9,7 +9,28 @@
 ```
 node detail/shoot.mjs             # 상세 이미지 → detail/out/
 node detail/shoot-products.mjs    # 제품 대표 이미지 → detail/out/
+node detail/shoot-sections.mjs    # 상세정보 본문 삽화 → src/assets/products/detail/
 ```
+
+### 상세정보 본문 삽화 (sections.html)
+
+제품 상세 페이지의 **상세정보 탭 본문**에 들어가는 그림입니다. 마크다운
+(`src/content/products/*.md`)에서 `![alt](../../assets/products/detail/*.png)`
+로 끼웁니다.
+
+- **제목을 넣지 마세요.** 마크다운의 `##` 제목 바로 아래에 놓이므로
+  그림 안에 또 제목이 있으면 같은 말이 두 번 나옵니다.
+- **폭은 740px.** 본문이 약 630px 이라 축소율이 0.85 정도로 끝납니다.
+  처음에 1200px 로 잡았더니 절반으로 줄어 16px 글자가 8px 이 되었고,
+  그 상태로는 아무것도 읽히지 않았습니다.
+- **alt 를 성의 있게 적으세요.** 그림 안 글자는 검색에도 스크린리더에도
+  잡히지 않습니다. alt 가 그 내용을 대신합니다.
+- 그림과 본문 글이 완전히 같은 말을 하면 글 쪽을 지웁니다
+  (`무엇이 달라지나` 의 목록이 그런 경우였습니다).
+
+⚠ **영문 판본은 아직 없습니다.** 그림 안 글자가 한국어라
+`*.en.md` 에는 넣지 않았습니다. 영문에도 넣으려면 `sections.html` 에
+`body.en` 을 만들어 영문 글자로 한 벌 더 구워야 합니다.
 
 ### 상세 이미지 (dispenser.html)
 
